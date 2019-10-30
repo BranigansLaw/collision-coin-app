@@ -6,6 +6,7 @@ import { history } from '../store';
 import { ConnectedRouter } from 'connected-react-router';
 import HomePage from './HomePage';
 import PeoplePage from './PeoplePage';
+import QrCodeReaderPage from './QrCodeReaderPage';
 import logo from '../logo.svg';
 
 // min height of 48 to work with AppBar
@@ -27,7 +28,6 @@ const styles = (theme: Theme) => createStyles({
         marginRight: '2em',
     },
     main: {
-        top: '-15px',
         minHeight: '100%',
         position: 'relative',
         paddingBottom: `calc(${footerHeight} + (2 * ${footerPadding}))`,
@@ -58,14 +58,15 @@ const AppRoute: React.FC<IProps> = ({
                                 alt="App Logo"
                                 src={logo} />
                         <MenuItem component={RouterLink}
-                                    to="/people">
-                            People
+                                    to="/qrcode">
+                            QR Reader
                         </MenuItem>
                     </Toolbar>
                 </AppBar>
                 <main className={classes.main}>
                     <Route exact path='/' component={HomePage} />
                     <Route exact path='/people' component={PeoplePage} />
+                    <Route exact path='/qrcode' component={QrCodeReaderPage} />
                 </main>
                 <footer className={classes.footer}>
                     &copy; New App Inc. {new Date().getFullYear()} - {process.env.NODE_ENV}
