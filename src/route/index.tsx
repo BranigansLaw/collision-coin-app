@@ -8,11 +8,16 @@ import HomePage from './HomePage';
 import PeoplePage from './PeoplePage';
 import QrCodeReaderPage from './QrCodeReaderPage';
 import logo from '../logo.svg';
+import AttendeeDetailsPage from './AttendeeDetailsPage';
 
 // min height of 48 to work with AppBar
 const headerHeight: string = '48px';
 const footerHeight: string = '20px';
 const footerPadding: string = '10px';
+
+export class RootUrls {
+    public static readonly attendeeDetails = (id: string): string => `/attendee/${id}`;
+}
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -67,6 +72,7 @@ const AppRoute: React.FC<IProps> = ({
                     <Route exact path='/' component={HomePage} />
                     <Route exact path='/people' component={PeoplePage} />
                     <Route exact path='/qrcode' component={QrCodeReaderPage} />
+                    <Route exact path={RootUrls.attendeeDetails(':id')} render={route => <AttendeeDetailsPage viewingAttendeeId={route.match.params.id} />} />
                 </main>
                 <footer className={classes.footer}>
                     &copy; New App Inc. {new Date().getFullYear()} - {process.env.NODE_ENV}
