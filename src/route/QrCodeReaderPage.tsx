@@ -32,7 +32,6 @@ const QrCodeReaderPage: React.FC<IProps> = ({
             const name: string = scannedData.substring(36);
 
             if (Guid.isGuid(idString)) {
-                debugger;
                 const id: Guid = Guid.parse(idString);
 
                 scanAttendee(id, name);
@@ -44,8 +43,8 @@ const QrCodeReaderPage: React.FC<IProps> = ({
         }
       }
 
-    const handleError = (err: string) => {
-        setData(err);
+    const handleError = (err: any) => {
+        setData(err.toString());
     }
 
     return (

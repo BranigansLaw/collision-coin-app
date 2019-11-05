@@ -8,10 +8,13 @@ import { Guid } from 'guid-typescript';
 export interface IAttendee {
     id: Guid;
     name: string;
+    firstName?: string;
+    lastName?: string;
     companyName?: string;
     position?: string;
-    email?: string;
-    linkedInUserName?: string;
+    emailAddress?: string;
+    linkedInUsername?: string;
+    imageLink?: string;
 }
 
 export interface IAttendeeState {
@@ -64,6 +67,8 @@ export const scanAttendeeActionCreator: ActionCreator<
                 'Access-Control-Allow-Origin': '*',
             },
         })).data;
+
+    attendeeDetails.imageLink = "https://i2.wp.com/tylerfindlay.com/wp-content/uploads/2014/07/cropped-1236380_10100252656487375_106899236_n.jpg";
     
     const gotAttendeeDetailsAction: IGotAttendeeDetailsAction = {
         fullAttendeeDetails: attendeeDetails,
@@ -90,7 +95,7 @@ export const attendeeReducer: Reducer<IAttendeeState, AttendeeActions> = (
             return {
                 ...state,
                 loading: false,
-                connections: [...state.connections.filter(a => a.id !== action.fullAttendeeDetails.id), action.fullAttendeeDetails],
+                connections: [...state.connections.filter(a => a.id.toString() !== action.fullAttendeeDetails.id.toString()), action.fullAttendeeDetails],
             };
         }
         default:

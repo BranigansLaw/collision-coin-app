@@ -1,6 +1,5 @@
 import { reducer as reduxFormReducer, FormStateMap } from 'redux-form';
 import { connectRouter, routerMiddleware, RouterState } from 'connected-react-router';
-import { IPeopleState, peopleReducer } from './people';
 import { IAttendeeState, attendeeReducer } from './attendee';
 import { combineReducers, createStore, applyMiddleware, Store } from 'redux';
 import { History, createBrowserHistory } from 'history';
@@ -10,7 +9,6 @@ import thunk from 'redux-thunk';
 export interface IAppState {
     readonly form: FormStateMap;
     readonly router: RouterState;
-    readonly peopleState: IPeopleState;
     readonly attendeesState: IAttendeeState;
 }
 
@@ -20,7 +18,6 @@ export const neverReached = (never: never) => {};
 const rootReducer = (history: History) => combineReducers<IAppState>({
     form: reduxFormReducer,
     router: connectRouter(history),
-    peopleState: peopleReducer,
     attendeesState: attendeeReducer,
 });
 

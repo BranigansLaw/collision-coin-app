@@ -5,7 +5,6 @@ import { AppBar, Toolbar, MenuItem, Theme, WithStyles } from '@material-ui/core'
 import { history } from '../store';
 import { ConnectedRouter } from 'connected-react-router';
 import HomePage from './HomePage';
-import PeoplePage from './PeoplePage';
 import QrCodeReaderPage from './QrCodeReaderPage';
 import logo from '../logo.svg';
 import AttendeeDetailsPage from './AttendeeDetailsPage';
@@ -70,7 +69,6 @@ const AppRoute: React.FC<IProps> = ({
                 </AppBar>
                 <main className={classes.main}>
                     <Route exact path='/' component={HomePage} />
-                    <Route exact path='/people' component={PeoplePage} />
                     <Route exact path='/qrcode' component={QrCodeReaderPage} />
                     <Route exact path={RootUrls.attendeeDetails(':id')} render={route => <AttendeeDetailsPage viewingAttendeeId={route.match.params.id} />} />
                 </main>
