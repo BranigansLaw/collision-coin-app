@@ -3,6 +3,8 @@ import { connectRouter, routerMiddleware, RouterState } from 'connected-react-ro
 import { IAttendeeState, attendeeReducer } from './attendee';
 import { combineReducers, createStore, applyMiddleware, Store } from 'redux';
 import { History, createBrowserHistory } from 'history';
+import { persistStore, persistReducer, Persistor } from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
 import thunk from 'redux-thunk';
 
 // state
@@ -15,20 +17,30 @@ export interface IAppState {
 // tslint:disable-next-line:no-empty
 export const neverReached = (never: never) => {};
 
-const rootReducer = (history: History) => combineReducers<IAppState>({
+export const history = createBrowserHistory();
+
+const rootReducer = ((history: History) => combineReducers<IAppState>({
     form: reduxFormReducer,
     router: connectRouter(history),
     attendeesState: attendeeReducer,
-});
+}))(history);
 
-export const history = createBrowserHistory();
+const persistConfig = {
+    key: 'root',
+    storage,
+    blacklist: ['form', 'router'],
+}
 
-export function configureStore(): Store<IAppState> {
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+export function configureStore(): [Store<IAppState>, Persistor] {
     // This line is suspect, not sure if this is the middleware required
     const store = createStore(
-        rootReducer(history), 
+        persistedReducer, 
         undefined, 
         applyMiddleware(routerMiddleware(history), thunk));
 
-    return store;
+    const persistor = persistStore(store);
+
+    return [store, persistor];
 }
