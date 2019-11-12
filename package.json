@@ -5,6 +5,7 @@
   "dependencies": {
     "@material-ui/core": "^4.5.0",
     "@material-ui/icons": "^4.4.3",
+    "@redux-offline/redux-offline": "^2.5.2",
     "@types/axios": "^0.14.0",
     "@types/history": "^4.7.3",
     "@types/jest": "24.0.13",
