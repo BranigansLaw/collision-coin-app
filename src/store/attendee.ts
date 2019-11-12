@@ -3,9 +3,10 @@ import { Action, ActionCreator, Reducer, AnyAction } from 'redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IAppState } from '.';
 import { Guid } from 'guid-typescript';
+import { IReceivedDataSyncAction, IAuditableEntity } from './sync';
 
 // Store
-export interface IAttendee {
+export interface IAttendee extends IAuditableEntity {
     id: Guid;
     name: string;
     firstName?: string;
@@ -39,7 +40,8 @@ export interface IGotAttendeeDetailsAction extends Action<'GotAttendeeDetails'> 
 
 export type AttendeeActions =
     | IGettingAttendeeDetailsAction
-    | IGotAttendeeDetailsAction;
+    | IGotAttendeeDetailsAction
+    | IReceivedDataSyncAction;
 
 // Action Creators
 export const scanAttendeeActionCreator: ActionCreator<
@@ -84,6 +86,20 @@ export const attendeeReducer: Reducer<IAttendeeState, AttendeeActions> = (
     action,
 ) => {
     switch (action.type) {
+        case 'ReceivedDataSync': {
+            const newConnections: Map<string, IAttendee> = new Map();
+            action.payload.attendees.forEach(a => newConnections.set(a.id.toString(), a));
+            state.connections.forEach(a => {
+                if (!newConnections.has(a.id.toString()) && !a.deleted) {
+                    newConnections.set(a.id.toString(), a);
+                }
+            });
+
+            return {
+                ...state,
+                connections: Array.from(newConnections.values()),
+            };
+        }
         case 'GettingAttendeeDetails': {   
             return {
                 ...state,

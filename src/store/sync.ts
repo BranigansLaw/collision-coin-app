@@ -1,27 +1,45 @@
-import { Action, ActionCreator, Reducer, AnyAction } from 'redux';
+import { ActionCreator, Reducer, AnyAction } from 'redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IAppState } from '.';
-import { OfflineAction } from '@redux-offline/redux-offline/lib/types';
+import { OfflineAction, ResultAction } from '@redux-offline/redux-offline/lib/types';
+import { IAttendee } from './attendee';
 
 // Store
 export interface ISyncState {
     readonly lastSyncEpochMilliseconds: number;
+    readonly currentlySyncing: boolean;
 }
 
 const initialSyncState: ISyncState = {
     lastSyncEpochMilliseconds: 0,
+    currentlySyncing: false,
 };
+
+export interface IAuditableEntity {
+    deleted?: boolean;
+}
 
 // Actions
 export interface IGetDataSyncAction extends OfflineAction {
-    type: 'GetDataSync',
+    type: 'GetDataSync';
 }
 
-export interface IReceivedDataSyncAction extends Action<'ReceivedDataSync'> {}
+export interface IReceivedDataSyncAction extends ResultAction {
+    type: 'ReceivedDataSync';
+    payload: {
+        attendees: IAttendee[];
+        epochUpdateTimeMilliseconds: number;
+    }
+}
+
+export interface IRollbackSyncAction extends ResultAction {
+    type: 'RollbackDataSync';
+} 
 
 export type SyncActions =
     | IGetDataSyncAction
-    | IReceivedDataSyncAction;
+    | IReceivedDataSyncAction
+    | IRollbackSyncAction;
 
 // Action Creators
 export const syncActionCreator: ActionCreator<
@@ -33,7 +51,11 @@ export const syncActionCreator: ActionCreator<
     >
 > = () => {
     return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
-    
+        if (getState().sync.currentlySyncing) {
+            setTimeout(() => dispatch(syncActionCreator()), 5000);
+            return;
+        }
+
         const lastUpdate: number = getState().sync.lastSyncEpochMilliseconds;
         const getDataSyncAction: IGetDataSyncAction = {
             type: 'GetDataSync',
@@ -43,11 +65,23 @@ export const syncActionCreator: ActionCreator<
                         url: `https://collisioncoinservices.tyficonsulting.com/api/Sync/${lastUpdate}`,
                         method: 'GET',
                     },
-                    commit: { type: 'ReceivedDataSync', meta: { completed: true, success: true} },
+                    commit: {
+                        type: 'ReceivedDataSync',
+                        meta: {
+                            completed: true,
+                            success: true
+                        },
+                    } as IReceivedDataSyncAction,
+                    rollback: {
+                        type: 'RollbackDataSync',
+                    } as IRollbackSyncAction
                 },
             },
         };
+
         dispatch(getDataSyncAction);
+
+        setTimeout(() => dispatch(syncActionCreator()), 1000);
     };
 };
 
@@ -60,12 +94,25 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
         case 'GetDataSync': {   
             return {
                 ...state,
+                currentlySyncing: true,
             };
         }
         case 'ReceivedDataSync': {
+            let newUpdateTime = action.payload.epochUpdateTimeMilliseconds;
+            if (action.payload.attendees.length == 0) {
+                newUpdateTime = state.lastSyncEpochMilliseconds;
+            }
+
             return {
                 ...state,
-                lastSyncEpochMilliseconds: (new Date()).getTime(),
+                lastSyncEpochMilliseconds: newUpdateTime,
+                currentlySyncing: false,
+            };
+        }
+        case 'RollbackDataSync': {
+            return {
+                ...state,
+                currentlySyncing: false,
             };
         }
         default:

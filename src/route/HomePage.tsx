@@ -31,7 +31,11 @@ const HomePage: React.FC<IProps> = ({
             <div>
                 Last Sync: {lastSync}
             </div>
-            {attendees.forEach(a => <div key={a.id.toString()}>{a.firstName}</div>)}
+            {attendees.map(a => (
+                <div key={a.id.toString()}>
+                    {a.firstName} {a.lastName} from {a.companyName}
+                </div>
+            ))}
             <div>
                 <Button 
                     variant="contained" 
