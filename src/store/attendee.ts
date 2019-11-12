@@ -22,7 +22,7 @@ export interface IAttendeeState {
     readonly loading: boolean;
 }
 
-const initialPeopleState: IAttendeeState = {
+const initialAttendeeState: IAttendeeState = {
     connections: [],
     loading: false,
 };
@@ -80,7 +80,7 @@ export const scanAttendeeActionCreator: ActionCreator<
 
 // Reducers
 export const attendeeReducer: Reducer<IAttendeeState, AttendeeActions> = (
-    state = initialPeopleState,
+    state = initialAttendeeState,
     action,
 ) => {
     switch (action.type) {

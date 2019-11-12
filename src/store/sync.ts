@@ -8,7 +8,7 @@ export interface ISyncState {
     readonly lastSyncEpochMilliseconds: number;
 }
 
-const initialPeopleState: ISyncState = {
+const initialSyncState: ISyncState = {
     lastSyncEpochMilliseconds: 0,
 };
 
@@ -17,8 +17,7 @@ export interface IGetDataSyncAction extends OfflineAction {
     type: 'GetDataSync',
 }
 
-export interface IReceivedDataSyncAction extends Action<'ReceivedDataSync'> {
-}
+export interface IReceivedDataSyncAction extends Action<'ReceivedDataSync'> {}
 
 export type SyncActions =
     | IGetDataSyncAction
@@ -54,7 +53,7 @@ export const syncActionCreator: ActionCreator<
 
 // Reducers
 export const syncReducer: Reducer<ISyncState, SyncActions> = (
-    state = initialPeopleState,
+    state = initialSyncState,
     action,
 ) => {
     switch (action.type) {
@@ -70,7 +69,7 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
             };
         }
         default:
-        neverReached(action); // when a new action is created, this helps us remember to handle it in the reducer
+            neverReached(action); // when a new action is created, this helps us remember to handle it in the reducer
     }
     return state;
 };
