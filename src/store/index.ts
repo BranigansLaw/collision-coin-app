@@ -1,6 +1,7 @@
 import { reducer as reduxFormReducer, FormStateMap } from 'redux-form';
 import { connectRouter, routerMiddleware, RouterState } from 'connected-react-router';
 import { IAttendeeState, attendeeReducer } from './attendee';
+import { IRehydratedState, rehydratedReducer } from './rehydrated';
 import { combineReducers, createStore, applyMiddleware, Store, compose } from 'redux';
 import { History, createBrowserHistory } from 'history';
 import { createOffline } from '@redux-offline/redux-offline';
@@ -12,6 +13,7 @@ import { ISyncState, syncReducer } from './sync';
 export interface IAppState {
     readonly form: FormStateMap;
     readonly router: RouterState;
+    readonly rehydrated: IRehydratedState;
     readonly sync: ISyncState;
     readonly attendeesState: IAttendeeState;
 }
@@ -24,6 +26,7 @@ export const history = createBrowserHistory();
 const rootReducer = ((history: History) => combineReducers<IAppState>({
     form: reduxFormReducer,
     router: connectRouter(history),
+    rehydrated: rehydratedReducer,
     sync: syncReducer,
     attendeesState: attendeeReducer,
 }))(history);

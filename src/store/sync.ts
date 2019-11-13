@@ -8,11 +8,13 @@ import { IAttendee } from './attendee';
 export interface ISyncState {
     readonly lastSyncEpochMilliseconds: number;
     readonly currentlySyncing: boolean;
+    readonly rehydrated: boolean;
 }
 
 const initialSyncState: ISyncState = {
     lastSyncEpochMilliseconds: 0,
     currentlySyncing: false,
+    rehydrated: false,
 };
 
 export interface IAuditableEntity {
@@ -34,7 +36,7 @@ export interface IReceivedDataSyncAction extends ResultAction {
 
 export interface IRollbackSyncAction extends ResultAction {
     type: 'RollbackDataSync';
-} 
+}
 
 export type SyncActions =
     | IGetDataSyncAction
@@ -99,7 +101,7 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
         }
         case 'ReceivedDataSync': {
             let newUpdateTime = action.payload.epochUpdateTimeMilliseconds;
-            if (action.payload.attendees.length == 0) {
+            if (action.payload.attendees.length === 0) {
                 newUpdateTime = state.lastSyncEpochMilliseconds;
             }
 
