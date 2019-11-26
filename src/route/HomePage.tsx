@@ -8,6 +8,7 @@ import { Button } from '@material-ui/core';
 import { syncActionCreator } from '../store/sync';
 import { IAppState } from '../store';
 import { IAttendee } from '../store/attendee';
+import GoogleLoginButton from '../components/GoogleLoginButton';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -44,6 +45,7 @@ const HomePage: React.FC<IProps> = ({
                         Sync
                 </Button>
             </div>
+            <GoogleLoginButton />
         </div>
     );
 }
