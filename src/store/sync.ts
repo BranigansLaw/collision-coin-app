@@ -58,14 +58,19 @@ export const syncActionCreator: ActionCreator<
             return;
         }
 
+        const testAuth: string = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNmMyNDlkMS1kNDJkLTRiNzQtOTA0YS04NDE4ZDhiMDg3NzYiLCJqdGkiOiJhYmI4M2JlYy0wZmU5LTRkY2YtYWFlYi0wNGY2ZTZiZTVhNWMiLCJ1bmlxdWVfbmFtZSI6InN1cGVydXNlciIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlN1cGVyQWRtaW5pc3RyYXRvciIsImV4cCI6MTU3NDgxMjc0NSwiaXNzIjoiaHR0cHM6Ly8vL2xvY2FsaG9zdDo0NDM0MiIsImF1ZCI6Imh0dHBzOi8vLy9sb2NhbGhvc3Q6NDQzNDIifQ.tz86jNdaUuU3hEWri2VzJ4Jsgz-eaE8n4a0VvD4H6YY";
+
         const lastUpdate: number = getState().sync.lastSyncEpochMilliseconds;
         const getDataSyncAction: IGetDataSyncAction = {
             type: 'GetDataSync',
             meta: {
                 offline: {
                     effect: {
-                        url: `https://collisioncoinservices.tyficonsulting.com/api/Sync/${lastUpdate}`,
+                        url: `https://localhost:44342/api/Sync/${lastUpdate}`,
                         method: 'GET',
+                        headers: {
+                            authorization: `Bearer ${testAuth}`,
+                        }
                     },
                     commit: {
                         type: 'ReceivedDataSync',

@@ -8,6 +8,7 @@ import { createOffline } from '@redux-offline/redux-offline';
 import offlineConfig from '@redux-offline/redux-offline/lib/defaults';
 import thunk from 'redux-thunk';
 import { ISyncState, syncReducer } from './sync';
+import { IAuthState, authReducer } from './auth';
 
 // state
 export interface IAppState {
@@ -16,6 +17,7 @@ export interface IAppState {
     readonly rehydrated: IRehydratedState;
     readonly sync: ISyncState;
     readonly attendeesState: IAttendeeState;
+    readonly authState: IAuthState;
 }
 
 // tslint:disable-next-line:no-empty
@@ -29,6 +31,7 @@ const rootReducer = ((history: History) => combineReducers<IAppState>({
     rehydrated: rehydratedReducer,
     sync: syncReducer,
     attendeesState: attendeeReducer,
+    authState: authReducer,
 }))(history);
 
 const { middleware, enhanceReducer, enhanceStore } = createOffline(offlineConfig);
