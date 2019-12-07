@@ -18,8 +18,7 @@ const footerPadding: string = '10px';
 
 export class RootUrls {
     public static readonly attendeeDetails = (id: string): string => `/attendee/${id}`;
-    public static readonly thirdPartyAuth = (redemptionCode: string): string => (redemptionCode) ?
-        `/thirdPartyAuth?redemptionCode=${redemptionCode}` : '/thirdPartyAuth';
+    public static readonly thirdPartyAuth = (): string => '/thirdPartyAuth';
 }
 
 const styles = (theme: Theme) => createStyles({
@@ -74,9 +73,23 @@ const AppRoute: React.FC<IProps> = ({
                 <main className={classes.main}>
                     <Route exact path='/' component={HomePage} />
                     <Route exact path='/login' component={LoginPage} />
-                    <Route exact path='/register/:email/:code' render={route => <LoginPage email={route.match.params.email} />} />
-                    <Route exact path={RootUrls.thirdPartyAuth(':redemptionCode')} render={route => 
-                        <ThirdPartyAuthCallbackPage redemptionCode={route.match.params.redemptionCode} />} />
+                    <Route exact path='/register' render={route => {
+                        const search = window.location.search;
+                        const params = new URLSearchParams(search);
+                        const id: string | null = params.get('id');
+                        const code: string | null = params.get('code');
+
+                        return <LoginPage id={id} code={code} />;
+                    }} />
+                    <Route exact path={RootUrls.thirdPartyAuth()} render={route => {
+                        const search = window.location.search;
+                        const params = new URLSearchParams(search);
+                        const redemptionCode: string | null = params.get('redemptionCode');
+                        
+                        if (redemptionCode !== null) {
+                            return <ThirdPartyAuthCallbackPage redemptionCode={redemptionCode} />;
+                        }
+                    }}/>;
                     <Route exact path='/qrcode' component={QrCodeReaderPage} />
                     <Route exact path={RootUrls.attendeeDetails(':id')} render={route => <AttendeeDetailsPage viewingAttendeeId={route.match.params.id} />} />
                 </main>

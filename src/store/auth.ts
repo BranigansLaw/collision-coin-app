@@ -72,6 +72,18 @@ export const loginActionCreator: ActionCreator<
     };
 };
 
+export const registerActionCreator: ActionCreator<
+    ThunkAction<
+        Promise<void>,      // The type of the last action to be dispatched - will always be promise<T> for async actions
+        IAppState,          // The type for the data within the last action
+        null,               // The type of the parameter for the nested function 
+        ILoginSuccessAction // The type of the last action to be dispatched
+    >
+> = (email: string, code: string, password: string) => {
+    return async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
+    };
+};
+
 export const thirdPartyLoginActionCreator: ActionCreator<
     ThunkAction<
         Promise<void>,                // The type of the last action to be dispatched - will always be promise<T> for async actions
@@ -79,7 +91,7 @@ export const thirdPartyLoginActionCreator: ActionCreator<
         null,                         // The type of the parameter for the nested function 
         ILoginThirdPartySuccessAction // The type of the last action to be dispatched
     >
-> = (loginType: ThirdParty, email?: string) => {
+> = (loginType: ThirdParty, userId: string | null, code: string | null) => {
     return async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
         dispatch({
             type: 'LoginThirdPartySent',
@@ -90,8 +102,9 @@ export const thirdPartyLoginActionCreator: ActionCreator<
             `${process.env.REACT_APP_AUTH_ROOT_URL}third-party-login/${loginType}`,
             {
                 clientCode,
-                redirectUrl: `${window.location.protocol}//${window.location.host}${RootUrls.thirdPartyAuth("")}`,
-                userEmail: email,
+                redirectUrl: `${window.location.protocol}//${window.location.host}${RootUrls.thirdPartyAuth()}`,
+                userKey: userId,
+                code: code,
             },
             {
                 headers: { 
@@ -104,19 +117,6 @@ export const thirdPartyLoginActionCreator: ActionCreator<
             clientCode,
             redirectUrl,
         } as ILoginThirdPartySuccessAction);
-    };
-};
-
-export const registerActionCreator: ActionCreator<
-    ThunkAction<
-        Promise<void>,      // The type of the last action to be dispatched - will always be promise<T> for async actions
-        IAppState,          // The type for the data within the last action
-        null,               // The type of the parameter for the nested function 
-        ILoginSuccessAction // The type of the last action to be dispatched
-    >
-> = (email: string, password: string, code: string) => {
-    return async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
-        // Implement later
     };
 };
 

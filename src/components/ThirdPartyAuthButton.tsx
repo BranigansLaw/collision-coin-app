@@ -9,23 +9,25 @@ import { push } from 'connected-react-router';
 
 interface IProps {
     authType: ThirdParty;
-    registrationEmail?: string;
+    userId: string | null
+    registrationCode: string | null;
     loading: boolean;
     redirectUrl: string | undefined;
-    thirdPartyLogin: (loginType: ThirdParty, email?: string) => Promise<void>;
+    thirdPartyLogin: (loginType: ThirdParty, email: string | null, code: string | null) => Promise<void>;
     push: (url: string) => void;
 }
 
 const ThirdPartyAuthButton: React.FC<IProps> = ({
     authType,
-    registrationEmail,
+    userId,
+    registrationCode,
     loading,
     redirectUrl,
     thirdPartyLogin,
     push,
 }) => {
     const login = () => {
-        thirdPartyLogin(authType, registrationEmail);
+        thirdPartyLogin(authType, userId, registrationCode);
     }
 
     if (redirectUrl !== undefined) {
@@ -34,7 +36,7 @@ const ThirdPartyAuthButton: React.FC<IProps> = ({
 
     return (<Button
         onClick={login}>
-        {registrationEmail === undefined ? 'Login' : 'Register'} with {authType} {loading ? 'Loading...' : ''}
+        {userId === undefined ? 'Login' : 'Register'} with {authType} {loading ? 'Loading...' : ''}
     </Button>);
 }
 
@@ -47,7 +49,8 @@ const mapStateToProps = (store: IAppState) => {
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
-        thirdPartyLogin: (loginType: ThirdParty, email?: string) => dispatch(thirdPartyLoginActionCreator(loginType, email)),
+        thirdPartyLogin: (loginType: ThirdParty, email: string | null, code: string | null) =>
+            dispatch(thirdPartyLoginActionCreator(loginType, email, code)),
         push: (url: string) => dispatch(push(url)),
     };
 };

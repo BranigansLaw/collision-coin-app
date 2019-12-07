@@ -10,17 +10,19 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    email?: string;
+    id: string | null;
+    code: string | null;
 }
 
 const LoginPage: React.FC<IProps> = ({
-    email
+    id,
+    code,
 }) => {
     return (
         <div>
-            <h1>Login</h1>
-            <ThirdPartyAuthButton authType={ThirdParty.Google} registrationEmail={email} />
-            <ThirdPartyAuthButton authType={ThirdParty.LinkedIn} registrationEmail={email} />
+            <h1>{id === undefined ? 'Login' : 'Register'}</h1>
+            <ThirdPartyAuthButton authType={ThirdParty.Google} userId={id} registrationCode={code} />
+            <ThirdPartyAuthButton authType={ThirdParty.LinkedIn} userId={id} registrationCode={code} />
         </div>
     );
 }
