@@ -8,6 +8,8 @@ import HomePage from './HomePage';
 import QrCodeReaderPage from './QrCodeReaderPage';
 import logo from '../logo.svg';
 import AttendeeDetailsPage from './AttendeeDetailsPage';
+import LoginPage from './LoginPage';
+import ThirdPartyAuthCallbackPage from './ThirdPartyAuthCallbackPage';
 
 // min height of 48 to work with AppBar
 const headerHeight: string = '48px';
@@ -16,6 +18,7 @@ const footerPadding: string = '10px';
 
 export class RootUrls {
     public static readonly attendeeDetails = (id: string): string => `/attendee/${id}`;
+    public static readonly thirdPartyAuth = (redemptionCode: string): string => `/thirdPartyAuth?redemptionCode=${redemptionCode}`;
 }
 
 const styles = (theme: Theme) => createStyles({
@@ -69,6 +72,9 @@ const AppRoute: React.FC<IProps> = ({
                 </AppBar>
                 <main className={classes.main}>
                     <Route exact path='/' component={HomePage} />
+                    <Route exact path='/login' component={LoginPage} />
+                    <Route exact path='/register/:email/:code' render={route => <LoginPage email={route.match.params.email} />} />
+                    <Route exact path={RootUrls.thirdPartyAuth(':redemptionCode')} render={route => <ThirdPartyAuthCallbackPage redemptionCode={route.match.params.redemptionCode} />} />
                     <Route exact path='/qrcode' component={QrCodeReaderPage} />
                     <Route exact path={RootUrls.attendeeDetails(':id')} render={route => <AttendeeDetailsPage viewingAttendeeId={route.match.params.id} />} />
                 </main>

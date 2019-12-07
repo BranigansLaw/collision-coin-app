@@ -15,35 +15,17 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    attendees: IAttendee[];
-    lastSync: number;
-    sync: () => void;
+    redemptionCode: string;
 }
 
-const HomePage: React.FC<IProps> = ({
+const ThirdPartyAuthCallbackPage: React.FC<IProps> = ({
     classes,
-    attendees,
-    lastSync,
-    sync,
+    redemptionCode,
 }) => {
     return (
         <div className={classes.root}>
-            <div>
-                Last Sync: {lastSync}
-            </div>
-            {attendees.map(a => (
-                <div key={a.id.toString()}>
-                    {a.firstName} {a.lastName} from {a.companyName}
-                </div>
-            ))}
-            <div>
-                <Button 
-                    variant="contained" 
-                    color="primary" 
-                    onClick={() => sync()}>
-                        Sync
-                </Button>
-            </div>
+            Third Party Callback Page. Hold on this page till the given redemption code is validated and a JWT token is returned<br />
+            {redemptionCode}
         </div>
     );
 }
@@ -64,4 +46,4 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
 export default withStyles(styles)(connect(
     mapStateToProps,
     mapDispatchToProps,
-)(HomePage));
+)(ThirdPartyAuthCallbackPage));
