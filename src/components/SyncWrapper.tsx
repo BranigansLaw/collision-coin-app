@@ -10,7 +10,6 @@ interface IProps {
     currentlySyncing: boolean;
     lastSyncEpochMilliseconds: number;
     authToken: string | undefined;
-    timerExists: boolean;
     startSync: () => void,
     stopSync: () => void,
 }
@@ -20,14 +19,13 @@ const SyncWrapper: React.FC<IProps> = ({
     currentlySyncing,
     lastSyncEpochMilliseconds,
     authToken,
-    timerExists,
     startSync,
     stopSync,
 }) => {
-    if (authToken !== undefined && !timerExists) {
+    if (authToken !== undefined) {
         startSync();
     }
-    else if (authToken === undefined && timerExists) {
+    else if (authToken === undefined) {
         stopSync();
     }
 
@@ -46,7 +44,6 @@ const mapStateToProps = (store: IAppState) => {
         currentlySyncing: store.sync.currentlySyncing,
         lastSyncEpochMilliseconds: store.sync.lastSyncEpochMilliseconds,
         authToken: store.authState.authToken,
-        timerExists: store.sync.timer !== undefined,
     };
 };
 

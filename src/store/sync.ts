@@ -1,4 +1,4 @@
-import { ActionCreator, Reducer, AnyAction, Action } from 'redux';
+import { ActionCreator, Reducer, AnyAction } from 'redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IAppState } from '.';
 import { OfflineAction, ResultAction } from '@redux-offline/redux-offline/lib/types';
@@ -8,14 +8,14 @@ import { IAttendee } from './attendee';
 export interface ISyncState {
     readonly lastSyncEpochMilliseconds: number;
     readonly currentlySyncing: boolean;
-    readonly timer?: NodeJS.Timeout;
 }
 
 const initialSyncState: ISyncState = {
     lastSyncEpochMilliseconds: 0,
     currentlySyncing: false,
-    timer: undefined,
 };
+
+let timer: NodeJS.Timeout | undefined = undefined;
 
 export interface IAuditableEntity {
     deleted?: boolean;
@@ -38,18 +38,10 @@ export interface IRollbackSyncAction extends ResultAction {
     type: 'RollbackDataSync';
 }
 
-export interface IStartTimerAction extends Action<'StartTimer'> {
-    timer: NodeJS.Timeout;
-}
-
-export interface IStopTimerAction extends Action<'StopTimer'> {}
-
 export type SyncActions =
     | IGetDataSyncAction
     | IReceivedDataSyncAction
-    | IRollbackSyncAction
-    | IStartTimerAction
-    | IStopTimerAction;
+    | IRollbackSyncAction;
 
 // Action Creators
 export const startSyncIntervalActionCreator: ActionCreator<
@@ -60,17 +52,13 @@ export const startSyncIntervalActionCreator: ActionCreator<
         IGetDataSyncAction          // The type of the last action to be dispatched
     >
 > = () => {
-    return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
-        if (getState().sync.timer !== undefined) {
+    return async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
+        if (timer !== undefined) {
             return;
         }
-
-        const interval: NodeJS.Timeout = setTimeout(() => dispatch(syncActionCreator()), 5000);
-
-        dispatch({
-            type: 'StartTimer',
-            timer: interval,
-        } as IStartTimerAction);
+        
+        dispatch(syncActionCreator());
+        timer = setInterval(() => dispatch(syncActionCreator()), 5000);
     };
 };
 
@@ -82,14 +70,9 @@ export const stopSyncIntervalActionCreator: ActionCreator<
         IGetDataSyncAction          // The type of the last action to be dispatched
     >
 > = () => {
-    return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
-        const timerFromState: NodeJS.Timeout | undefined = getState().sync.timer;
-        if (timerFromState !== undefined) {
-            const timerReference: NodeJS.Timeout = timerFromState;
-            clearInterval(timerReference);
-            dispatch({
-                type: 'StopTimer',
-            } as IStopTimerAction);
+    return async () => {
+        if (timer !== undefined) {
+            clearInterval(timer);
         }
     };
 };
@@ -107,8 +90,6 @@ const syncActionCreator: ActionCreator<
             return;
         }
 
-        const testAuth: string = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwNmMyNDlkMS1kNDJkLTRiNzQtOTA0YS04NDE4ZDhiMDg3NzYiLCJqdGkiOiJhYmI4M2JlYy0wZmU5LTRkY2YtYWFlYi0wNGY2ZTZiZTVhNWMiLCJ1bmlxdWVfbmFtZSI6InN1cGVydXNlciIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlN1cGVyQWRtaW5pc3RyYXRvciIsImV4cCI6MTU3NDgxMjc0NSwiaXNzIjoiaHR0cHM6Ly8vL2xvY2FsaG9zdDo0NDM0MiIsImF1ZCI6Imh0dHBzOi8vLy9sb2NhbGhvc3Q6NDQzNDIifQ.tz86jNdaUuU3hEWri2VzJ4Jsgz-eaE8n4a0VvD4H6YY";
-
         const lastUpdate: number = getState().sync.lastSyncEpochMilliseconds;
         const getDataSyncAction: IGetDataSyncAction = {
             type: 'GetDataSync',
@@ -118,7 +99,7 @@ const syncActionCreator: ActionCreator<
                         url: `https://localhost:44342/api/Sync/${lastUpdate}`,
                         method: 'GET',
                         headers: {
-                            authorization: `Bearer ${testAuth}`,
+                            authorization: `Bearer ${getState().authState.authToken}`,
                         }
                     },
                     commit: {
@@ -153,9 +134,6 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
         }
         case 'ReceivedDataSync': {
             let newUpdateTime = action.payload.epochUpdateTimeMilliseconds;
-            if (action.payload.attendees.length === 0) {
-                newUpdateTime = state.lastSyncEpochMilliseconds;
-            }
 
             return {
                 ...state,
@@ -167,18 +145,6 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
             return {
                 ...state,
                 currentlySyncing: false,
-            };
-        }
-        case 'StartTimer': {
-            return {
-                ...state,
-                timer: action.timer,
-            };
-        }
-        case 'StopTimer': {
-            return {
-                ...state,
-                timer: undefined,
             };
         }
         default:

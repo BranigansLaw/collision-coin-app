@@ -10,6 +10,7 @@ import logo from '../logo.svg';
 import AttendeeDetailsPage from './AttendeeDetailsPage';
 import LoginPage from './LoginPage';
 import ThirdPartyAuthCallbackPage from './ThirdPartyAuthCallbackPage';
+import DashboardPage from './DashboardPage';
 
 // min height of 48 to work with AppBar
 const headerHeight: string = '48px';
@@ -19,6 +20,7 @@ const footerPadding: string = '10px';
 export class RootUrls {
     public static readonly attendeeDetails = (id: string): string => `/attendee/${id}`;
     public static readonly thirdPartyAuth = (): string => '/thirdPartyAuth';
+    public static readonly dashboard = (): string => '/dashboard';
 }
 
 const styles = (theme: Theme) => createStyles({
@@ -89,7 +91,8 @@ const AppRoute: React.FC<IProps> = ({
                         if (redemptionCode !== null) {
                             return <ThirdPartyAuthCallbackPage redemptionCode={redemptionCode} />;
                         }
-                    }}/>;
+                    }}/>
+                    <Route exact path={RootUrls.dashboard()} component={DashboardPage} />
                     <Route exact path='/qrcode' component={QrCodeReaderPage} />
                     <Route exact path={RootUrls.attendeeDetails(':id')} render={route => <AttendeeDetailsPage viewingAttendeeId={route.match.params.id} />} />
                 </main>

@@ -48,6 +48,14 @@ export interface ILoginThirdPartySuccessAction extends Action<'LoginThirdPartySu
 
 export interface ILoginThirdPartyFailedAction extends Action<'LoginThirdPartyFailed'> {}
 
+export interface ILoginThirdPartyRedeemTokenSentAction extends Action<'LoginThirdPartyRedeemTokenSent'> {}
+
+export interface ILoginThirdPartyRedeemTokenSuccessAction extends Action<'LoginThirdPartyRedeemTokenSuccess'> {
+    accessToken: string;
+}
+
+export interface ILoginThirdPartyRedeemTokenFailedAction extends Action<'LoginThirdPartyRedeemTokenFailed'> {}
+
 export type SyncActions =
     | ILoginSentAction
     | ILoginSuccessAction
@@ -57,7 +65,10 @@ export type SyncActions =
     | IRegisterFailedAction
     | ILoginThirdPartySentAction
     | ILoginThirdPartySuccessAction
-    | ILoginThirdPartyFailedAction;
+    | ILoginThirdPartyFailedAction
+    | ILoginThirdPartyRedeemTokenSentAction
+    | ILoginThirdPartyRedeemTokenSuccessAction
+    | ILoginThirdPartyRedeemTokenFailedAction;
 
 // Action Creators
 export const loginActionCreator: ActionCreator<
@@ -120,6 +131,38 @@ export const thirdPartyLoginActionCreator: ActionCreator<
     };
 };
 
+export const thirdPartyRedeemTokenActionCreator: ActionCreator<
+    ThunkAction<
+        Promise<void>,                           // The type of the last action to be dispatched - will always be promise<T> for async actions
+        IAppState,                               // The type for the data within the last action
+        null,                                    // The type of the parameter for the nested function 
+        ILoginThirdPartyRedeemTokenSuccessAction // The type of the last action to be dispatched
+    >
+> = (redemptionToken: string) => {
+    return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
+        dispatch({
+            type: 'LoginThirdPartyRedeemTokenSent',
+        } as ILoginThirdPartyRedeemTokenSentAction);
+
+        const token: string = (await axios.post(
+            `${process.env.REACT_APP_AUTH_ROOT_URL}third-party-redeem`,
+            {
+                clientCode: getState().authState.clientCode,
+                redemptionCode: redemptionToken,
+            },
+            {
+                headers: { 
+                    'Access-Control-Allow-Origin': '*'
+                }
+            })).data.value.token;
+
+        dispatch({
+            type: 'LoginThirdPartyRedeemTokenSuccess',
+            accessToken: token,
+        } as ILoginThirdPartyRedeemTokenSuccessAction);
+    };
+};
+
 // Reducers
 export const authReducer: Reducer<IAuthState, SyncActions> = (
     state = initialSyncState,
@@ -148,14 +191,31 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
         case 'LoginThirdPartySent':
             return {
                 loading: true,
+                ...state,
             };
         case 'LoginThirdPartySuccess':
             return {
                 loading: false,
                 clientCode: action.clientCode,
                 redirectUrl: action.redirectUrl,
+                ...state,
             };
         case 'LoginThirdPartyFailed':
+            return state;
+        case 'LoginThirdPartyRedeemTokenSent':
+            return {
+                loading: true,
+                redirectUrl: undefined,
+                clientCode: undefined,
+                ...state,
+            };
+        case 'LoginThirdPartyRedeemTokenSuccess':
+            return {
+                loading: false,
+                authToken: action.accessToken,
+                ...state,
+            };
+        case 'LoginThirdPartyRedeemTokenFailed':
             return state;
         default:
             neverReached(action); // when a new action is created, this helps us remember to handle it in the reducer
