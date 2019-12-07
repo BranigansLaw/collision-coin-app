@@ -18,7 +18,8 @@ const footerPadding: string = '10px';
 
 export class RootUrls {
     public static readonly attendeeDetails = (id: string): string => `/attendee/${id}`;
-    public static readonly thirdPartyAuth = (redemptionCode: string): string => `/thirdPartyAuth?redemptionCode=${redemptionCode}`;
+    public static readonly thirdPartyAuth = (redemptionCode: string): string => (redemptionCode) ?
+        `/thirdPartyAuth?redemptionCode=${redemptionCode}` : '/thirdPartyAuth';
 }
 
 const styles = (theme: Theme) => createStyles({
@@ -74,7 +75,8 @@ const AppRoute: React.FC<IProps> = ({
                     <Route exact path='/' component={HomePage} />
                     <Route exact path='/login' component={LoginPage} />
                     <Route exact path='/register/:email/:code' render={route => <LoginPage email={route.match.params.email} />} />
-                    <Route exact path={RootUrls.thirdPartyAuth(':redemptionCode')} render={route => <ThirdPartyAuthCallbackPage redemptionCode={route.match.params.redemptionCode} />} />
+                    <Route exact path={RootUrls.thirdPartyAuth(':redemptionCode')} render={route => 
+                        <ThirdPartyAuthCallbackPage redemptionCode={route.match.params.redemptionCode} />} />
                     <Route exact path='/qrcode' component={QrCodeReaderPage} />
                     <Route exact path={RootUrls.attendeeDetails(':id')} render={route => <AttendeeDetailsPage viewingAttendeeId={route.match.params.id} />} />
                 </main>

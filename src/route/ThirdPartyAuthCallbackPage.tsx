@@ -4,10 +4,7 @@ import { Theme } from '@material-ui/core/styles/createMuiTheme';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
-import { Button } from '@material-ui/core';
-import { syncActionCreator } from '../store/sync';
 import { IAppState } from '../store';
-import { IAttendee } from '../store/attendee';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -39,7 +36,6 @@ const mapStateToProps = (store: IAppState) => {
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
-        sync: () => dispatch(syncActionCreator()),
     };
 };
 

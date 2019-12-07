@@ -4,8 +4,6 @@ import { Theme } from '@material-ui/core/styles/createMuiTheme';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
-import { Button } from '@material-ui/core';
-import { syncActionCreator } from '../store/sync';
 import { IAppState } from '../store';
 import { IAttendee } from '../store/attendee';
 
@@ -17,14 +15,12 @@ const styles = (theme: Theme) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     attendees: IAttendee[];
     lastSync: number;
-    sync: () => void;
 }
 
 const HomePage: React.FC<IProps> = ({
     classes,
     attendees,
     lastSync,
-    sync,
 }) => {
     return (
         <div className={classes.root}>
@@ -36,14 +32,6 @@ const HomePage: React.FC<IProps> = ({
                     {a.firstName} {a.lastName} from {a.companyName}
                 </div>
             ))}
-            <div>
-                <Button 
-                    variant="contained" 
-                    color="primary" 
-                    onClick={() => sync()}>
-                        Sync
-                </Button>
-            </div>
         </div>
     );
 }
@@ -57,7 +45,6 @@ const mapStateToProps = (store: IAppState) => {
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
-        sync: () => dispatch(syncActionCreator()),
     };
 };
 

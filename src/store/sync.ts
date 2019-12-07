@@ -1,4 +1,4 @@
-import { ActionCreator, Reducer, AnyAction } from 'redux';
+import { ActionCreator, Reducer, AnyAction, Action } from 'redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IAppState } from '.';
 import { OfflineAction, ResultAction } from '@redux-offline/redux-offline/lib/types';
@@ -8,13 +8,13 @@ import { IAttendee } from './attendee';
 export interface ISyncState {
     readonly lastSyncEpochMilliseconds: number;
     readonly currentlySyncing: boolean;
-    readonly rehydrated: boolean;
+    readonly timer?: NodeJS.Timeout;
 }
 
 const initialSyncState: ISyncState = {
     lastSyncEpochMilliseconds: 0,
     currentlySyncing: false,
-    rehydrated: false,
+    timer: undefined,
 };
 
 export interface IAuditableEntity {
@@ -38,13 +38,63 @@ export interface IRollbackSyncAction extends ResultAction {
     type: 'RollbackDataSync';
 }
 
+export interface IStartTimerAction extends Action<'StartTimer'> {
+    timer: NodeJS.Timeout;
+}
+
+export interface IStopTimerAction extends Action<'StopTimer'> {}
+
 export type SyncActions =
     | IGetDataSyncAction
     | IReceivedDataSyncAction
-    | IRollbackSyncAction;
+    | IRollbackSyncAction
+    | IStartTimerAction
+    | IStopTimerAction;
 
 // Action Creators
-export const syncActionCreator: ActionCreator<
+export const startSyncIntervalActionCreator: ActionCreator<
+    ThunkAction<
+        Promise<void>,              // The type of the last action to be dispatched - will always be promise<T> for async actions
+        IAppState,                  // The type for the data within the last action
+        null,                       // The type of the parameter for the nested function 
+        IGetDataSyncAction          // The type of the last action to be dispatched
+    >
+> = () => {
+    return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
+        if (getState().sync.timer !== undefined) {
+            return;
+        }
+
+        const interval: NodeJS.Timeout = setTimeout(() => dispatch(syncActionCreator()), 5000);
+
+        dispatch({
+            type: 'StartTimer',
+            timer: interval,
+        } as IStartTimerAction);
+    };
+};
+
+export const stopSyncIntervalActionCreator: ActionCreator<
+    ThunkAction<
+        Promise<void>,              // The type of the last action to be dispatched - will always be promise<T> for async actions
+        IAppState,                  // The type for the data within the last action
+        null,                       // The type of the parameter for the nested function 
+        IGetDataSyncAction          // The type of the last action to be dispatched
+    >
+> = () => {
+    return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
+        const timerFromState: NodeJS.Timeout | undefined = getState().sync.timer;
+        if (timerFromState !== undefined) {
+            const timerReference: NodeJS.Timeout = timerFromState;
+            clearInterval(timerReference);
+            dispatch({
+                type: 'StopTimer',
+            } as IStopTimerAction);
+        }
+    };
+};
+
+const syncActionCreator: ActionCreator<
     ThunkAction<
         Promise<void>,              // The type of the last action to be dispatched - will always be promise<T> for async actions
         IAppState,                  // The type for the data within the last action
@@ -54,7 +104,6 @@ export const syncActionCreator: ActionCreator<
 > = () => {
     return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
         if (getState().sync.currentlySyncing) {
-            setTimeout(() => dispatch(syncActionCreator()), 5000);
             return;
         }
 
@@ -87,8 +136,6 @@ export const syncActionCreator: ActionCreator<
         };
 
         dispatch(getDataSyncAction);
-
-        setTimeout(() => dispatch(syncActionCreator()), 1000);
     };
 };
 
@@ -120,6 +167,18 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
             return {
                 ...state,
                 currentlySyncing: false,
+            };
+        }
+        case 'StartTimer': {
+            return {
+                ...state,
+                timer: action.timer,
+            };
+        }
+        case 'StopTimer': {
+            return {
+                ...state,
+                timer: undefined,
             };
         }
         default:

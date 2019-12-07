@@ -90,7 +90,7 @@ export const thirdPartyLoginActionCreator: ActionCreator<
             `${process.env.REACT_APP_AUTH_ROOT_URL}third-party-login/${loginType}`,
             {
                 clientCode,
-                redirectUrl: `${window.location.protocol}//${window.location.host}${RootUrls.thirdPartyAuth()}`,
+                redirectUrl: `${window.location.protocol}//${window.location.host}${RootUrls.thirdPartyAuth("")}`,
                 userEmail: email,
             },
             {
