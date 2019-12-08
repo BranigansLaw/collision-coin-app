@@ -11,6 +11,7 @@ import AttendeeDetailsPage from './AttendeeDetailsPage';
 import LoginPage from './LoginPage';
 import ThirdPartyAuthCallbackPage from './ThirdPartyAuthCallbackPage';
 import DashboardPage from './DashboardPage';
+import ThirdPartyAuthErrorPage from './ThirdPartyAuthErrorPage';
 
 // min height of 48 to work with AppBar
 const headerHeight: string = '48px';
@@ -90,6 +91,9 @@ const AppRoute: React.FC<IProps> = ({
                         
                         if (redemptionCode !== null) {
                             return <ThirdPartyAuthCallbackPage redemptionCode={redemptionCode} />;
+                        }
+                        else {
+                            return <ThirdPartyAuthErrorPage />;
                         }
                     }}/>
                     <Route exact path={RootUrls.dashboard()} component={DashboardPage} />

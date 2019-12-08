@@ -29,6 +29,7 @@ export const rehydratedReducer: Reducer<IRehydratedState> = (
     switch (action.type) {
         case PERSIST_REHYDRATE: {
             return {
+                ...state,
                 rehydrated: true,
             };
         }

@@ -9,7 +9,6 @@ import { RootUrls } from '../route';
 export interface IAuthState {
     readonly loading: boolean;
     readonly authToken?: string;
-    readonly redirectUrl?: string;
     readonly clientCode?: string;
 }
 
@@ -42,7 +41,6 @@ export interface IRegisterFailedAction extends Action<'RegisterFailed'> {}
 export interface ILoginThirdPartySentAction extends Action<'LoginThirdPartySent'> {}
 
 export interface ILoginThirdPartySuccessAction extends Action<'LoginThirdPartySuccess'> {
-    redirectUrl: string;
     clientCode: string;
 }
 
@@ -97,13 +95,13 @@ export const registerActionCreator: ActionCreator<
 
 export const thirdPartyLoginActionCreator: ActionCreator<
     ThunkAction<
-        Promise<void>,                // The type of the last action to be dispatched - will always be promise<T> for async actions
+        Promise<string>,              // The type of the last action to be dispatched - will always be promise<T> for async actions
         IAppState,                    // The type for the data within the last action
         null,                         // The type of the parameter for the nested function 
         ILoginThirdPartySuccessAction // The type of the last action to be dispatched
     >
 > = (loginType: ThirdParty, userId: string | null, code: string | null) => {
-    return async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
+    return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
         dispatch({
             type: 'LoginThirdPartySent',
         } as ILoginThirdPartySentAction);
@@ -126,8 +124,9 @@ export const thirdPartyLoginActionCreator: ActionCreator<
         dispatch({
             type: 'LoginThirdPartySuccess',
             clientCode,
-            redirectUrl,
         } as ILoginThirdPartySuccessAction);
+
+        return redirectUrl;
     };
 };
 
@@ -171,14 +170,14 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
     switch (action.type) {
         case 'LoginSent':
             return {
-                loading: true,
                 ...state,
+                loading: true,
             };
         case 'LoginSuccess':
             return {
+                ...state,
                 loading: false,
                 accessToken: action.accessToken,
-                ...state,
             };
         case 'LoginFailed':
             return state;
@@ -190,30 +189,29 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
             return state;
         case 'LoginThirdPartySent':
             return {
-                loading: true,
                 ...state,
+                loading: true,
             };
         case 'LoginThirdPartySuccess':
             return {
+                ...state,
                 loading: false,
                 clientCode: action.clientCode,
-                redirectUrl: action.redirectUrl,
-                ...state,
             };
         case 'LoginThirdPartyFailed':
             return state;
         case 'LoginThirdPartyRedeemTokenSent':
             return {
-                loading: true,
-                redirectUrl: undefined,
-                clientCode: undefined,
                 ...state,
+                loading: true,
             };
         case 'LoginThirdPartyRedeemTokenSuccess':
             return {
+                ...state,
                 loading: false,
                 authToken: action.accessToken,
-                ...state,
+                redirectUrl: undefined,
+                clientCode: undefined,
             };
         case 'LoginThirdPartyRedeemTokenFailed':
             return state;

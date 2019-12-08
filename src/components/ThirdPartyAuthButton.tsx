@@ -5,16 +5,13 @@ import { ThirdParty, thirdPartyLoginActionCreator } from '../store/auth';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { Button } from '@material-ui/core';
-import { push } from 'connected-react-router';
 
 interface IProps {
     authType: ThirdParty;
     userId: string | null
     registrationCode: string | null;
     loading: boolean;
-    redirectUrl: string | undefined;
-    thirdPartyLogin: (loginType: ThirdParty, email: string | null, code: string | null) => Promise<void>;
-    push: (url: string) => void;
+    thirdPartyLogin: (loginType: ThirdParty, email: string | null, code: string | null) => Promise<string>;
 }
 
 const ThirdPartyAuthButton: React.FC<IProps> = ({
@@ -22,16 +19,11 @@ const ThirdPartyAuthButton: React.FC<IProps> = ({
     userId,
     registrationCode,
     loading,
-    redirectUrl,
     thirdPartyLogin,
-    push,
 }) => {
-    const login = () => {
-        thirdPartyLogin(authType, userId, registrationCode);
-    }
-
-    if (redirectUrl !== undefined) {
-        window.location.assign(redirectUrl);
+    const login = async () => {
+        const redirectTo: string = await thirdPartyLogin(authType, userId, registrationCode);
+        window.location.assign(redirectTo);
     }
 
     return (<Button
@@ -43,7 +35,6 @@ const ThirdPartyAuthButton: React.FC<IProps> = ({
 const mapStateToProps = (store: IAppState) => {
     return {
         loading: store.authState.loading,
-        redirectUrl: store.authState.redirectUrl,
     };
 };
 
@@ -51,7 +42,6 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
         thirdPartyLogin: (loginType: ThirdParty, email: string | null, code: string | null) =>
             dispatch(thirdPartyLoginActionCreator(loginType, email, code)),
-        push: (url: string) => dispatch(push(url)),
     };
 };
 
