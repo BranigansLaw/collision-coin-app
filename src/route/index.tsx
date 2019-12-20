@@ -1,24 +1,26 @@
 import React from 'react';
-import { Link as RouterLink, Route } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import { withStyles, createStyles } from '@material-ui/styles';
-import { AppBar, Toolbar, MenuItem, Theme, WithStyles } from '@material-ui/core';
+import { Theme, WithStyles } from '@material-ui/core';
 import { history } from '../store';
 import { ConnectedRouter } from 'connected-react-router';
 import HomePage from './HomePage';
 import QrCodeReaderPage from './QrCodeReaderPage';
-import logo from '../logo.svg';
 import AttendeeDetailsPage from './AttendeeDetailsPage';
 import LoginPage from './LoginPage';
 import ThirdPartyAuthCallbackPage from './ThirdPartyAuthCallbackPage';
 import DashboardPage from './DashboardPage';
 import ThirdPartyAuthErrorPage from './ThirdPartyAuthErrorPage';
+import AuthenticatedRoute from './AuthenticatedRoute';
+import Navbar from './Navbar';
 
 // min height of 48 to work with AppBar
-const headerHeight: string = '48px';
+export const headerHeight: string = '48px';
 const footerHeight: string = '20px';
 const footerPadding: string = '10px';
 
 export class RootUrls {
+    public static readonly login = () => '/login';
     public static readonly attendeeDetails = (id: string): string => `/attendee/${id}`;
     public static readonly thirdPartyAuth = (): string => '/thirdPartyAuth';
     public static readonly dashboard = (): string => '/dashboard';
@@ -28,14 +30,6 @@ const styles = (theme: Theme) => createStyles({
     root: {
         minHeight: '100%',
         position: 'relative',
-    },
-    header: {
-        height: headerHeight,
-    },
-    logo: {
-        height: 'calc(100% - 1em)',
-        margin: '0.5em',
-        marginRight: '2em',
     },
     main: {
         minHeight: '100%',
@@ -61,21 +55,10 @@ const AppRoute: React.FC<IProps> = ({
     return (
         <div className={classes.root}>
             <ConnectedRouter history={history}>
-                <AppBar position="static"
-                        className={classes.header}>
-                    <Toolbar variant="dense">
-                        <img className={classes.logo} 
-                                alt="App Logo"
-                                src={logo} />
-                        <MenuItem component={RouterLink}
-                                    to="/qrcode">
-                            QR Reader
-                        </MenuItem>
-                    </Toolbar>
-                </AppBar>
+                <Navbar />
                 <main className={classes.main}>
                     <Route exact path='/' component={HomePage} />
-                    <Route exact path='/login' component={LoginPage} />
+                    <Route exact path={RootUrls.login()} component={LoginPage} />
                     <Route exact path='/register' render={route => {
                         const search = window.location.search;
                         const params = new URLSearchParams(search);
@@ -96,8 +79,8 @@ const AppRoute: React.FC<IProps> = ({
                             return <ThirdPartyAuthErrorPage />;
                         }
                     }}/>
-                    <Route exact path={RootUrls.dashboard()} component={DashboardPage} />
-                    <Route exact path='/qrcode' component={QrCodeReaderPage} />
+                    <AuthenticatedRoute exact path={RootUrls.dashboard()} component={DashboardPage} />
+                    <AuthenticatedRoute exact path='/qrcode' component={QrCodeReaderPage} />
                     <Route exact path={RootUrls.attendeeDetails(':id')} render={route => <AttendeeDetailsPage viewingAttendeeId={route.match.params.id} />} />
                 </main>
                 <footer className={classes.footer}>

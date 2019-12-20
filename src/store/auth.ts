@@ -54,6 +54,8 @@ export interface ILoginThirdPartyRedeemTokenSuccessAction extends Action<'LoginT
 
 export interface ILoginThirdPartyRedeemTokenFailedAction extends Action<'LoginThirdPartyRedeemTokenFailed'> {}
 
+export interface ILogoutAction extends Action<'Logout'> {}
+
 export type SyncActions =
     | ILoginSentAction
     | ILoginSuccessAction
@@ -66,7 +68,8 @@ export type SyncActions =
     | ILoginThirdPartyFailedAction
     | ILoginThirdPartyRedeemTokenSentAction
     | ILoginThirdPartyRedeemTokenSuccessAction
-    | ILoginThirdPartyRedeemTokenFailedAction;
+    | ILoginThirdPartyRedeemTokenFailedAction
+    | ILogoutAction;
 
 // Action Creators
 export const loginActionCreator: ActionCreator<
@@ -162,6 +165,21 @@ export const thirdPartyRedeemTokenActionCreator: ActionCreator<
     };
 };
 
+export const logoutActionCreator: ActionCreator<
+    ThunkAction<
+        Promise<void>,      // The type of the last action to be dispatched - will always be promise<T> for async actions
+        IAppState,          // The type for the data within the last action
+        null,               // The type of the parameter for the nested function 
+        ILoginSuccessAction // The type of the last action to be dispatched
+    >
+> = () => {
+    return async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
+        dispatch({
+            type: 'Logout',
+        } as ILogoutAction);
+    };
+};
+
 // Reducers
 export const authReducer: Reducer<IAuthState, SyncActions> = (
     state = initialSyncState,
@@ -215,6 +233,12 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
             };
         case 'LoginThirdPartyRedeemTokenFailed':
             return state;
+        case 'Logout':
+            return {
+                ...state,
+                loading: false,
+                authToken: undefined,
+            };
         default:
             neverReached(action); // when a new action is created, this helps us remember to handle it in the reducer
     }
