@@ -1,19 +1,37 @@
 import { ActionCreator, Reducer, AnyAction, Action } from 'redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IAppState } from '.';
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { Guid } from 'guid-typescript';
 import { RootUrls } from '../route';
 
 // Store
+interface authFlag {
+    googleAuth: boolean;
+    linkedinAuth: boolean;
+    normalAuth: boolean;
+}
+
 export interface IAuthState {
-    readonly loading: boolean;
+    readonly loading: authFlag;
+    readonly loginFailed: authFlag;
+    readonly redeemTokenLoading: boolean;
     readonly authToken?: string;
     readonly clientCode?: string;
 }
 
 const initialSyncState: IAuthState = {
-    loading: false,
+    loading: {
+        googleAuth: false,
+        linkedinAuth: false,
+        normalAuth: false,
+    },
+    loginFailed: {
+        googleAuth: false,
+        linkedinAuth: false,
+        normalAuth: false,
+    },
+    redeemTokenLoading: false,
 };
 
 export enum ThirdParty {
@@ -38,13 +56,17 @@ export interface IRegisterSuccessAction extends Action<'RegisterSuccess'> {
 
 export interface IRegisterFailedAction extends Action<'RegisterFailed'> {}
 
-export interface ILoginThirdPartySentAction extends Action<'LoginThirdPartySent'> {}
+export interface ILoginThirdPartySentAction extends Action<'LoginThirdPartySent'> {
+    authType: ThirdParty;
+}
 
 export interface ILoginThirdPartySuccessAction extends Action<'LoginThirdPartySuccess'> {
     clientCode: string;
 }
 
-export interface ILoginThirdPartyFailedAction extends Action<'LoginThirdPartyFailed'> {}
+export interface ILoginThirdPartyFailedAction extends Action<'LoginThirdPartyFailed'> {
+    authType: ThirdParty;
+}
 
 export interface ILoginThirdPartyRedeemTokenSentAction extends Action<'LoginThirdPartyRedeemTokenSent'> {}
 
@@ -98,7 +120,7 @@ export const registerActionCreator: ActionCreator<
 
 export const thirdPartyLoginActionCreator: ActionCreator<
     ThunkAction<
-        Promise<string>,              // The type of the last action to be dispatched - will always be promise<T> for async actions
+        Promise<string | undefined>,  // The type of the last action to be dispatched - will always be promise<T> for async actions
         IAppState,                    // The type for the data within the last action
         null,                         // The type of the parameter for the nested function 
         ILoginThirdPartySuccessAction // The type of the last action to be dispatched
@@ -107,29 +129,44 @@ export const thirdPartyLoginActionCreator: ActionCreator<
     return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
         dispatch({
             type: 'LoginThirdPartySent',
+            authType: loginType,
         } as ILoginThirdPartySentAction);
         const clientCode: string = Guid.create().toString();
 
-        const redirectUrl: string = (await axios.post(
-            `${process.env.REACT_APP_AUTH_ROOT_URL}third-party-login/${loginType}`,
-            {
+        let res: AxiosResponse<any> | undefined;
+        try {
+            res = (await axios.post(
+                `${process.env.REACT_APP_AUTH_ROOT_URL}third-party-login/${loginType}`,
+                {
+                    clientCode,
+                    redirectUrl: `${window.location.protocol}//${window.location.host}${RootUrls.thirdPartyAuth()}`,
+                    userKey: userId,
+                    code: code,
+                },
+                {
+                    headers: { 
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                }));
+        }
+        catch (e) { }
+
+        if (res !== undefined && res.status === 200) {
+            dispatch({
+                type: 'LoginThirdPartySuccess',
                 clientCode,
-                redirectUrl: `${window.location.protocol}//${window.location.host}${RootUrls.thirdPartyAuth()}`,
-                userKey: userId,
-                code: code,
-            },
-            {
-                headers: { 
-                    'Access-Control-Allow-Origin': '*'
-                }
-            })).data.redirectUrl;
+            } as ILoginThirdPartySuccessAction);
+    
+            return res.data.redirectUrl;
+        }
+        else {
+            dispatch({
+                type: 'LoginThirdPartyFailed',
+                authType: loginType,
+            } as ILoginThirdPartyFailedAction);
 
-        dispatch({
-            type: 'LoginThirdPartySuccess',
-            clientCode,
-        } as ILoginThirdPartySuccessAction);
-
-        return redirectUrl;
+            return undefined;
+        }
     };
 };
 
@@ -189,12 +226,17 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
         case 'LoginSent':
             return {
                 ...state,
-                loading: true,
+                loading: {
+                    ...state.loading,
+                    normalAuth: true,
+                },
+                loginFailed: initialSyncState.loginFailed,
             };
         case 'LoginSuccess':
             return {
                 ...state,
-                loading: false,
+                loading: initialSyncState.loading,
+                loginFailed: initialSyncState.loginFailed,
                 accessToken: action.accessToken,
             };
         case 'LoginFailed':
@@ -208,35 +250,52 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
         case 'LoginThirdPartySent':
             return {
                 ...state,
-                loading: true,
+                loading: {
+                    ...state.loading,
+                    googleAuth: action.authType === ThirdParty.Google ? true : false,
+                    linkedinAuth: action.authType === ThirdParty.LinkedIn ? true : false,
+                },
+                loginFailed: initialSyncState.loginFailed,
             };
         case 'LoginThirdPartySuccess':
             return {
                 ...state,
-                loading: false,
+                loading: initialSyncState.loading,
                 clientCode: action.clientCode,
             };
         case 'LoginThirdPartyFailed':
-            return state;
+            return {
+                ...state,
+                loading: initialSyncState.loading,
+                loginFailed: {
+                    ...state.loginFailed,
+                    googleAuth: action.authType === ThirdParty.Google ? true : false,
+                    linkedinAuth: action.authType === ThirdParty.LinkedIn ? true : false,
+                }
+            };
         case 'LoginThirdPartyRedeemTokenSent':
             return {
                 ...state,
-                loading: true,
+                redeemTokenLoading: true,
             };
         case 'LoginThirdPartyRedeemTokenSuccess':
             return {
                 ...state,
-                loading: false,
+                loading: initialSyncState.loading,
                 authToken: action.accessToken,
                 redirectUrl: undefined,
                 clientCode: undefined,
+                redeemTokenLoading: false,
             };
         case 'LoginThirdPartyRedeemTokenFailed':
-            return state;
+            return {
+                ...state,
+                redeemTokenLoading: false,
+            };
         case 'Logout':
             return {
                 ...state,
-                loading: false,
+                loading: initialSyncState.loading,
                 authToken: undefined,
             };
         default:
