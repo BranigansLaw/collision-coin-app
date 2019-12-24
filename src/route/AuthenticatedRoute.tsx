@@ -4,12 +4,16 @@ import { RootUrls } from '.';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
 import { profileIsValid } from '../store/profile';
+import { startSyncIntervalActionCreator } from '../store/sync';
+import { ThunkDispatch } from 'redux-thunk';
+import { AnyAction } from 'redux';
 
 interface IProps extends RouteProps {
     component: React.ComponentType<RouteComponentProps<any>> | React.ComponentType<any>;
     isAuthenticated: boolean;
     firstSyncRequired: boolean;
     profileDataValid: boolean;
+    startSync: () => void;
 }
 
 const AuthenticatedRoute = ({
@@ -17,10 +21,12 @@ const AuthenticatedRoute = ({
     isAuthenticated,
     firstSyncRequired,
     profileDataValid,
+    startSync,
     ...rest 
 }: IProps) => (
     <Route {...rest} render={(props) => {
         if (isAuthenticated) {
+            startSync();
             if (!firstSyncRequired) {
                 if (profileDataValid) {
                     return <Component {...props} />;
@@ -57,6 +63,13 @@ const mapStateToProps = (store: IAppState) => {
     };
 }
 
+const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
+    return {
+        startSync: () => dispatch(startSyncIntervalActionCreator()),
+    };
+};
+
 export default connect(
-    mapStateToProps
+    mapStateToProps,
+    mapDispatchToProps,
 )(AuthenticatedRoute);

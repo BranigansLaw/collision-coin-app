@@ -6,7 +6,6 @@ import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
 import { Typography } from '@material-ui/core';
-import { startSyncIntervalActionCreator } from '../store/sync';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -14,14 +13,11 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    startSync: () => void;
 }
 
 const EditProfilePage: React.FC<IProps> = ({
     classes,
-    startSync,
 }) => {
-    startSync();
     return (
         <>
             <Typography>First Data Sync In Progress</Typography>  
@@ -36,7 +32,6 @@ const mapStateToProps = (store: IAppState) => {
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
-        startSync: () => dispatch(startSyncIntervalActionCreator()),
     };
 };
 

@@ -88,7 +88,8 @@ const syncActionCreator: ActionCreator<
     >
 > = () => {
     return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
-        if (getState().sync.currentlySyncing) {
+        if (getState().sync.currentlySyncing || 
+            getState().authState.authToken === undefined) {
             return;
         }
 
