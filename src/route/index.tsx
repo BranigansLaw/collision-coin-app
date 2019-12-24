@@ -1,10 +1,9 @@
 import React from 'react';
-import { Route } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
 import { withStyles, createStyles } from '@material-ui/styles';
 import { Theme, WithStyles } from '@material-ui/core';
 import { history } from '../store';
 import { ConnectedRouter } from 'connected-react-router';
-import HomePage from './HomePage';
 import QrCodeReaderPage from './QrCodeReaderPage';
 import AttendeeDetailsPage from './AttendeeDetailsPage';
 import LoginPage from './LoginPage';
@@ -13,6 +12,8 @@ import DashboardPage from './DashboardPage';
 import ThirdPartyAuthErrorPage from './ThirdPartyAuthErrorPage';
 import AuthenticatedRoute from './AuthenticatedRoute';
 import Navbar from './Navbar';
+import EditProfilePage from './EditProfilePage';
+import FirstDataSyncInProgress from './FirstDataSyncInProgress';
 
 // min height of 48 to work with AppBar
 export const headerHeight: string = '48px';
@@ -24,6 +25,8 @@ export class RootUrls {
     public static readonly attendeeDetails = (id: string): string => `/attendee/${id}`;
     public static readonly thirdPartyAuth = (): string => '/thirdPartyAuth';
     public static readonly dashboard = (): string => '/dashboard';
+    public static readonly firstDataSync = (): string => '/first-data-sync';
+    public static readonly userProfile = (): string => '/profile';
 }
 
 const styles = (theme: Theme) => createStyles({
@@ -57,7 +60,8 @@ const AppRoute: React.FC<IProps> = ({
             <ConnectedRouter history={history}>
                 <Navbar />
                 <main className={classes.main}>
-                    <Route exact path='/' component={HomePage} />
+                    <Route exact path='/' render={route => <Redirect to={RootUrls.dashboard()} />} />
+                    <AuthenticatedRoute exact path={RootUrls.dashboard()} component={DashboardPage} />
                     <Route exact path={RootUrls.login()} component={LoginPage} />
                     <Route exact path='/register' render={route => {
                         const search = window.location.search;
@@ -79,12 +83,14 @@ const AppRoute: React.FC<IProps> = ({
                             return <ThirdPartyAuthErrorPage />;
                         }
                     }}/>
-                    <AuthenticatedRoute exact path={RootUrls.dashboard()} component={DashboardPage} />
+                    <AuthenticatedRoute exact path='/qrcode' component={QrCodeReaderPage} />
+                    <AuthenticatedRoute exact path={RootUrls.userProfile()} component={EditProfilePage} />
+                    <AuthenticatedRoute exact path={RootUrls.firstDataSync()} component={FirstDataSyncInProgress} />
                     <AuthenticatedRoute exact path='/qrcode' component={QrCodeReaderPage} />
                     <Route exact path={RootUrls.attendeeDetails(':id')} render={route => <AttendeeDetailsPage viewingAttendeeId={route.match.params.id} />} />
                 </main>
                 <footer className={classes.footer}>
-                    &copy; New App Inc. {new Date().getFullYear()} - {process.env.NODE_ENV}
+                    &copy; Collision Coin Inc. {new Date().getFullYear()} - {process.env.NODE_ENV}
                 </footer>
             </ConnectedRouter>
         </div>

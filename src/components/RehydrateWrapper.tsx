@@ -17,7 +17,7 @@ const RehydrateWrapper: React.FC<IProps> = ({
         );
     }
     else {
-        return (<div>Loading</div>);
+        return (<></>);
     }
 }
 

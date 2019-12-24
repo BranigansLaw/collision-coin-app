@@ -3,6 +3,7 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IAppState } from '.';
 import { OfflineAction, ResultAction } from '@redux-offline/redux-offline/lib/types';
 import { IAttendee } from './attendee';
+import { IProfile } from './profile';
 
 // Store
 export interface ISyncState {
@@ -30,6 +31,7 @@ export interface IReceivedDataSyncAction extends ResultAction {
     type: 'ReceivedDataSync';
     payload: {
         attendees: IAttendee[];
+        userProfile: IProfile;
         epochUpdateTimeMilliseconds: number;
     }
 }

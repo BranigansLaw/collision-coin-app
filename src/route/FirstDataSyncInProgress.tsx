@@ -5,7 +5,8 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
-import { IAttendee } from '../store/attendee';
+import { Typography } from '@material-ui/core';
+import { startSyncIntervalActionCreator } from '../store/sync';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -13,42 +14,33 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    attendees: IAttendee[];
-    lastSync: number;
+    startSync: () => void;
 }
 
-const HomePage: React.FC<IProps> = ({
+const EditProfilePage: React.FC<IProps> = ({
     classes,
-    attendees,
-    lastSync,
+    startSync,
 }) => {
+    startSync();
     return (
-        <div className={classes.root}>
-            <div>
-                Last Sync: {lastSync}
-            </div>
-            {attendees.map(a => (
-                <div key={a.id.toString()}>
-                    {a.firstName} {a.lastName} from {a.companyName}
-                </div>
-            ))}
-        </div>
+        <>
+            <Typography>First Data Sync In Progress</Typography>  
+        </>
     );
 }
 
 const mapStateToProps = (store: IAppState) => {
     return {
-        attendees: store.attendeesState.connections,
-        lastSync: store.sync.lastSyncEpochMilliseconds,
     };
 };
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
+        startSync: () => dispatch(startSyncIntervalActionCreator()),
     };
 };
 
 export default withStyles(styles)(connect(
     mapStateToProps,
     mapDispatchToProps,
-)(HomePage));
+)(EditProfilePage));
