@@ -22,6 +22,7 @@ const SyncWrapper: React.FC<IProps> = ({
     startSync,
     stopSync,
 }) => {
+    startSync();
     if (authToken !== undefined) {
         startSync();
     }
