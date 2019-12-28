@@ -101,7 +101,7 @@ const syncActionCreator: ActionCreator<
             meta: {
                 offline: {
                     effect: {
-                        url: `https://localhost:44342/api/Sync/${lastUpdate}`,
+                        url: `${process.env.REACT_APP_API_ROOT_URL}sync/${lastUpdate}`,
                         method: 'GET',
                         headers: {
                             authorization: `Bearer ${getState().authState.authToken}`,

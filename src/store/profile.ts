@@ -22,12 +22,11 @@ export interface IProfileState {
     readonly userProfile: IProfile | null;
 }
 
+// TODO: Replace this method with a lookup from the database
 export const profileIsValid = (profile: IProfile | null): boolean => {
-    return profile != null &&
+    return profile !== null &&
         profile.companyName !== undefined && 
-        profile.position !== undefined &&
-        profile.imageLink !== undefined &&
-        profile.linkedInUsername !== undefined;
+        profile.position !== undefined;
 }
 
 const initialProfileState: IProfileState = {
@@ -63,14 +62,15 @@ export const updateProfileActionCreator: ActionCreator<
             meta: {
                 offline: {
                     effect: {
-                        url: '', // TODO: Update later
+                        url: `${process.env.REACT_APP_API_ROOT_URL}profile/update`,
                         method: 'POST',
                         headers: {
                             authorization: `Bearer ${getState().authState.authToken}`,
                         },
-                        body: {
-                            // TODO: Update with fields later
-                        }
+                        body: JSON.stringify({
+                            newCompanyName: companyName,
+                            newPosition: position,
+                        })
                     },
                     rollback: {
                         type: 'RollbackDataSync',
