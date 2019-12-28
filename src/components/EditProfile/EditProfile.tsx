@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { reduxForm, InjectedFormProps, Field } from 'redux-form';
-import { Button, CircularProgress, Fade } from '@material-ui/core';
+import { Button, CircularProgress, Fade, TextField } from '@material-ui/core';
 import { renderTextField } from '../muiReduxFormIntegration';
 import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { IAppState } from '../../store';
-import { updateProfileActionCreator } from '../../store/profile';
+import { updateProfileActionCreator, IProfile } from '../../store/profile';
 
 interface IEditProfileForm {
     companyName: string;
@@ -28,7 +28,6 @@ const FormComponent: React.FC<InjectedFormProps<IEditProfileForm, IFormProps> & 
             <div>
                 <Field
                     name="companyName"
-                    value="Default Value 1"
                     component={renderTextField}
                     type="text"
                     label="Company Name"
@@ -40,7 +39,6 @@ const FormComponent: React.FC<InjectedFormProps<IEditProfileForm, IFormProps> & 
             <div>
                 <Field
                     name="position"
-                    value="Default Value 2"
                     component={renderTextField}
                     type="text"
                     label="Position"
@@ -76,29 +74,52 @@ const ConnectedFormComponent = reduxForm<IEditProfileForm, IFormProps>({
 interface IProps {
     currentCompanyName: string;
     currentPosition: string;
+    profileFields: IProfile | null;
     updateProfile: (companyName: string, position: string) => void;
 }
+
+const readonlyFields: {name: string; label: string; value: (v: IProfile) => string}[] = [
+    { name: 'firstName', label: 'First Name', value: v => v.firstName },
+    { name: 'lastName', label: 'Last Name', value: v => v.lastName },
+    { name: 'email', label: 'Email', value: v => v.email },
+];
 
 const EditProfile: React.FC<IProps> = ({
     currentCompanyName,
     currentPosition,
+    profileFields,
     updateProfile,
 }) => {
     return (
-        <ConnectedFormComponent
-            loading={false}
-            initialValues={{
-                companyName: currentCompanyName,
-                position: currentPosition,
-            }}
-            onSubmit={(values: IEditProfileForm) => { updateProfile(values.companyName, values.position); }} />
+        <>
+            {profileFields === null ? "" : readonlyFields.map(field => (
+                <div key={field.name}>
+                    <TextField 
+                        name={field.name}
+                        value={field.value(profileFields)}
+                        type="text"
+                        label={field.label}
+                        disabled={true}
+                        margin="normal"
+                    />
+                </div>
+            ))}
+            <ConnectedFormComponent
+                loading={false}
+                initialValues={{
+                    companyName: currentCompanyName,
+                    position: currentPosition,
+                }}
+                onSubmit={(values: IEditProfileForm) => { updateProfile(values.companyName, values.position); }} />
+        </>
     );
 }
 
 const mapStateToProps = (store: IAppState) => {
     return {
-        currentCompanyName: store.profile.userProfile !== undefined && store.profile.userProfile.companyName !== undefined ? store.profile.userProfile.companyName : '',
-        currentPosition: store.profile.userProfile !== undefined && store.profile.userProfile.position !== undefined ? store.profile.userProfile.position : '',
+        currentCompanyName: store.profile.userProfile !== null && store.profile.userProfile.companyName !== undefined ? store.profile.userProfile.companyName : '',
+        currentPosition: store.profile.userProfile !== null && store.profile.userProfile.position !== undefined ? store.profile.userProfile.position : '',
+        profileFields: store.profile.userProfile,
     };
 };
 

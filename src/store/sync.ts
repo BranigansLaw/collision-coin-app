@@ -4,6 +4,7 @@ import { neverReached, IAppState } from '.';
 import { OfflineAction, ResultAction } from '@redux-offline/redux-offline/lib/types';
 import { IAttendee } from './attendee';
 import { IProfile } from './profile';
+import { ILogoutAction } from './auth';
 
 // Store
 export interface ISyncState {
@@ -31,7 +32,7 @@ export interface IReceivedDataSyncAction extends ResultAction {
     type: 'ReceivedDataSync';
     payload: {
         attendees: IAttendee[];
-        userProfile: IProfile;
+        myProfile: IProfile;
         epochUpdateTimeMilliseconds: number;
     }
 }
@@ -43,7 +44,8 @@ export interface IRollbackSyncAction extends ResultAction {
 export type SyncActions =
     | IGetDataSyncAction
     | IReceivedDataSyncAction
-    | IRollbackSyncAction;
+    | IRollbackSyncAction
+    | ILogoutAction;
 
 // Action Creators
 export const startSyncIntervalActionCreator: ActionCreator<
@@ -149,6 +151,9 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
                 ...state,
                 currentlySyncing: false,
             };
+        }
+        case 'Logout': {
+            return initialSyncState;
         }
         default:
             neverReached(action); // when a new action is created, this helps us remember to handle it in the reducer

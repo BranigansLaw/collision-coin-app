@@ -4,11 +4,12 @@ import { neverReached, IAppState } from '.';
 import { Guid } from 'guid-typescript';
 import { IReceivedDataSyncAction, IRollbackSyncAction } from './sync';
 import { OfflineAction } from '@redux-offline/redux-offline/lib/types';
+import { ILogoutAction } from './auth';
 
 // Store
 export interface IProfile {
     id: Guid;
-    emailAddress: string;
+    email: string;
     firstName: string;
     lastName: string;
     companyName?: string;
@@ -18,19 +19,19 @@ export interface IProfile {
 }
 
 export interface IProfileState {
-    readonly userProfile?: IProfile;
+    readonly userProfile: IProfile | null;
 }
 
-export const profileIsValid = (profile?: IProfile): boolean => {
-    return profile !== undefined &&
+export const profileIsValid = (profile: IProfile | null): boolean => {
+    return profile != null &&
         profile.companyName !== undefined && 
         profile.position !== undefined &&
         profile.imageLink !== undefined &&
         profile.linkedInUsername !== undefined;
 }
 
-const initialAttendeeState: IProfileState = {
-    userProfile: undefined,
+const initialProfileState: IProfileState = {
+    userProfile: null,
 };
 
 // Actions
@@ -42,7 +43,8 @@ interface IUpdateProfileAction extends OfflineAction {
 
 export type AttendeeActions =
     | IUpdateProfileAction
-    | IReceivedDataSyncAction;
+    | IReceivedDataSyncAction
+    | ILogoutAction;
 
 // Action Creators
 export const updateProfileActionCreator: ActionCreator<
@@ -83,12 +85,12 @@ export const updateProfileActionCreator: ActionCreator<
 
 // Reducers
 export const profileReducer: Reducer<IProfileState, AttendeeActions> = (
-    state = initialAttendeeState,
+    state = initialProfileState,
     action,
 ) => {
     switch (action.type) {
         case 'UpdateProfile': {
-            if (state.userProfile !== undefined) {
+            if (state.userProfile !== null) {
                 return {
                     ...state,
                     userProfile: {
@@ -103,10 +105,15 @@ export const profileReducer: Reducer<IProfileState, AttendeeActions> = (
         }
         case 'ReceivedDataSync': {   
             return {
+                ...state,
+                userProfile: action.payload.myProfile != null ? action.payload.myProfile : state.userProfile,
             };
         }
+        case 'Logout': {
+            return initialProfileState;
+        }
         default:
-        neverReached(action); // when a new action is created, this helps us remember to handle it in the reducer
+            neverReached(action); // when a new action is created, this helps us remember to handle it in the reducer
     }
     return state;
 };

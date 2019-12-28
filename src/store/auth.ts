@@ -4,7 +4,7 @@ import { neverReached, IAppState } from '.';
 import axios, { AxiosResponse } from 'axios';
 import { Guid } from 'guid-typescript';
 import { RootUrls } from '../route';
-import { IRollbackSyncAction } from './sync';
+import { IRollbackSyncAction, stopSyncIntervalActionCreator } from './sync';
 
 // Store
 interface authFlag {
@@ -213,6 +213,8 @@ export const logoutActionCreator: ActionCreator<
     >
 > = () => {
     return async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
+        dispatch(stopSyncIntervalActionCreator());
+
         dispatch({
             type: 'Logout',
         } as ILogoutAction);

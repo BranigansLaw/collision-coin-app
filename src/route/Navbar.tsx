@@ -37,7 +37,7 @@ const Navbar: React.FC<IProps> = ({
                 <MenuItem component={RouterLink} to="/qrcode">
                     QR Reader
                 </MenuItem>
-                <MenuItem onClick={() => logout()}>
+                <MenuItem hidden={isAuthenticated} onClick={() => logout()}>
                     Logout
                 </MenuItem>
             </Toolbar>
