@@ -29,7 +29,12 @@ const AuthenticatedRoute = ({
             startSync();
             if (!firstSyncRequired) {
                 if (profileDataValid) {
-                    return <Component {...props} />;
+                    if (window.location.pathname === RootUrls.firstDataSync()) {
+                        return <Redirect to={RootUrls.dashboard()} />;
+                    }
+                    else {
+                        return <Component {...props} />;
+                    }
                 }
                 else {
                     if (window.location.pathname !== RootUrls.userProfile()) {

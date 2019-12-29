@@ -18,8 +18,8 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    id: string | null;
-    code: string | null;
+    id: string | undefined;
+    code: string | undefined;
 }
 
 interface IProps extends WithStyles<typeof styles> {
@@ -36,7 +36,7 @@ const LoginPage: React.FC<IProps> = ({
                 <Typography variant="h5">
                     {id === undefined ? 'Login' : 'Register'}
                 </Typography>
-                <LoginForm />
+                <LoginForm userId={id} registrationCode={code} />
                 <ThirdPartyAuthButton authType={ThirdParty.Google} userId={id} registrationCode={code} />
                 <ThirdPartyAuthButton authType={ThirdParty.LinkedIn} userId={id} registrationCode={code} />
             </Paper>

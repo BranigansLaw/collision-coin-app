@@ -69,7 +69,7 @@ const AppRoute: React.FC<IProps> = ({
                         const id: string | null = params.get('id');
                         const code: string | null = params.get('code');
 
-                        return <LoginPage id={id} code={code} />;
+                        return <LoginPage id={id !== null ? id : undefined} code={code !== null ? code : undefined} />;
                     }} />
                     <Route exact path={RootUrls.thirdPartyAuth()} render={route => {
                         const search = window.location.search;

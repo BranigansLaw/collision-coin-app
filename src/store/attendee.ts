@@ -88,7 +88,7 @@ export const attendeeReducer: Reducer<IAttendeeState, AttendeeActions> = (
     switch (action.type) {
         case 'ReceivedDataSync': {
             const newConnections: Map<string, IAttendee> = new Map();
-            action.payload.attendees.forEach(a => newConnections.set(a.id.toString(), a));
+            action.attendees.forEach(a => newConnections.set(a.id.toString(), a));
             state.connections.forEach(a => {
                 if (!newConnections.has(a.id.toString()) && !a.deleted) {
                     newConnections.set(a.id.toString(), a);

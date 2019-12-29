@@ -14,13 +14,13 @@ const styles = (theme: Theme) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     authType: ThirdParty;
-    userId: string | null;
-    registrationCode: string | null;
+    userId: string | undefined;
+    registrationCode: string | undefined;
     googleLoading: boolean;
     linkedInLoading: boolean;
-    googleError: boolean;
-    linkedInError: boolean;
-    thirdPartyLogin: (loginType: ThirdParty, email: string | null, code: string | null) => Promise<string | undefined>;
+    googleError?: string;
+    linkedInError?: string;
+    thirdPartyLogin: (loginType: ThirdParty, email: string | undefined, code: string | undefined) => Promise<string | undefined>;
 }
 
 const ThirdPartyAuthButton: React.FC<IProps> = ({
@@ -46,9 +46,9 @@ const ThirdPartyAuthButton: React.FC<IProps> = ({
         (authType === ThirdParty.Google && googleLoading) ||
         (authType === ThirdParty.LinkedIn && linkedInLoading);
 
-    const isError = 
-        (authType === ThirdParty.Google && googleError) ||
-        (authType === ThirdParty.LinkedIn && linkedInError);
+    const errorMessage: string | undefined = 
+        (authType === ThirdParty.Google && googleError !== undefined) ? googleError :
+            (authType === ThirdParty.LinkedIn && linkedInError !== undefined) ? linkedInError : undefined;
 
     return (
         <>
@@ -56,7 +56,7 @@ const ThirdPartyAuthButton: React.FC<IProps> = ({
                 onClick={login}>
                 {userId === undefined ? 'Login' : 'Register'} with {authType} {isLoading ? 'Loading ...' : ''}
             </Button>
-            <Typography hidden={!isError} className={classes.errorMessage}>An error occurred. Please try again.</Typography>
+            <Typography hidden={errorMessage !== undefined} className={classes.errorMessage}>{errorMessage}</Typography>
         </>);
 }
 
@@ -71,7 +71,7 @@ const mapStateToProps = (store: IAppState) => {
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
-        thirdPartyLogin: (loginType: ThirdParty, email: string | null, code: string | null) =>
+        thirdPartyLogin: (loginType: ThirdParty, email: string | undefined, code: string | undefined) =>
             dispatch(thirdPartyLoginActionCreator(loginType, email, code)),
     };
 };

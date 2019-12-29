@@ -13,9 +13,15 @@ interface authFlag {
     normalAuth: boolean;
 }
 
+interface authFailedMessage {
+    googleAuth?: string;
+    linkedinAuth?: string;
+    normalAuth?: string;
+}
+
 export interface IAuthState {
     readonly loading: authFlag;
-    readonly loginFailed: authFlag;
+    readonly loginFailed: authFailedMessage;
     readonly redeemTokenLoading: boolean;
     readonly authToken?: string;
     readonly clientCode?: string;
@@ -28,9 +34,9 @@ const initialSyncState: IAuthState = {
         normalAuth: false,
     },
     loginFailed: {
-        googleAuth: false,
-        linkedinAuth: false,
-        normalAuth: false,
+        googleAuth: undefined,
+        linkedinAuth: undefined,
+        normalAuth: undefined,
     },
     redeemTokenLoading: false,
 };
@@ -47,7 +53,9 @@ export interface ILoginSuccessAction extends Action<'LoginSuccess'> {
     accessToken: string;
 }
 
-export interface ILoginFailedAction extends Action<'LoginFailed'> {}
+export interface ILoginFailedAction extends Action<'LoginFailed'> {
+    reason: string;
+}
 
 export interface IRegisterSentAction extends Action<'RegisterSent'> {}
 
@@ -55,7 +63,9 @@ export interface IRegisterSuccessAction extends Action<'RegisterSuccess'> {
     accessToken: string;
 }
 
-export interface IRegisterFailedAction extends Action<'RegisterFailed'> {}
+export interface IRegisterFailedAction extends Action<'RegisterFailed'> {
+    reason: string;
+}
 
 export interface ILoginThirdPartySentAction extends Action<'LoginThirdPartySent'> {
     authType: ThirdParty;
@@ -75,7 +85,9 @@ export interface ILoginThirdPartyRedeemTokenSuccessAction extends Action<'LoginT
     accessToken: string;
 }
 
-export interface ILoginThirdPartyRedeemTokenFailedAction extends Action<'LoginThirdPartyRedeemTokenFailed'> {}
+export interface ILoginThirdPartyRedeemTokenFailedAction extends Action<'LoginThirdPartyRedeemTokenFailed'> {
+    reason: string;
+}
 
 export interface ILogoutAction extends Action<'Logout'> {}
 
@@ -98,25 +110,122 @@ export type SyncActions =
 // Action Creators
 export const loginActionCreator: ActionCreator<
     ThunkAction<
-        Promise<void>,      // The type of the last action to be dispatched - will always be promise<T> for async actions
+        Promise<boolean>,   // The type of the last action to be dispatched - will always be promise<T> for async actions
         IAppState,          // The type for the data within the last action
         null,               // The type of the parameter for the nested function 
         ILoginSuccessAction // The type of the last action to be dispatched
     >
-> = (email: string, password: string) => {
+> = (username: string, password: string) => {
     return async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
+        dispatch({
+            type: 'LoginSent',
+        } as ILoginSentAction);
+
+        let res: AxiosResponse<any> | undefined;
+        try {
+            res = (await axios.post(
+                `${process.env.REACT_APP_AUTH_ROOT_URL}normal-auth-login`,
+                {
+                    username,
+                    password,
+                },
+                {
+                    headers: { 
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                }));
+        }
+        catch (e) { }
+
+        if (res !== undefined && res.status === 200) {
+            dispatch({
+                type: 'LoginSuccess',
+                accessToken: res.data.token,
+            } as ILoginSuccessAction);
+
+            return true;
+        }
+        else if (res !== undefined && res.status === 401) {
+            dispatch({
+                type: 'RegisterFailed',
+                reason: 'User/password combination was not found.',
+            } as IRegisterFailedAction);
+        }
+        else if (res !== undefined) {
+            dispatch({
+                type: 'LoginFailed',
+                reason: res.data.length < 1 ? 'Error logging in.' : res.data[0].description,
+            } as ILoginFailedAction);
+        }
+        else {
+            dispatch({
+                type: 'LoginFailed',
+                reason: 'Error logging in.',
+            } as ILoginFailedAction);
+        }
+
+        return false;    
     };
 };
 
 export const registerActionCreator: ActionCreator<
     ThunkAction<
-        Promise<void>,      // The type of the last action to be dispatched - will always be promise<T> for async actions
+        Promise<boolean>,   // The type of the last action to be dispatched - will always be promise<T> for async actions
         IAppState,          // The type for the data within the last action
         null,               // The type of the parameter for the nested function 
         ILoginSuccessAction // The type of the last action to be dispatched
     >
-> = (email: string, code: string, password: string) => {
+> = (username: string, password: string, code: string) => {
     return async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
+        dispatch({
+            type: 'RegisterSent',
+        } as IRegisterSentAction);
+
+        let res: AxiosResponse<any> | undefined;
+        try {
+            res = (await axios.post(
+                `${process.env.REACT_APP_AUTH_ROOT_URL}normal-auth-register`,
+                {
+                    username,
+                    password,
+                    code,
+                },
+                {
+                    headers: { 
+                        'Access-Control-Allow-Origin': '*'
+                    }
+                }));
+        }
+        catch (e) { }
+        
+        if (res !== undefined && res.status === 200) {
+            dispatch({
+                type: 'RegisterSuccess',
+                accessToken: res.data.token,
+            } as IRegisterSuccessAction);
+
+            return true;
+        }
+        else if (res !== undefined && res.status === 404) {
+            dispatch({
+                type: 'RegisterFailed',
+                reason: 'User not found',
+            } as IRegisterFailedAction);
+        }
+        else if (res !== undefined) {
+            dispatch({
+                type: 'RegisterFailed',
+                reason: res.data.length < 1 ? 'Error registering.' : res.data[0].description,
+            } as IRegisterFailedAction);
+        }
+        else {
+            dispatch({
+                type: 'RegisterFailed',
+                reason: 'Error registering.',
+            } as IRegisterFailedAction);
+        }
+
+        return false;
     };
 };
 
@@ -127,7 +236,7 @@ export const thirdPartyLoginActionCreator: ActionCreator<
         null,                         // The type of the parameter for the nested function 
         ILoginThirdPartySuccessAction // The type of the last action to be dispatched
     >
-> = (loginType: ThirdParty, userId: string | null, code: string | null) => {
+> = (loginType: ThirdParty, userId: string | undefined, code: string | undefined) => {
     return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
         dispatch({
             type: 'LoginThirdPartySent',
@@ -253,16 +362,41 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                 ...state,
                 loading: initialSyncState.loading,
                 loginFailed: initialSyncState.loginFailed,
-                accessToken: action.accessToken,
+                authToken: action.accessToken,
             };
         case 'LoginFailed':
-            return state;
+            return {
+                ...state,
+                loading: initialSyncState.loading,
+                loginFailed: {
+                    ...state.loginFailed,
+                    normalAuth: action.reason,
+                }
+            };
         case 'RegisterSent':
-            return state;
+            return {
+                ...state,
+                loading: {
+                    ...state.loading,
+                    normalAuth: true,
+                }
+            };
         case 'RegisterSuccess':
-            return state;
+            return {
+                ...state,
+                loading: initialSyncState.loading,
+                loginFailed: initialSyncState.loginFailed,
+                authToken: action.accessToken,
+            };
         case 'RegisterFailed':
-            return state;
+            return {
+                ...state,
+                loading: initialSyncState.loading,
+                loginFailed: {
+                    ...state.loginFailed,
+                    normalAuth: action.reason,
+                }
+            };
         case 'LoginThirdPartySent':
             return {
                 ...state,
@@ -285,8 +419,8 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                 loading: initialSyncState.loading,
                 loginFailed: {
                     ...state.loginFailed,
-                    googleAuth: action.authType === ThirdParty.Google ? true : false,
-                    linkedinAuth: action.authType === ThirdParty.LinkedIn ? true : false,
+                    googleAuth: action.authType === ThirdParty.Google ? "There was an error loggin in. Please try again." : undefined,
+                    linkedinAuth: action.authType === ThirdParty.LinkedIn ? "There was an error loggin in. Please try again." : undefined,
                 }
             };
         case 'LoginThirdPartyRedeemTokenSent':
@@ -315,7 +449,7 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                 authToken: undefined,
             };
         case 'RollbackDataSync': {
-            if (action.payload !== undefined && is401Response(action.payload)) {
+            if (action !== undefined && action.code === 401) {
                 return {
                     ...state,
                     authToken: undefined,

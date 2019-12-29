@@ -2,7 +2,7 @@ import { ActionCreator, Reducer, AnyAction } from 'redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IAppState } from '.';
 import { Guid } from 'guid-typescript';
-import { IReceivedDataSyncAction, IRollbackSyncAction } from './sync';
+import { IReceivedDataSyncAction } from './sync';
 import { OfflineAction } from '@redux-offline/redux-offline/lib/types';
 import { ILogoutAction } from './auth';
 
@@ -25,8 +25,8 @@ export interface IProfileState {
 // TODO: Replace this method with a lookup from the database
 export const profileIsValid = (profile: IProfile | null): boolean => {
     return profile !== null &&
-        profile.companyName !== undefined && 
-        profile.position !== undefined;
+        profile.companyName !== null && profile.companyName !== undefined &&
+        profile.position !== null && profile.position !== undefined;
 }
 
 const initialProfileState: IProfileState = {
@@ -71,10 +71,7 @@ export const updateProfileActionCreator: ActionCreator<
                             newCompanyName: companyName,
                             newPosition: position,
                         })
-                    },
-                    rollback: {
-                        type: 'RollbackDataSync',
-                    } as IRollbackSyncAction
+                    }
                 },
             },
         };
@@ -103,10 +100,10 @@ export const profileReducer: Reducer<IProfileState, AttendeeActions> = (
 
             return state;
         }
-        case 'ReceivedDataSync': {   
+        case 'ReceivedDataSync': {
             return {
                 ...state,
-                userProfile: action.payload.myProfile != null ? action.payload.myProfile : state.userProfile,
+                userProfile: action.myProfile != null ? action.myProfile : state.userProfile,
             };
         }
         case 'Logout': {

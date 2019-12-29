@@ -1,7 +1,7 @@
-import { ActionCreator, Reducer, AnyAction } from 'redux';
+import { ActionCreator, Reducer, AnyAction, Action } from 'redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IAppState } from '.';
-import { OfflineAction, ResultAction } from '@redux-offline/redux-offline/lib/types';
+import axios, { AxiosResponse } from 'axios';
 import { IAttendee } from './attendee';
 import { IProfile } from './profile';
 import { ILogoutAction } from './auth';
@@ -24,21 +24,16 @@ export interface IAuditableEntity {
 }
 
 // Actions
-export interface IGetDataSyncAction extends OfflineAction {
-    type: 'GetDataSync';
+export interface IGetDataSyncAction extends Action<'GetDataSync'> {}
+
+export interface IReceivedDataSyncAction extends Action<'ReceivedDataSync'> {
+    attendees: IAttendee[];
+    myProfile: IProfile;
+    epochUpdateTimeMilliseconds: number;
 }
 
-export interface IReceivedDataSyncAction extends ResultAction {
-    type: 'ReceivedDataSync';
-    payload: {
-        attendees: IAttendee[];
-        myProfile: IProfile;
-        epochUpdateTimeMilliseconds: number;
-    }
-}
-
-export interface IRollbackSyncAction extends ResultAction {
-    type: 'RollbackDataSync';
+export interface IRollbackSyncAction extends Action<'RollbackDataSync'> {
+    code: number;
 }
 
 export type SyncActions =
@@ -96,32 +91,45 @@ const syncActionCreator: ActionCreator<
         }
 
         const lastUpdate: number = getState().sync.lastSyncEpochMilliseconds;
-        const getDataSyncAction: IGetDataSyncAction = {
-            type: 'GetDataSync',
-            meta: {
-                offline: {
-                    effect: {
-                        url: `${process.env.REACT_APP_API_ROOT_URL}sync/${lastUpdate}`,
-                        method: 'GET',
-                        headers: {
-                            authorization: `Bearer ${getState().authState.authToken}`,
-                        }
-                    },
-                    commit: {
-                        type: 'ReceivedDataSync',
-                        meta: {
-                            completed: true,
-                            success: true
-                        },
-                    } as IReceivedDataSyncAction,
-                    rollback: {
-                        type: 'RollbackDataSync',
-                    } as IRollbackSyncAction
-                },
-            },
-        };
 
-        dispatch(getDataSyncAction);
+        dispatch({
+            type: 'GetDataSync',
+        } as IGetDataSyncAction);
+
+        let res: AxiosResponse<any> | undefined;
+        try {
+            res = (await axios.get(
+                `${process.env.REACT_APP_API_ROOT_URL}sync/${lastUpdate}`,
+                {
+                    headers: { 
+                        'Access-Control-Allow-Origin': '*',
+                        authorization: `Bearer ${getState().authState.authToken}`,
+                    }
+                }));
+        }
+        catch (e) { }
+
+        if (res !== undefined && res.status === 200) {
+            if (getState().authState.authToken !== undefined) {
+                dispatch({
+                    type: 'ReceivedDataSync',
+                    attendees: res.data.attendees,
+                    myProfile: res.data.myProfile,
+                    epochUpdateTimeMilliseconds: res.data.epochUpdateTimeMilliseconds,
+                } as IReceivedDataSyncAction);
+            }
+            else {
+                dispatch({
+                    type: 'Logout',
+                } as ILogoutAction);
+            }
+        }
+        else {
+            dispatch({
+                type: 'RollbackDataSync',
+                code: 401,
+            } as IRollbackSyncAction);
+        }
     };
 };
 
@@ -138,11 +146,9 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
             };
         }
         case 'ReceivedDataSync': {
-            let newUpdateTime = action.payload.epochUpdateTimeMilliseconds;
-
             return {
                 ...state,
-                lastSyncEpochMilliseconds: newUpdateTime,
+                lastSyncEpochMilliseconds: action.epochUpdateTimeMilliseconds,
                 currentlySyncing: false,
             };
         }
@@ -153,6 +159,7 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
             };
         }
         case 'Logout': {
+            timer = undefined;
             return initialSyncState;
         }
         default:
