@@ -10,6 +10,7 @@ import thunk from 'redux-thunk';
 import { ISyncState, syncReducer } from './sync';
 import { IAuthState, authReducer } from './auth';
 import { IProfileState, profileReducer } from './profile';
+import { AppState as OfflineAppState } from '@redux-offline/redux-offline/lib/types';
 
 // state
 export interface IAppState {
@@ -21,6 +22,9 @@ export interface IAppState {
     readonly authState: IAuthState;
     readonly profile: IProfileState;
 }
+
+export type IOfflineAppState = IAppState
+    & OfflineAppState;
 
 // tslint:disable-next-line:no-empty
 export const neverReached = (never: never) => {};
@@ -37,7 +41,12 @@ const rootReducer = ((history: History) => combineReducers<IAppState>({
     profile: profileReducer,
 }))(history);
 
-const { middleware, enhanceReducer, enhanceStore } = createOffline(offlineConfig);
+let offlineChangedConfig = offlineConfig;
+offlineChangedConfig.persistOptions = { 
+    blacklist: [ 'form', 'router' ],
+};
+
+const { middleware, enhanceReducer, enhanceStore } = createOffline(offlineChangedConfig);
 
 export function configureStore(): Store<IAppState> {
     // This line is suspect, not sure if this is the middleware required

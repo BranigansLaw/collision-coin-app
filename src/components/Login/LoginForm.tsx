@@ -83,8 +83,8 @@ const ConnectedFormComponent =  reduxForm<ILoginForm, IFormProps>({
 interface IProps {
     loading: boolean;
     errorMessage: string | undefined;
-    userId: string | undefined;
-    registrationCode: string | undefined;
+    userId?: string;
+    registrationCode?: string;
     login: (username: string, password: string) => Promise<boolean>;
     register: (username: string, password: string, code: string) => Promise<boolean>;
     push: (url: string) => void;

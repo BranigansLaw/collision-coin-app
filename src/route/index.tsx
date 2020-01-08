@@ -14,6 +14,7 @@ import AuthenticatedRoute from './AuthenticatedRoute';
 import Navbar from './Navbar';
 import EditProfilePage from './EditProfilePage';
 import FirstDataSyncInProgress from './FirstDataSyncInProgress';
+import OfflineFunctionalTestPage from './OfflineFunctionalTestPage';
 
 // min height of 48 to work with AppBar
 export const headerHeight: string = '48px';
@@ -88,6 +89,8 @@ const AppRoute: React.FC<IProps> = ({
                     <AuthenticatedRoute exact path={RootUrls.firstDataSync()} component={FirstDataSyncInProgress} />
                     <AuthenticatedRoute exact path='/qrcode' component={QrCodeReaderPage} />
                     <Route exact path={RootUrls.attendeeDetails(':id')} render={route => <AttendeeDetailsPage viewingAttendeeId={route.match.params.id} />} />
+                    <Route exact path='/offline-app-testing-area' component={OfflineFunctionalTestPage} />
+                    <AuthenticatedRoute exact path='/offline-app-testing-area-auth' component={OfflineFunctionalTestPage} />
                 </main>
                 <footer className={classes.footer}>
                     &copy; Collision Coin Inc. {new Date().getFullYear()} - {process.env.NODE_ENV}
