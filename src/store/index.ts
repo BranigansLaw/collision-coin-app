@@ -2,15 +2,15 @@ import { reducer as reduxFormReducer, FormStateMap } from 'redux-form';
 import { connectRouter, routerMiddleware, RouterState } from 'connected-react-router';
 import { IAttendeeState, attendeeReducer } from './attendee';
 import { IRehydratedState, rehydratedReducer } from './rehydrated';
-import { combineReducers, createStore, applyMiddleware, Store, compose } from 'redux';
+import { combineReducers, createStore, applyMiddleware, Store, compose, StoreEnhancer } from 'redux';
 import { History, createBrowserHistory } from 'history';
 import { createOffline } from '@redux-offline/redux-offline';
 import offlineConfig from '@redux-offline/redux-offline/lib/defaults';
 import thunk from 'redux-thunk';
 import { ISyncState, syncReducer } from './sync';
-import { IAuthState, authReducer } from './auth';
+import { IAuthState, authReducer, ILogoutAction } from './auth';
 import { IProfileState, profileReducer } from './profile';
-import { AppState as OfflineAppState } from '@redux-offline/redux-offline/lib/types';
+import { AppState as OfflineAppState, OfflineAction } from '@redux-offline/redux-offline/lib/types';
 
 // state
 export interface IAppState {
@@ -46,6 +46,22 @@ offlineChangedConfig.persistOptions = {
     blacklist: [ 'form', 'router' ],
 };
 
+let storeRef: Store<IAppState> | undefined = undefined;
+offlineChangedConfig.discard = (error: any, action: OfflineAction, retries: number) => {
+    if (storeRef !== undefined && error && error.status === 401) {
+        storeRef.dispatch({
+            type: 'Logout',
+        } as ILogoutAction);
+
+        return true;
+    }
+
+    return error && (
+        (error.status >= 200 && error.status < 299) || 
+        (error.status === 400)
+    );
+}
+
 const { middleware, enhanceReducer, enhanceStore } = createOffline(offlineChangedConfig);
 
 export function configureStore(): Store<IAppState> {
@@ -54,8 +70,9 @@ export function configureStore(): Store<IAppState> {
         enhanceReducer(rootReducer), 
         undefined,
         compose(
-            applyMiddleware(middleware, routerMiddleware(history), thunk),
-            enhanceStore));
+            enhanceStore as StoreEnhancer,
+            applyMiddleware(middleware, routerMiddleware(history), thunk)));
 
+    storeRef = store;
     return store;
 }

@@ -10,6 +10,7 @@ import { IOfflineAppState } from '../store';
 import { Outbox, OfflineAction } from '@redux-offline/redux-offline/lib/types';
 import { updateProfileActionCreator } from '../store/profile';
 import { Guid } from 'guid-typescript';
+import { skipWaiting, update } from '..';
 
 const ComponentWithLocalState: React.FC = () => {
     const [val, setVal] = React.useState('default value');
@@ -25,6 +26,12 @@ const ComponentWithLocalState: React.FC = () => {
 const styles = (theme: Theme) => createStyles({
     root: {
     },
+    updateMessage: {
+        display: 'none',
+        '&.updated': {
+            display: 'block',
+        }
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -76,7 +83,21 @@ const OfflineFunctionalTestPage: React.FC<IProps> = ({
                 <Typography>authenticated = {authenticated ? 'True' : 'False'}</Typography>
             </Paper>
             <Paper>
-                <Button onClick={() => updateProfileRandomly()}>Update Profile</Button>
+                <Button onClick={() => updateProfileRandomly()}>Add Update Request</Button>
+            </Paper>
+            <Paper>
+                <Typography>Update the app</Typography>
+                <Button onClick={() => {
+                    update();
+                }}>Update</Button>
+            </Paper>
+            <Paper>
+                <Button onClick={() => {
+                    skipWaiting();
+                }}>Skip Waiting</Button>
+            </Paper>
+            <Paper>
+                <Typography id="updateMessage" className={classes.updateMessage}>Update Available!</Typography>
             </Paper>
             <Paper>
                 <Typography>Outbox</Typography>
