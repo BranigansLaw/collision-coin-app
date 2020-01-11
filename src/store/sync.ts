@@ -4,7 +4,7 @@ import { neverReached, IOfflineAppState } from '.';
 import axios, { AxiosResponse } from 'axios';
 import { IAttendee } from './attendee';
 import { IProfile } from './profile';
-import { ILogoutAction } from './auth';
+import { ILogoutAction, ILoginThirdPartySuccessAction, IRegisterSuccessAction, ILoginSuccessAction } from './auth';
 import { OfflineAction } from '@redux-offline/redux-offline/lib/types';
 import { Guid } from 'guid-typescript';
 import { getCurrentTimeEpochMilliseconds } from '../util';
@@ -16,9 +16,12 @@ export interface ISyncState {
     readonly actionQueue: ApiAction<ApiActions>[];
 }
 
+interface ILogoutRequeueAction extends Action<'LogoutRequeue'> {}
+
 export type ApiActions = 
     | IDataSyncAction
-    | IUpdateProfileAction;
+    | IUpdateProfileAction
+    | ILogoutRequeueAction;
 
 export type ApiActionsWithResponses = IDataSyncAction;
 
@@ -36,18 +39,19 @@ export class ApiAction<A extends ApiActions> {
     }
 }
 
-export const handleApiAction = async (action: ApiActions, state: IOfflineAppState, dispatch: ThunkDispatch<any, any, AnyAction>) => {
+export const handleApiAction = async (action: ApiAction<ApiActions>, state: IOfflineAppState, dispatch: ThunkDispatch<any, any, AnyAction>) => {
     let res: AxiosResponse<any> | undefined = undefined;
     const headers = {
+        'Access-Control-Allow-Origin': '*',
         authorization: `Bearer ${state.authState.authToken}`,
-        'Access-Control-Allow-Origin': '*'
+        TransactionId: action.transactionId.toString(),
     };
 
     try {
-        switch (action.type) {
+        switch (action.meta.type) {
             case 'DataSync':
                 res = (await axios.get(
-                    `${process.env.REACT_APP_AUTH_ROOT_URL}api/sync/${state.sync.lastSyncEpochMilliseconds}`,
+                    `${process.env.REACT_APP_API_ROOT_URL}sync/${state.sync.lastSyncEpochMilliseconds}`,
                     {
                         headers
                     }));
@@ -63,17 +67,20 @@ export const handleApiAction = async (action: ApiActions, state: IOfflineAppStat
                 break;
             case 'UpdateProfile':
                 res = (await axios.post(
-                    `${process.env.REACT_APP_AUTH_ROOT_URL}api/profile/update`,
+                    `${process.env.REACT_APP_API_ROOT_URL}profile/update`,
                     {
-                        newCompanyName: action.newCompanyName,
-                        newPosition: action.newPosition,
+                        newCompanyName: action.meta.newCompanyName,
+                        newPosition: action.meta.newPosition,
                     },
                     {
                         headers
                     }));
                 break;
+            case 'LogoutRequeue':
+                dispatch(action.meta);
+                break;
             default:
-                neverReached(action); // when a new action is created, this helps us remember to handle it in the reducer
+                neverReached(action.meta); // when a new action is created, this helps us remember to handle it in the reducer
         }
     }
     catch (e) {
@@ -116,7 +123,10 @@ export type SyncActions =
     | IIncrementNumTries
     | IReceivedDataSyncAction
     | ILogoutAction
-    | ApiActions;
+    | ApiActions
+    | ILoginSuccessAction
+    | IRegisterSuccessAction
+    | ILoginThirdPartySuccessAction;
 
 export const checkQueueActionCreator: ActionCreator<
     ThunkAction<
@@ -127,6 +137,7 @@ export const checkQueueActionCreator: ActionCreator<
     >
 > = () => {
     return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IOfflineAppState) => {
+        console.log('Check data queue');
         try {
             if (getState().offline.online) {
                 let completedActions: ApiAction<ApiActions>[] = [];
@@ -134,7 +145,7 @@ export const checkQueueActionCreator: ActionCreator<
 
                 for (const action of getState().sync.actionQueue) {
                     const res: AxiosResponse<any> | undefined =
-                        await handleApiAction(action.meta, getState(), dispatch);
+                        await handleApiAction(action, getState(), dispatch);
 
                     if (res !== undefined && res.status === 401) {
                         // break immediately and logout
@@ -161,6 +172,16 @@ export const checkQueueActionCreator: ActionCreator<
                     type: 'Deque',
                     toDequeue: completedActions,
                 } as IDequeueAction);
+
+                if (getState().authState.authToken !== undefined && 
+                    (
+                        completedActions.filter(a => a.meta.type !== 'DataSync').length > 0 ||
+                        getCurrentTimeEpochMilliseconds() - getState().sync.lastSyncEpochMilliseconds > 30000
+                    )) {
+                    dispatch({
+                        type: 'DataSync',
+                    } as IDataSyncAction);
+                }
             }
         }
         catch (e) {
@@ -184,6 +205,14 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
             };
         }
         case 'Logout': {
+            return {
+                ...initialSyncState,
+                actionQueue: [ new ApiAction<ILogoutRequeueAction>({
+                    type: 'LogoutRequeue',
+                } as ILogoutRequeueAction) ]
+            };
+        }
+        case 'LogoutRequeue': {
             return initialSyncState;
         }
         case 'DataSync': {
@@ -218,6 +247,15 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
                 actionQueue: [ ...updatedQueue ]
             };
         }
+        case 'LoginSuccess':
+        case 'LoginThirdPartySuccess':
+        case 'RegisterSuccess':
+            return {
+                ...state,
+                actionQueue: [ ...state.actionQueue, new ApiAction<IDataSyncAction>({
+                    type: 'DataSync'
+                } as IDataSyncAction) ]
+            };
         default:
             neverReached(action); // when a new action is created, this helps us remember to handle it in the reducer
     }

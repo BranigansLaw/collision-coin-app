@@ -9,6 +9,7 @@ import { IAppState } from '../store';
 import { logoutActionCreator } from '../store/auth';
 import { MenuItem, AppBar, Toolbar } from '@material-ui/core';
 import { headerHeight } from '.';
+import Logout from '../components/Logout';
 
 const styles = (theme: Theme) => createStyles({
     header: {
@@ -37,9 +38,7 @@ const Navbar: React.FC<IProps> = ({
                 <MenuItem component={RouterLink} to="/qrcode">
                     QR Reader
                 </MenuItem>
-                <MenuItem hidden={isAuthenticated} onClick={() => logout()}>
-                    Logout
-                </MenuItem>
+                <Logout />
             </Toolbar>
         </AppBar>
     );

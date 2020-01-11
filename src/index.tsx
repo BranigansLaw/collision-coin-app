@@ -49,7 +49,7 @@ const checkForUpdates = () => {
     }
 }
 
-setInterval(() => checkForUpdates(), 10000);
+setInterval(() => checkForUpdates(), 30000);
 checkForUpdates();
 
 ReactDOM.render(<App />, document.getElementById('root'));
