@@ -4,7 +4,6 @@ import { neverReached, IAppState } from '.';
 import axios, { AxiosResponse } from 'axios';
 import { Guid } from 'guid-typescript';
 import { RootUrls } from '../route';
-import { IRollbackSyncAction, stopSyncIntervalActionCreator } from './sync';
 
 // Store
 interface authFlag {
@@ -104,8 +103,7 @@ export type SyncActions =
     | ILoginThirdPartyRedeemTokenSentAction
     | ILoginThirdPartyRedeemTokenSuccessAction
     | ILoginThirdPartyRedeemTokenFailedAction
-    | ILogoutAction
-    | IRollbackSyncAction;
+    | ILogoutAction;
 
 // Action Creators
 export const loginActionCreator: ActionCreator<
@@ -322,8 +320,6 @@ export const logoutActionCreator: ActionCreator<
     >
 > = () => {
     return async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
-        dispatch(stopSyncIntervalActionCreator());
-
         dispatch({
             type: 'Logout',
         } as ILogoutAction);
@@ -331,18 +327,6 @@ export const logoutActionCreator: ActionCreator<
 };
 
 // Reducers
-interface IHasStatus {
-    status: number;
-}
-
-const is401Response = (payload: object): boolean => {
-    if ((payload as IHasStatus).status === 401) {
-        return true;
-    }
-
-    return false;
-}
-
 export const authReducer: Reducer<IAuthState, SyncActions> = (
     state = initialSyncState,
     action,
@@ -448,16 +432,6 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                 loading: initialSyncState.loading,
                 authToken: undefined,
             };
-        case 'RollbackDataSync': {
-            if (action !== undefined && action.code === 401) {
-                return {
-                    ...state,
-                    authToken: undefined,
-                };
-            }
-
-            return state;
-        }
         default:
             neverReached(action); // when a new action is created, this helps us remember to handle it in the reducer
     }

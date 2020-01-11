@@ -7,10 +7,10 @@ import { AnyAction } from 'redux';
 import LoginForm from '../components/Login/LoginForm';
 import { logoutActionCreator } from '../store/auth';
 import { IOfflineAppState } from '../store';
-import { Outbox, OfflineAction } from '@redux-offline/redux-offline/lib/types';
 import { updateProfileActionCreator } from '../store/profile';
 import { Guid } from 'guid-typescript';
-import { skipWaiting, update } from '..';
+import { skipWaiting } from '..';
+import { ApiAction, ApiActions } from '../store/sync';
 
 const ComponentWithLocalState: React.FC = () => {
     const [val, setVal] = React.useState('default value');
@@ -38,8 +38,9 @@ interface IProps extends WithStyles<typeof styles> {
     lastSyncEpochMilliseconds: number;
     currentlySyncing: boolean;
     authenticated: boolean;
-    actions: Outbox;
+    actions: ApiAction<ApiActions>[];
     online: boolean;
+    updateAvailable: boolean;
     logout: () => void;
     updateProfileRandomly: () => void;
 }
@@ -51,13 +52,10 @@ const OfflineFunctionalTestPage: React.FC<IProps> = ({
     authenticated,
     actions,
     online,
+    updateAvailable,
     logout,
     updateProfileRandomly,
 }) => {
-    const deleteQueueItem = (toDelete: OfflineAction) => {
-        toDelete.meta.offline.effect = {};
-    }
-
     return (
         <Box>
             <Typography>Offline Testing Area</Typography>
@@ -68,7 +66,12 @@ const OfflineFunctionalTestPage: React.FC<IProps> = ({
                 <Button onClick={() => logout()}>Logout</Button>
             </Paper>
             <Paper>
+            <Typography>Online Status</Typography>
                 <Typography>{online ? 'ONLINE' : 'OFFLINE'}</Typography>
+            </Paper>
+            <Paper>
+                <Typography>Service Worker Status</Typography>
+                <Typography>{updateAvailable ? 'Update Available' : 'Up to Date'}</Typography>
             </Paper>
             <Paper>
                 <ComponentWithLocalState />
@@ -83,13 +86,7 @@ const OfflineFunctionalTestPage: React.FC<IProps> = ({
                 <Typography>authenticated = {authenticated ? 'True' : 'False'}</Typography>
             </Paper>
             <Paper>
-                <Button onClick={() => updateProfileRandomly()}>Add Update Request</Button>
-            </Paper>
-            <Paper>
-                <Typography>Update the app</Typography>
-                <Button onClick={() => {
-                    update();
-                }}>Update</Button>
+                <Button onClick={() => updateProfileRandomly()}>Add Request to Queue</Button>
             </Paper>
             <Paper>
                 <Button onClick={() => {
@@ -97,14 +94,13 @@ const OfflineFunctionalTestPage: React.FC<IProps> = ({
                 }}>Skip Waiting</Button>
             </Paper>
             <Paper>
-                <Typography id="updateMessage" className={classes.updateMessage}>Update Available!</Typography>
+                <Typography id="updateMessage" className={classes.updateMessage}>Update Available</Typography>
             </Paper>
             <Paper>
                 <Typography>Outbox</Typography>
                 {actions.map(action => (
-                    <Box key={action.meta.transaction}>
+                    <Box key={action.transactionId.toString()}>
                         Offline Meta: {JSON.stringify(action)}
-                        <Button onClick={() => deleteQueueItem(action)}>Delete</Button>
                     </Box>
                 ))}
             </Paper>
@@ -115,10 +111,11 @@ const OfflineFunctionalTestPage: React.FC<IProps> = ({
 const mapStateToProps = (store: IOfflineAppState) => {
     return {
         lastSyncEpochMilliseconds: store.sync.lastSyncEpochMilliseconds,
-        currentlySyncing: store.sync.currentlySyncing,
+        currentlySyncing: store.offline.outbox.filter(item => item.type === 'GetDataSync').length > 0,
         authenticated: store.authState.authToken !== undefined,
-        actions: store.offline.outbox,
+        actions: store.sync.actionQueue,
         online: store.offline.online,
+        updateAvailable: store.serviceWorker.updateAvailable,
     };
 };
 

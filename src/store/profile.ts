@@ -1,9 +1,8 @@
-import { ActionCreator, Reducer, AnyAction } from 'redux';
+import { ActionCreator, Reducer, AnyAction, Action } from 'redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IAppState } from '.';
 import { Guid } from 'guid-typescript';
 import { IReceivedDataSyncAction } from './sync';
-import { OfflineAction } from '@redux-offline/redux-offline/lib/types';
 import { ILogoutAction } from './auth';
 
 // Store
@@ -34,8 +33,7 @@ const initialProfileState: IProfileState = {
 };
 
 // Actions
-interface IUpdateProfileAction extends OfflineAction {
-    type: 'UpdateProfile';
+export interface IUpdateProfileAction extends Action<'UpdateProfile'> {
     newCompanyName: string;
     newPosition: string;
 }
@@ -59,21 +57,6 @@ export const updateProfileActionCreator: ActionCreator<
             type: 'UpdateProfile',
             newCompanyName: companyName,
             newPosition: position,
-            meta: {
-                offline: {
-                    effect: {
-                        url: `${process.env.REACT_APP_API_ROOT_URL}profile/update`,
-                        method: 'POST',
-                        headers: {
-                            authorization: `Bearer ${getState().authState.authToken}`,
-                        },
-                        body: JSON.stringify({
-                            newCompanyName: companyName,
-                            newPosition: position,
-                        })
-                    }
-                },
-            },
         };
 
         dispatch(getDataSyncAction);

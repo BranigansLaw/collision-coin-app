@@ -1,8 +1,7 @@
 import React from 'react';
-import { WithStyles, createStyles, withStyles } from '@material-ui/styles';
+import { Typography, WithStyles, createStyles, withStyles, Theme, Paper } from '@material-ui/core';
 import ThirdPartyAuthButton from '../components/Login/ThirdPartyAuthButton';
 import { ThirdParty } from '../store/auth';
-import { Paper, Typography, Theme } from '@material-ui/core';
 import LoginForm from '../components/Login/LoginForm';
 
 const styles = (theme: Theme) => createStyles({
@@ -11,18 +10,15 @@ const styles = (theme: Theme) => createStyles({
     },
     loginPane: {
         marginTop: '2em',
-        //padding: theme.spacing(5),
+        padding: theme.spacing(2),
         display: 'inline-block',
-        //boxShadow: theme.shadows[5],
+        boxShadow: theme.shadows[3],
     },
 });
 
 interface IProps extends WithStyles<typeof styles> {
     id: string | undefined;
     code: string | undefined;
-}
-
-interface IProps extends WithStyles<typeof styles> {
 }
 
 const LoginPage: React.FC<IProps> = ({

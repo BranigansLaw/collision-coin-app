@@ -8,9 +8,10 @@ import { createOffline } from '@redux-offline/redux-offline';
 import offlineConfig from '@redux-offline/redux-offline/lib/defaults';
 import thunk from 'redux-thunk';
 import { ISyncState, syncReducer } from './sync';
-import { IAuthState, authReducer, ILogoutAction } from './auth';
+import { IAuthState, authReducer } from './auth';
 import { IProfileState, profileReducer } from './profile';
-import { AppState as OfflineAppState, OfflineAction } from '@redux-offline/redux-offline/lib/types';
+import { IServiceWorkerState, serviceWorkerReducer } from './serviceWorker';
+import { AppState as OfflineAppState } from '@redux-offline/redux-offline/lib/types';
 
 // state
 export interface IAppState {
@@ -21,9 +22,11 @@ export interface IAppState {
     readonly attendeesState: IAttendeeState;
     readonly authState: IAuthState;
     readonly profile: IProfileState;
+    readonly serviceWorker: IServiceWorkerState;
 }
 
-export type IOfflineAppState = IAppState
+export type IOfflineAppState = 
+    IAppState
     & OfflineAppState;
 
 // tslint:disable-next-line:no-empty
@@ -39,30 +42,17 @@ const rootReducer = ((history: History) => combineReducers<IAppState>({
     attendeesState: attendeeReducer,
     authState: authReducer,
     profile: profileReducer,
+    serviceWorker: serviceWorkerReducer,
 }))(history);
 
-let offlineChangedConfig = offlineConfig;
-offlineChangedConfig.persistOptions = { 
-    blacklist: [ 'form', 'router' ],
+const offlineAppConfig = {
+    ...offlineConfig,
+    persistOptions: { 
+        blacklist: [ 'form', 'router', 'serviceWorker' ],
+    },
 };
 
-let storeRef: Store<IAppState> | undefined = undefined;
-offlineChangedConfig.discard = (error: any, action: OfflineAction, retries: number) => {
-    if (storeRef !== undefined && error && error.status === 401) {
-        storeRef.dispatch({
-            type: 'Logout',
-        } as ILogoutAction);
-
-        return true;
-    }
-
-    return error && (
-        (error.status >= 200 && error.status < 299) || 
-        (error.status === 400)
-    );
-}
-
-const { middleware, enhanceReducer, enhanceStore } = createOffline(offlineChangedConfig);
+const { middleware, enhanceReducer, enhanceStore } = createOffline(offlineAppConfig);
 
 export function configureStore(): Store<IAppState> {
     // This line is suspect, not sure if this is the middleware required
@@ -73,6 +63,5 @@ export function configureStore(): Store<IAppState> {
             enhanceStore as StoreEnhancer,
             applyMiddleware(middleware, routerMiddleware(history), thunk)));
 
-    storeRef = store;
     return store;
 }

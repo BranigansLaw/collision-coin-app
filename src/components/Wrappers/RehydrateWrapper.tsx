@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { IAppState } from '../store';
+import { IAppState } from '../../store';
 
 interface IProps {
     rehydrated: boolean;
