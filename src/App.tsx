@@ -9,6 +9,9 @@ import { ThunkDispatch } from 'redux-thunk';
 import OfflineWrapper from './components/Wrappers/OfflineWrapper';
 import ServiceWorkerUpdateWrapper from './components/Wrappers/ServiceWorkerUpdateWrapper';
 import { updateAvailableActionCreator } from './store/serviceWorker';
+import { MuiThemeProvider } from '@material-ui/core/styles';
+import theme from './theme';
+import { CssBaseline } from '@material-ui/core';
 
 const store: Store<IAppState, AnyAction> = configureStore();
 
@@ -21,15 +24,18 @@ export const onServiceWorkerUpdateAvailable = () => {
 
 const App: React.FC = () => {
     return (
-        <Provider store={store}>
-            <RehydrateWrapper>
-                <OfflineWrapper>
-                    <ServiceWorkerUpdateWrapper>
-                        <Route />
-                    </ServiceWorkerUpdateWrapper>
-                </OfflineWrapper>
-            </RehydrateWrapper>
-        </Provider>
+        <MuiThemeProvider theme={theme}>
+            <CssBaseline />
+            <Provider store={store}>
+                <RehydrateWrapper>
+                    <OfflineWrapper>
+                        <ServiceWorkerUpdateWrapper>
+                            <Route />
+                        </ServiceWorkerUpdateWrapper>
+                    </OfflineWrapper>
+                </RehydrateWrapper>
+            </Provider>
+        </MuiThemeProvider>
     );
 }
 
