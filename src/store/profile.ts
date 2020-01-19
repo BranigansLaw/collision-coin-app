@@ -14,7 +14,8 @@ export interface IProfile {
     companyName?: string;
     position?: string;
     linkedInUsername?: string;
-    imageLink?: string;
+    profilePictureBase64Data?: string;
+    qrCodeBase64Data?: string;
 }
 
 export interface IProfileState {
