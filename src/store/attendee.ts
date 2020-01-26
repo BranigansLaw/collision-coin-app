@@ -1,83 +1,66 @@
-import axios from 'axios';
-import { Action, ActionCreator, Reducer, AnyAction } from 'redux';
-import { ThunkAction, ThunkDispatch } from 'redux-thunk';
+import { Action, Reducer, ActionCreator, AnyAction } from 'redux';
 import { neverReached, IAppState } from '.';
-import { Guid } from 'guid-typescript';
 import { IReceivedDataSyncAction, IAuditableEntity } from './sync';
+import { ThunkAction, ThunkDispatch } from 'redux-thunk';
+import { ILogoutAction } from './auth';
 
 // Store
 export interface IAttendee extends IAuditableEntity {
-    id: Guid;
+    id: string;
     name: string;
-    firstName?: string;
-    lastName?: string;
+    firstName: string;
+    lastName: string;
     companyName?: string;
     position?: string;
     emailAddress?: string;
     linkedInUsername?: string;
-    imageLink?: string;
 }
 
 export interface IAttendeeState {
-    readonly connections: IAttendee[];
-    readonly loading: boolean;
+    readonly collisions: IAttendee[];
 }
 
 const initialAttendeeState: IAttendeeState = {
-    connections: [],
-    loading: false,
+    collisions: [],
 };
 
 // Actions
-export interface IGettingAttendeeDetailsAction extends Action<'GettingAttendeeDetails'> {
-    attendeeId: Guid;
-    name: string;
-}
-
-export interface IGotAttendeeDetailsAction extends Action<'GotAttendeeDetails'> {
-    fullAttendeeDetails: IAttendee;
+export interface ICreateAttendeeCollisionAction extends Action<'CreateAttendeeCollision'> {
+    attendeeId: string;
+    firstName: string;
+    lastName: string;
 }
 
 export type AttendeeActions =
-    | IGettingAttendeeDetailsAction
-    | IGotAttendeeDetailsAction
-    | IReceivedDataSyncAction;
+    | IReceivedDataSyncAction
+    | ICreateAttendeeCollisionAction
+    | ILogoutAction;
 
 // Action Creators
-export const scanAttendeeActionCreator: ActionCreator<
+export const createAttendeeCollisionActionCreator: ActionCreator<
     ThunkAction<
-        Promise<void>,              // The type of the last action to be dispatched - will always be promise<T> for async actions
-        IAppState,                  // The type for the data within the last action
-        null,                       // The type of the parameter for the nested function 
-        IGotAttendeeDetailsAction   // The type of the last action to be dispatched
+        Promise<void>,        // The type of the last action to be dispatched - will always be promise<T> for async actions
+        IAppState,            // The type for the data within the last action
+        null,                 // The type of the parameter for the nested function 
+        ICreateAttendeeCollisionAction  // The type of the last action to be dispatched
     >
-> = (attendeeId: Guid, scannedName: string) => {
-  return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
-    const gettingAttendeeDetails: IGettingAttendeeDetailsAction = {
-        type: 'GettingAttendeeDetails',
-        attendeeId,
-        name: scannedName,
+> = (attendeeId: string, firstName: string, lastName: string) => {
+    return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
+        const profile = getState().profile.userProfile;
+        if ((profile && profile.id.toString() === attendeeId) ||
+            getState().attendeesState.collisions.filter(a => a.id === attendeeId).length > 0) {
+                return;
+        }
+
+        const createAttendeeCollisionAction: ICreateAttendeeCollisionAction = {
+            type: 'CreateAttendeeCollision',
+            attendeeId,
+            firstName,
+            lastName,
+        };
+
+        dispatch(createAttendeeCollisionAction);
     };
-    dispatch(gettingAttendeeDetails);
-
-    await (new Promise((resolve) => setTimeout(resolve, 5000)));
-
-    const attendeeDetails = (await axios.get<IAttendee>(
-        'https://collisioncoinservices.tyficonsulting.com/api/Attendee/' + attendeeId,
-        {
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-            },
-        })).data;
-
-    attendeeDetails.imageLink = "https://i2.wp.com/tylerfindlay.com/wp-content/uploads/2014/07/cropped-1236380_10100252656487375_106899236_n.jpg";
-    
-    const gotAttendeeDetailsAction: IGotAttendeeDetailsAction = {
-        fullAttendeeDetails: attendeeDetails,
-        type: 'GotAttendeeDetails',
-    };
-    dispatch(gotAttendeeDetailsAction);
-  };
 };
 
 // Reducers
@@ -88,8 +71,8 @@ export const attendeeReducer: Reducer<IAttendeeState, AttendeeActions> = (
     switch (action.type) {
         case 'ReceivedDataSync': {
             const newConnections: Map<string, IAttendee> = new Map();
-            action.attendees.forEach(a => newConnections.set(a.id.toString(), a));
-            state.connections.forEach(a => {
+            action.attendeeCollisions.forEach(a => newConnections.set(a.id.toString(), a));
+            state.collisions.forEach(a => {
                 if (!newConnections.has(a.id.toString()) && !a.deleted) {
                     newConnections.set(a.id.toString(), a);
                 }
@@ -97,25 +80,24 @@ export const attendeeReducer: Reducer<IAttendeeState, AttendeeActions> = (
 
             return {
                 ...state,
-                connections: Array.from(newConnections.values()),
+                collisions: Array.from(newConnections.values()),
             };
         }
-        case 'GettingAttendeeDetails': {   
+        case 'CreateAttendeeCollision': {
             return {
                 ...state,
-                loading: true,
-                connections: [...state.connections, { id: action.attendeeId, name: action.name }]
+                collisions: [ {
+                    id: action.attendeeId,
+                    firstName: action.firstName,
+                    lastName: action.lastName,
+                } as IAttendee, ...state.collisions ]
             };
         }
-        case 'GotAttendeeDetails': {
-            return {
-                ...state,
-                loading: false,
-                connections: [...state.connections.filter(a => a.id.toString() !== action.fullAttendeeDetails.id.toString()), action.fullAttendeeDetails],
-            };
+        case 'Logout': {
+            return initialAttendeeState;
         }
         default:
-        neverReached(action); // when a new action is created, this helps us remember to handle it in the reducer
+            neverReached(action); // when a new action is created, this helps us remember to handle it in the reducer
     }
     return state;
 };

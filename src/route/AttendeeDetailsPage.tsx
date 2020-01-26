@@ -39,13 +39,11 @@ const styles = (theme: Theme) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     attendees: IAttendee[];
-    loading: boolean;
     viewingAttendeeId: string;
 }
 
 const AttendeeDetailsPage: React.FC<IProps> = ({
     attendees,
-    loading,
     viewingAttendeeId,
     classes,
 }) => {
@@ -61,13 +59,13 @@ const AttendeeDetailsPage: React.FC<IProps> = ({
                     <Box className={classes.container}>
                         <Box>
                             <Box className={classes.avatarContainer}>
-                                <Box hidden={!loading}>
+                                <Box hidden={!true}>
                                     <PermIdentityIcon className={classes.avatar} />
                                     <Box className={classes.loadingCircleContainer}>
                                         <CircularProgress size={avatarSize} />
                                     </Box>
                                 </Box>
-                                <Box hidden={loading}>
+                                <Box hidden={false}>
                                     <Avatar className={classes.avatar}
                                             alt={`Avatar Placeholder`} 
                                             src="https://i2.wp.com/tylerfindlay.com/wp-content/uploads/2014/07/cropped-1236380_10100252656487375_106899236_n.jpg" />
@@ -115,8 +113,7 @@ const AttendeeDetailsPage: React.FC<IProps> = ({
 
 const mapStateToProps = (store: IAppState) => {
     return {
-        attendees: store.attendeesState.connections,
-        loading: store.attendeesState.loading,
+        attendees: store.attendeesState.collisions,
     };
 };
 

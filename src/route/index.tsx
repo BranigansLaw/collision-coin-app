@@ -16,6 +16,7 @@ import EditProfilePage from './EditProfilePage';
 import FirstDataSyncInProgress from './FirstDataSyncInProgress';
 import OfflineFunctionalTestPage from './OfflineFunctionalTestPage';
 import StylesTestPage from './StylesTestPage';
+import AttendeeCollisionsPage from './AttendeeCollisionsPage';
 
 // min height of 48 to work with AppBar
 export const headerHeight: string = '48px';
@@ -24,11 +25,13 @@ const footerPadding: string = '10px';
 
 export class RootUrls {
     public static readonly login = () => '/login';
+    public static readonly qrCodeScan = () => '/scan';    
     public static readonly attendeeDetails = (id: string): string => `/attendee/${id}`;
     public static readonly thirdPartyAuth = (): string => '/thirdPartyAuth';
     public static readonly dashboard = (): string => '/dashboard';
     public static readonly firstDataSync = (): string => '/first-data-sync';
     public static readonly userProfile = (): string => '/profile';
+    public static readonly attendeeCollisions = (id?: string): string => `/attendee-collisions${id ? `/${id}` : ''}`
 }
 
 const styles = (theme: Theme) => createStyles({
@@ -85,10 +88,11 @@ const AppRoute: React.FC<IProps> = ({
                             return <ThirdPartyAuthErrorPage />;
                         }
                     }}/>
-                    <AuthenticatedRoute exact path='/qrcode' component={QrCodeReaderPage} />
+                    <AuthenticatedRoute exact path={RootUrls.qrCodeScan()} component={QrCodeReaderPage} />
                     <AuthenticatedRoute exact path={RootUrls.userProfile()} component={EditProfilePage} />
                     <AuthenticatedRoute exact path={RootUrls.firstDataSync()} component={FirstDataSyncInProgress} />
-                    <AuthenticatedRoute exact path='/qrcode' component={QrCodeReaderPage} />
+                    <AuthenticatedRoute exact path={RootUrls.attendeeCollisions()} component={AttendeeCollisionsPage} />
+                    <AuthenticatedRoute exact path={RootUrls.attendeeCollisions(':id')} render={route => <AttendeeCollisionsPage openedCollisionId={route.match.params.id} />} />
                     <Route exact path={RootUrls.attendeeDetails(':id')} render={route => <AttendeeDetailsPage viewingAttendeeId={route.match.params.id} />} />
                     <Route exact path='/offline-app-testing-area' component={OfflineFunctionalTestPage} />
                     <Route exact path='/styles-test-page' component={StylesTestPage} />

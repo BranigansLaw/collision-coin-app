@@ -1,5 +1,5 @@
 import React from 'react';
-import { WithStyles, createStyles, withStyles, Box, Button, Fab, Paper } from '@material-ui/core';
+import { WithStyles, createStyles, withStyles, Button, Fab, Paper } from '@material-ui/core';
 import { Theme } from '@material-ui/core/styles/createMuiTheme';
 import AddToPhotosIcon from '@material-ui/icons/AddToPhotos';
 

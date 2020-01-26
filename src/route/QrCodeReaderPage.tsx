@@ -2,12 +2,12 @@ import React from 'react';
 import { WithStyles, createStyles, withStyles } from '@material-ui/styles';
 import { Theme } from '@material-ui/core/styles/createMuiTheme';
 import QrReader from 'react-qr-reader';
-import { Guid } from 'guid-typescript';
 import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { push } from 'connected-react-router';
-import { scanAttendeeActionCreator } from '../store/attendee';
+import { createAttendeeCollisionActionCreator } from '../store/attendee';
+import { RootUrls } from '.';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -15,33 +15,34 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    scanAttendee: (id: Guid, name: string) => Promise<void>;
     push: (url: string) => void;
+    createAttendeeCollision: (id: string, firstName: string, lastName: string) => void;
 }
 
 const QrCodeReaderPage: React.FC<IProps> = ({
-    scanAttendee,
     push,
+    createAttendeeCollision,
     classes,
 }) => {
     const [data, setData] = React.useState("");
+    const qrScanUrlFromEnv: string = `${process.env.REACT_APP_QR_SCAN_URL}`;
 
     const handleScan = (scannedData: string | null) => {
-        if (scannedData !== null && scannedData.length > 36) {
-            const idString: string = scannedData.substring(0, 36);
-            const name: string = scannedData.substring(36);
+        if (scannedData !== null && scannedData.length > 0 && scannedData.indexOf(qrScanUrlFromEnv) >= 0) {
+            const data: string = scannedData.substring(qrScanUrlFromEnv.length);
+            const dataSplit: string[] = data.split('#');
+            const type: number = +dataSplit[0];
+            const id: string = dataSplit[1];
+            const meta: string[] = dataSplit.splice(2);
 
-            if (Guid.isGuid(idString)) {
-                const id: Guid = Guid.parse(idString);
-
-                scanAttendee(id, name);
-                push(`/attendee/${id.toString()}`);
-            }
-            else {
-                handleError("The QR Code Scanner was invalid.");
+            switch (type) {
+                case 1:
+                    createAttendeeCollision(id, meta[0], meta[1]);
+                    push(RootUrls.attendeeCollisions(id));
+                    break;
             }
         }
-      }
+    }
 
     const handleError = (err: any) => {
         setData(err.toString());
@@ -62,8 +63,8 @@ const QrCodeReaderPage: React.FC<IProps> = ({
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
-        scanAttendee: (id: Guid, name: string) => dispatch(scanAttendeeActionCreator(id, name)),
-        push: (url: string) => dispatch(push(url))
+        push: (url: string) => dispatch(push(url)),
+        createAttendeeCollision: (id: string, firstName: string, lastName: string) => dispatch(createAttendeeCollisionActionCreator(id, firstName, lastName)),
     };
 };
 

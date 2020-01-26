@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { IAppState } from '../store';
 import { logoutActionCreator } from '../store/auth';
 import { MenuItem, AppBar, Toolbar } from '@material-ui/core';
-import { headerHeight } from '.';
+import { headerHeight, RootUrls } from '.';
 import Logout from '../components/Logout';
 
 const styles = (theme: Theme) => createStyles({
@@ -35,7 +35,7 @@ const Navbar: React.FC<IProps> = ({
     return (
         <AppBar position="static" className={classes.header}>
             <Toolbar variant="dense">
-                <MenuItem component={RouterLink} to="/qrcode">
+                <MenuItem component={RouterLink} to={RootUrls.qrCodeScan()}>
                     QR Reader
                 </MenuItem>
                 <Logout />

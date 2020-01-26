@@ -8,7 +8,8 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 
 interface IProps extends RouteProps {
-    component: React.ComponentType<RouteComponentProps<any>> | React.ComponentType<any>;
+    component?: React.ComponentType<RouteComponentProps<any>> | React.ComponentType<any>;
+    render?: (props: RouteComponentProps<any>) => React.ReactNode;
     isAuthenticated: boolean;
     firstSyncRequired: boolean;
     profileDataValid: boolean;
@@ -16,45 +17,59 @@ interface IProps extends RouteProps {
 
 const AuthenticatedRoute = ({
     component: Component,
+    render,
     isAuthenticated,
     firstSyncRequired,
     profileDataValid,
     ...rest 
-}: IProps) => (
-    <Route {...rest} render={(props) => {
-        if (isAuthenticated) {
-            if (!firstSyncRequired) {
-                if (profileDataValid) {
-                    if (window.location.pathname === RootUrls.firstDataSync()) {
-                        return <Redirect to={RootUrls.dashboard()} />;
+}: IProps) => {
+    const componentOrRender = (props: any) => {
+        if (render) {
+            return render(props);
+        }
+        else if (Component) {
+            return <Component {...props} />
+        }
+        else {
+            throw Error('Either component or render must be defined');
+        }
+    };
+
+    return (
+        <Route {...rest} render={(props) => {
+            if (isAuthenticated) {
+                if (!firstSyncRequired) {
+                    if (profileDataValid) {
+                        if (window.location.pathname === RootUrls.firstDataSync()) {
+                            return <Redirect to={RootUrls.dashboard()} />;
+                        }
+                        else {
+                            return componentOrRender(props);
+                        }
                     }
                     else {
-                        return <Component {...props} />;
+                        if (window.location.pathname !== RootUrls.userProfile()) {
+                            return <Redirect to={RootUrls.userProfile()} />;
+                        }
+                        else {
+                            return componentOrRender(props);
+                        }
                     }
                 }
                 else {
-                    if (window.location.pathname !== RootUrls.userProfile()) {
-                        return <Redirect to={RootUrls.userProfile()} />;
+                    if (window.location.pathname !== RootUrls.firstDataSync()) {
+                        return <Redirect to={RootUrls.firstDataSync()} />;
                     }
                     else {
-                        return <Component {...props} />;
+                        return componentOrRender(props);
                     }
                 }
             }
             else {
-                if (window.location.pathname !== RootUrls.firstDataSync()) {
-                    return <Redirect to={RootUrls.firstDataSync()} />;
-                }
-                else {
-                    return <Component {...props} />;
-                }
+                return <Redirect to={RootUrls.login()} />;
             }
-        }
-        else {
-            return <Redirect to={RootUrls.login()} />;
-        }
-    }} />
-)
+        }} />);
+};
 
 const mapStateToProps = (store: IAppState) => {
     return {

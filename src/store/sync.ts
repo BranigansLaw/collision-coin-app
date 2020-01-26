@@ -2,7 +2,7 @@ import { ActionCreator, Reducer, AnyAction, Action } from 'redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IOfflineAppState } from '.';
 import axios, { AxiosResponse } from 'axios';
-import { IAttendee } from './attendee';
+import { IAttendee, ICreateAttendeeCollisionAction } from './attendee';
 import { IProfile } from './profile';
 import { ILogoutAction, ILoginThirdPartySuccessAction, IRegisterSuccessAction, ILoginSuccessAction } from './auth';
 import { OfflineAction } from '@redux-offline/redux-offline/lib/types';
@@ -21,6 +21,7 @@ interface ILogoutRequeueAction extends Action<'LogoutRequeue'> {}
 export type ApiActions = 
     | IDataSyncAction
     | IUpdateProfileAction
+    | ICreateAttendeeCollisionAction
     | ILogoutRequeueAction;
 
 export type ApiActionsWithResponses = IDataSyncAction;
@@ -59,7 +60,7 @@ export const handleApiAction = async (action: ApiAction<ApiActions>, state: IOff
                 if (res !== undefined) {
                     dispatch({
                         type: 'ReceivedDataSync',
-                        attendees: res.data.attendees,
+                        attendeeCollisions: res.data.attendeeCollisions,
                         myProfile: res.data.myProfile,
                         epochUpdateTimeMilliseconds: res.data.epochUpdateTimeMilliseconds,
                     } as IReceivedDataSyncAction);
@@ -71,6 +72,16 @@ export const handleApiAction = async (action: ApiAction<ApiActions>, state: IOff
                     {
                         newCompanyName: action.meta.newCompanyName,
                         newPosition: action.meta.newPosition,
+                    },
+                    {
+                        headers
+                    }));
+                break;
+            case 'CreateAttendeeCollision':
+                res = (await axios.post(
+                    `${process.env.REACT_APP_API_ROOT_URL}collision/attendee`,
+                    {
+                        toUserId: action.meta.attendeeId,
                     },
                     {
                         headers
@@ -113,7 +124,7 @@ interface IIncrementNumTries extends Action<'IncrementTries'> {
 }
 
 export interface IReceivedDataSyncAction extends Action<'ReceivedDataSync'> {
-    attendees: IAttendee[];
+    attendeeCollisions: IAttendee[];
     myProfile: IProfile;
     epochUpdateTimeMilliseconds: number;
 }
@@ -219,6 +230,12 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
             return {
                 ...state,
                 actionQueue: [ ...state.actionQueue, new ApiAction<IDataSyncAction>(action) ],
+            }
+        }
+        case 'CreateAttendeeCollision': {
+            return {
+                ...state,
+                actionQueue: [ ...state.actionQueue, new ApiAction<ICreateAttendeeCollisionAction>(action) ],
             }
         }
         case 'UpdateProfile': {

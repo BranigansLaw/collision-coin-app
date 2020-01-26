@@ -1,13 +1,12 @@
 import { ActionCreator, Reducer, AnyAction, Action } from 'redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IAppState } from '.';
-import { Guid } from 'guid-typescript';
 import { IReceivedDataSyncAction } from './sync';
 import { ILogoutAction } from './auth';
 
 // Store
 export interface IProfile {
-    id: Guid;
+    id: string;
     email: string;
     firstName: string;
     lastName: string;
