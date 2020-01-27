@@ -17,11 +17,12 @@ import FirstDataSyncInProgress from './FirstDataSyncInProgress';
 import OfflineFunctionalTestPage from './OfflineFunctionalTestPage';
 import StylesTestPage from './StylesTestPage';
 import AttendeeCollisionsPage from './AttendeeCollisionsPage';
+import BottomBar from './BottomBar';
 
 // min height of 48 to work with AppBar
 export const headerHeight: string = '48px';
-const footerHeight: string = '20px';
-const footerPadding: string = '10px';
+export const footerHeight: string = '20px';
+export const footerPadding: string = '10px';
 
 export class RootUrls {
     public static readonly login = () => '/login';
@@ -43,15 +44,6 @@ const styles = (theme: Theme) => createStyles({
         minHeight: '100%',
         position: 'relative',
         paddingBottom: `calc(${footerHeight} + (2 * ${footerPadding}))`,
-    },
-    footer: {
-        width: `calc(100% - (2 * ${footerPadding}))`,
-        padding: footerPadding,
-        height: footerHeight,
-        position: 'absolute',
-        textAlign: 'center',
-        left: 0,
-        bottom: 0,
     },
 });
 
@@ -98,9 +90,7 @@ const AppRoute: React.FC<IProps> = ({
                     <Route exact path='/styles-test-page' component={StylesTestPage} />
                     <AuthenticatedRoute exact path='/offline-app-testing-area-auth' component={OfflineFunctionalTestPage} />
                 </main>
-                <footer className={classes.footer}>
-                    &copy; Collision Coin Inc. {new Date().getFullYear()} - {process.env.NODE_ENV}
-                </footer>
+                <BottomBar />
             </ConnectedRouter>
         </div>
     );

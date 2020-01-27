@@ -1,20 +1,20 @@
 import React from 'react';
 import { WithStyles, createStyles, withStyles } from '@material-ui/styles';
 import { Theme } from '@material-ui/core/styles/createMuiTheme';
-import { Link as RouterLink } from 'react-router-dom';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
 import { logoutActionCreator } from '../store/auth';
-import { MenuItem, AppBar, Toolbar } from '@material-ui/core';
-import { headerHeight, RootUrls } from '.';
-import Logout from '../components/Logout';
+import { AppBar, Toolbar, Typography, Menu, MenuItem, ListItemText, ListItemIcon } from '@material-ui/core';
+import { headerHeight } from '.';
+import SendIcon from '@material-ui/icons/Send';
 
 const styles = (theme: Theme) => createStyles({
     header: {
         height: headerHeight,
-    },   
+    },
+    navbarOffset: theme.mixins.toolbar,
     logo: {
         height: 'calc(100% - 1em)',
         margin: '0.5em',
@@ -32,15 +32,41 @@ const Navbar: React.FC<IProps> = ({
     isAuthenticated,
     logout,
 }) => {
+    const [menuOpen, setMenuOpen] = React.useState(false);
+
     return (
-        <AppBar position="static" className={classes.header}>
-            <Toolbar variant="dense">
-                <MenuItem component={RouterLink} to={RootUrls.qrCodeScan()}>
-                    QR Reader
-                </MenuItem>
-                <Logout />
-            </Toolbar>
-        </AppBar>
+        <>
+            <AppBar position="fixed" className={classes.header}>
+                <Toolbar variant="dense">
+                    <MenuItem onClick={() => setMenuOpen(!menuOpen)}>
+                        Show Menu
+                    </MenuItem>
+                    <Typography variant="h5">Collision Coin</Typography>
+                    <Menu
+                        open={menuOpen}
+                        elevation={0}
+                        keepMounted
+                        getContentAnchorEl={null}
+                        anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'center',
+                        }}
+                        transformOrigin={{
+                            vertical: 'top',
+                            horizontal: 'center',
+                        }}
+                    >
+                        <MenuItem>
+                            <ListItemIcon>
+                                <SendIcon fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText primary="Sent mail" />
+                        </MenuItem>
+                    </Menu>
+                </Toolbar>
+            </AppBar>
+            <div className={classes.navbarOffset} />
+        </>
     );
 }
 
