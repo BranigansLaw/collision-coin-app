@@ -18,6 +18,7 @@ import OfflineFunctionalTestPage from './OfflineFunctionalTestPage';
 import StylesTestPage from './StylesTestPage';
 import AttendeeCollisionsPage from './AttendeeCollisionsPage';
 import BottomBar from './BottomBar';
+import CalendarPage from './CalendarPage';
 
 // min height of 48 to work with AppBar
 export const headerHeight: string = '48px';
@@ -26,6 +27,7 @@ export const footerPadding: string = '10px';
 
 export class RootUrls {
     public static readonly login = () => '/login';
+    public static readonly calendar = () => '/calendar';
     public static readonly qrCodeScan = () => '/scan';    
     public static readonly attendeeDetails = (id: string): string => `/attendee/${id}`;
     public static readonly thirdPartyAuth = (): string => '/thirdPartyAuth';
@@ -81,6 +83,7 @@ const AppRoute: React.FC<IProps> = ({
                         }
                     }}/>
                     <AuthenticatedRoute exact path={RootUrls.qrCodeScan()} component={QrCodeReaderPage} />
+                    <AuthenticatedRoute exact path={RootUrls.calendar()} component={CalendarPage} />
                     <AuthenticatedRoute exact path={RootUrls.userProfile()} component={EditProfilePage} />
                     <AuthenticatedRoute exact path={RootUrls.firstDataSync()} component={FirstDataSyncInProgress} />
                     <AuthenticatedRoute exact path={RootUrls.attendeeCollisions()} component={AttendeeCollisionsPage} />

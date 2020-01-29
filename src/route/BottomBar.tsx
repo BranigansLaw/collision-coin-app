@@ -1,23 +1,41 @@
 import React from 'react';
 import { WithStyles, createStyles, withStyles } from '@material-ui/styles';
 import { Theme } from '@material-ui/core/styles/createMuiTheme';
-import { Link as RouterLink } from 'react-router-dom';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
-import { logoutActionCreator } from '../store/auth';
-import { MenuItem, AppBar, Toolbar } from '@material-ui/core';
-import { RootUrls, footerPadding, footerHeight } from '.';
-import Logout from '../components/Logout';
+import { AppBar, Toolbar, Fab } from '@material-ui/core';
+import { footerPadding, footerHeight, RootUrls } from '.';
+import { IProfile } from '../store/profile';
+import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
+import PeopleIcon from '@material-ui/icons/People';
+import ButtonWithText from '../components/UserInterface/ButtonWithText';
+import CropFreeIcon from '@material-ui/icons/CropFree';
+import { push } from 'connected-react-router';
+
+const scanButtonSize: number = 11;
+const barPadding: number = 3;
 
 const styles = (theme: Theme) => createStyles({
     root: {
         top: 'auto',
         bottom: 0,
+        height: theme.spacing(scanButtonSize + barPadding),
+        justifyContent: 'center',
     },
     navbarOffset: {
-        height: 15,
+        height: theme.spacing(scanButtonSize + barPadding),
+    },
+    grow: {
+        flexGrow: 1,
+    },
+    scanButton: {
+        width: theme.spacing(scanButtonSize),
+        height: theme.spacing(scanButtonSize),
+        "& svg": {
+            fontSize: theme.spacing(scanButtonSize - 3),
+        },
     },
     footer: {
         width: `calc(100% - (2 * ${footerPadding}))`,
@@ -31,29 +49,36 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    isAuthenticated: boolean;
-    logout: () => void;
+    profile: IProfile | null;
+    push: (url: string) => void;
 }
 
 const BottomBar: React.FC<IProps> = ({
     classes,
-    isAuthenticated,
-    logout,
+    profile,
+    push,
 }) => {
-    if (isAuthenticated) {
-    return (
-        <>
-            <div className={classes.navbarOffset} />
-            <AppBar position="fixed" className={classes.root}>
-                <Toolbar variant="dense">
-                    <MenuItem component={RouterLink} to={RootUrls.qrCodeScan()}>
-                        QR Reader
-                    </MenuItem>
-                    <Logout />
-                </Toolbar>
-            </AppBar>
-        </>
-    );
+    if (profile !== null) {
+        return (
+            <>
+                <div className={classes.navbarOffset} />
+                <AppBar position="fixed" className={classes.root}>
+                    <Toolbar>
+                        <ButtonWithText color="secondary" aria-label="contacts list" text="Contacts" onClick={() => push(RootUrls.attendeeCollisions())}>
+                            <PeopleIcon />
+                        </ButtonWithText>
+                        <div className={classes.grow} />
+                        <Fab color="primary" aria-label="scan" className={classes.scanButton} onClick={() => push(RootUrls.qrCodeScan())}>
+                            <CropFreeIcon />
+                        </Fab>
+                        <div className={classes.grow} />
+                        <ButtonWithText color="secondary" aria-label="calendar of events" text="Calendar" onClick={() => push(RootUrls.calendar())}>
+                            <CalendarTodayIcon />
+                        </ButtonWithText>
+                    </Toolbar>
+                </AppBar>
+            </>
+        );
     }
     else {
         return (                
@@ -65,13 +90,13 @@ const BottomBar: React.FC<IProps> = ({
 
 const mapStateToProps = (store: IAppState) => {
     return {
-        isAuthenticated: store.authState.authToken !== undefined,
+        profile: store.profile.userProfile,
     };
 };
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
-        logout: () => dispatch(logoutActionCreator()),
+        push: (url: string) => dispatch(push(url)),
     };
 };
 
