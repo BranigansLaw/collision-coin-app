@@ -46,7 +46,7 @@ const Navbar: React.FC<IProps> = ({
     if (profile !== null) {
         const getAvatar = () => {
             if (profile.profilePictureBase64Data) {
-                return <Avatar className={classes.avatar} alt="Remy Sharp" src="/static/images/avatar/1.jpg" />;
+                return <Avatar className={classes.avatar} alt="Remy Sharp" src={profile.profilePictureBase64Data} />;
             }
             else {
                 return <Avatar className={classes.avatar}>{profile.firstName[0]}{profile.lastName[0]}</Avatar>;

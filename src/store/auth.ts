@@ -24,6 +24,7 @@ export interface IAuthState {
     readonly redeemTokenLoading: boolean;
     readonly authToken?: string;
     readonly clientCode?: string;
+    readonly wasForcedLogout: boolean;
 }
 
 const initialSyncState: IAuthState = {
@@ -38,6 +39,7 @@ const initialSyncState: IAuthState = {
         normalAuth: undefined,
     },
     redeemTokenLoading: false,
+    wasForcedLogout: false,
 };
 
 export enum ThirdParty {
@@ -88,7 +90,9 @@ export interface ILoginThirdPartyRedeemTokenFailedAction extends Action<'LoginTh
     reason: string;
 }
 
-export interface ILogoutAction extends Action<'Logout'> {}
+export interface ILogoutAction extends Action<'Logout'> {
+    isForceLogout: boolean;
+}
 
 export type SyncActions =
     | ILoginSentAction
@@ -340,6 +344,7 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                     normalAuth: true,
                 },
                 loginFailed: initialSyncState.loginFailed,
+                wasForcedLogout: false,
             };
         case 'LoginSuccess':
             return {
@@ -347,6 +352,7 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                 loading: initialSyncState.loading,
                 loginFailed: initialSyncState.loginFailed,
                 authToken: action.accessToken,
+                wasForcedLogout: false,
             };
         case 'LoginFailed':
             return {
@@ -355,7 +361,8 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                 loginFailed: {
                     ...state.loginFailed,
                     normalAuth: action.reason,
-                }
+                },
+                wasForcedLogout: false,
             };
         case 'RegisterSent':
             return {
@@ -363,7 +370,8 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                 loading: {
                     ...state.loading,
                     normalAuth: true,
-                }
+                },
+                wasForcedLogout: false,
             };
         case 'RegisterSuccess':
             return {
@@ -371,6 +379,7 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                 loading: initialSyncState.loading,
                 loginFailed: initialSyncState.loginFailed,
                 authToken: action.accessToken,
+                wasForcedLogout: false,
             };
         case 'RegisterFailed':
             return {
@@ -379,7 +388,8 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                 loginFailed: {
                     ...state.loginFailed,
                     normalAuth: action.reason,
-                }
+                },
+                wasForcedLogout: false,
             };
         case 'LoginThirdPartySent':
             return {
@@ -390,12 +400,14 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                     linkedinAuth: action.authType === ThirdParty.LinkedIn ? true : false,
                 },
                 loginFailed: initialSyncState.loginFailed,
+                wasForcedLogout: false,
             };
         case 'LoginThirdPartySuccess':
             return {
                 ...state,
                 loading: initialSyncState.loading,
                 clientCode: action.clientCode,
+                wasForcedLogout: false,
             };
         case 'LoginThirdPartyFailed':
             return {
@@ -405,12 +417,14 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                     ...state.loginFailed,
                     googleAuth: action.authType === ThirdParty.Google ? "There was an error loggin in. Please try again." : undefined,
                     linkedinAuth: action.authType === ThirdParty.LinkedIn ? "There was an error loggin in. Please try again." : undefined,
-                }
+                },
+                wasForcedLogout: false,
             };
         case 'LoginThirdPartyRedeemTokenSent':
             return {
                 ...state,
                 redeemTokenLoading: true,
+                wasForcedLogout: false,
             };
         case 'LoginThirdPartyRedeemTokenSuccess':
             return {
@@ -420,17 +434,20 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                 redirectUrl: undefined,
                 clientCode: undefined,
                 redeemTokenLoading: false,
+                wasForcedLogout: false,
             };
         case 'LoginThirdPartyRedeemTokenFailed':
             return {
                 ...state,
                 redeemTokenLoading: false,
+                wasForcedLogout: false,
             };
         case 'Logout':
             return {
                 ...state,
                 loading: initialSyncState.loading,
                 authToken: undefined,
+                wasForcedLogout: action.isForceLogout,
             };
         default:
             neverReached(action); // when a new action is created, this helps us remember to handle it in the reducer

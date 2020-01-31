@@ -82,6 +82,7 @@ const ConnectedFormComponent =  reduxForm<ILoginForm, IFormProps>({
 
 interface IProps {
     loading: boolean;
+    forcedLogout: boolean;
     errorMessage: string | undefined;
     userId?: string;
     registrationCode?: string;
@@ -92,6 +93,7 @@ interface IProps {
 
 const LoginForm: React.FC<IProps> = ({
     loading,
+    forcedLogout,
     errorMessage,
     userId,
     registrationCode,
@@ -99,6 +101,10 @@ const LoginForm: React.FC<IProps> = ({
     register,
     push,
 }) => {
+    if (errorMessage === undefined && forcedLogout) {
+        errorMessage = "Oh snap! An error occurred. Please login again."
+    }
+
     return (
         <ConnectedFormComponent 
             loading={loading} 
@@ -129,6 +135,7 @@ const mapStateToProps = (store: IAppState) => {
             store.authState.loading.linkedinAuth || 
             store.authState.loading.normalAuth,
         errorMessage: store.authState.loginFailed.normalAuth,
+        forcedLogout: store.authState.wasForcedLogout,
     };
 };
 

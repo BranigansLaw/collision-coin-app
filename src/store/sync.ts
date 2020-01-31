@@ -40,6 +40,24 @@ export class ApiAction<A extends ApiActions> {
     }
 }
 
+const wrapResponse = async (axiosPromise: Promise<AxiosResponse<any> | undefined>, dispatch: ThunkDispatch<any, any, AnyAction>): Promise<AxiosResponse<any> | undefined> => {
+    try {
+        const res: AxiosResponse<any> | undefined = await axiosPromise;
+        return res;
+    }
+    catch (e) {
+        if (e.isAxiosError && e.response.status === 401) {
+            dispatch({
+                type: 'Logout',
+                isForceLogout: true,
+            } as ILogoutAction);
+            return undefined;
+        }
+
+        return undefined;
+    }
+}
+
 export const handleApiAction = async (action: ApiAction<ApiActions>, state: IOfflineAppState, dispatch: ThunkDispatch<any, any, AnyAction>) => {
     let res: AxiosResponse<any> | undefined = undefined;
     const headers = {
@@ -51,11 +69,11 @@ export const handleApiAction = async (action: ApiAction<ApiActions>, state: IOff
     try {
         switch (action.meta.type) {
             case 'DataSync':
-                res = (await axios.get(
+                res = await wrapResponse(axios.get(
                     `${process.env.REACT_APP_API_ROOT_URL}sync/${state.sync.lastSyncEpochMilliseconds}`,
                     {
                         headers
-                    }));
+                    }), dispatch);
                     
                 if (res !== undefined) {
                     dispatch({
@@ -67,7 +85,7 @@ export const handleApiAction = async (action: ApiAction<ApiActions>, state: IOff
                 }
                 break;
             case 'UpdateProfile':
-                res = (await axios.post(
+                res = await wrapResponse(axios.post(
                     `${process.env.REACT_APP_API_ROOT_URL}profile/update`,
                     {
                         newCompanyName: action.meta.newCompanyName,
@@ -75,17 +93,17 @@ export const handleApiAction = async (action: ApiAction<ApiActions>, state: IOff
                     },
                     {
                         headers
-                    }));
+                    }), dispatch);
                 break;
             case 'CreateAttendeeCollision':
-                res = (await axios.post(
+                res = await wrapResponse(axios.post(
                     `${process.env.REACT_APP_API_ROOT_URL}collision/attendee`,
                     {
                         toUserId: action.meta.attendeeId,
                     },
                     {
                         headers
-                    }));
+                    }), dispatch);
                 break;
             case 'LogoutRequeue':
                 dispatch(action.meta);
