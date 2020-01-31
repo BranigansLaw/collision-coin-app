@@ -5,7 +5,7 @@ import { renderTextField } from '../muiReduxFormIntegration';
 import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
-import { IAppState } from '../../store';
+import { IOfflineAppState } from '../../store';
 import { loginActionCreator, registerActionCreator } from '../../store/auth';
 import { push } from 'connected-react-router';
 import { RootUrls } from '../../route';
@@ -18,6 +18,7 @@ interface ILoginForm {
 interface IFormProps {
     loading: boolean;
     isRegister: boolean;
+    online: boolean;
     errorMessage: string | undefined;
 }
 
@@ -27,6 +28,7 @@ const FormComponent: React.FC<InjectedFormProps<ILoginForm, IFormProps> & IFormP
     submitting,
     loading,
     isRegister,
+    online,
     errorMessage,
 }) => {
     return (
@@ -62,7 +64,7 @@ const FormComponent: React.FC<InjectedFormProps<ILoginForm, IFormProps> & IFormP
                     color="primary" 
                     aria-label="add" 
                     type="submit"
-                    disabled={pristine || submitting || loading}>
+                    disabled={pristine || submitting || loading || !online}>
                     {isRegister ? 'Register' : 'Login'}
                 </Button>
                 <Fade
@@ -83,6 +85,7 @@ const ConnectedFormComponent =  reduxForm<ILoginForm, IFormProps>({
 interface IProps {
     loading: boolean;
     forcedLogout: boolean;
+    online: boolean;
     errorMessage: string | undefined;
     userId?: string;
     registrationCode?: string;
@@ -94,6 +97,7 @@ interface IProps {
 const LoginForm: React.FC<IProps> = ({
     loading,
     forcedLogout,
+    online,
     errorMessage,
     userId,
     registrationCode,
@@ -107,6 +111,7 @@ const LoginForm: React.FC<IProps> = ({
 
     return (
         <ConnectedFormComponent 
+            online={online}
             loading={loading} 
             errorMessage={errorMessage}
             isRegister={registrationCode !== undefined}
@@ -129,13 +134,14 @@ const LoginForm: React.FC<IProps> = ({
     );
 }
 
-const mapStateToProps = (store: IAppState) => {
+const mapStateToProps = (store: IOfflineAppState) => {
     return {
         loading: store.authState.loading.googleAuth || 
             store.authState.loading.linkedinAuth || 
             store.authState.loading.normalAuth,
         errorMessage: store.authState.loginFailed.normalAuth,
         forcedLogout: store.authState.wasForcedLogout,
+        online: store.offline.online,
     };
 };
 

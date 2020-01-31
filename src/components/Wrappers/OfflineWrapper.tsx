@@ -9,23 +9,27 @@ const styles = (theme: Theme) => createStyles({
         textAlign: 'center',
         backgroundColor: theme.palette.error.light,
         color: theme.palette.error.contrastText,
-    }
+    },
+    navbarOffset: theme.mixins.toolbar,
 });
 
 interface IProps extends WithStyles<typeof styles>  {
     online: boolean;
+    authenticated: boolean;
     children: React.ReactNode;
 }
 
 const OfflineWrapper: React.FC<IProps> = ({
     online,
+    authenticated,
     children,
     classes,
 }) => {
     return (
         <>
+            <div className={classes.navbarOffset} hidden={!authenticated} />
             <Box className={classes.offlineBanner} hidden={online}>
-                <Typography>The app is currently offline. Please reconnect to the internet.</Typography>
+                <Typography>The app is currently offline. Some functionality may not be available.</Typography>
             </Box>
             {children}
         </>
@@ -35,6 +39,7 @@ const OfflineWrapper: React.FC<IProps> = ({
 const mapStateToProps = (store: IOfflineAppState) => {
     return {
         online: store.offline.online,
+        authenticated: store.authState.authToken !== undefined,
     };
 };
 

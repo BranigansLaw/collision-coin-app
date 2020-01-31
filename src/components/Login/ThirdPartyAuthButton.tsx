@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { IAppState } from '../../store';
+import { IOfflineAppState } from '../../store';
 import { ThirdParty, thirdPartyLoginActionCreator } from '../../store/auth';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
@@ -18,6 +18,7 @@ interface IProps extends WithStyles<typeof styles> {
     registrationCode: string | undefined;
     googleLoading: boolean;
     linkedInLoading: boolean;
+    online: boolean;
     googleError?: string;
     linkedInError?: string;
     thirdPartyLogin: (loginType: ThirdParty, email: string | undefined, code: string | undefined) => Promise<string | undefined>;
@@ -30,6 +31,7 @@ const ThirdPartyAuthButton: React.FC<IProps> = ({
     googleLoading,
     linkedInLoading,
     thirdPartyLogin,
+    online,
     googleError,
     linkedInError,
     classes,
@@ -53,6 +55,7 @@ const ThirdPartyAuthButton: React.FC<IProps> = ({
     return (
         <>
             <Button
+                disabled={!online}
                 onClick={login}>
                 {userId === undefined ? 'Login' : 'Register'} with {authType} {isLoading ? 'Loading ...' : ''}
             </Button>
@@ -60,12 +63,13 @@ const ThirdPartyAuthButton: React.FC<IProps> = ({
         </>);
 }
 
-const mapStateToProps = (store: IAppState) => {
+const mapStateToProps = (store: IOfflineAppState) => {
     return {
         googleLoading: store.authState.loading.googleAuth,
         linkedInLoading: store.authState.loading.linkedinAuth,
         googleError: store.authState.loginFailed.googleAuth,
         linkedInError: store.authState.loginFailed.linkedinAuth,
+        online: store.offline.online,
     };
 };
 

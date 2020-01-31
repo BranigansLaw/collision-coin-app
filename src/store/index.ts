@@ -11,7 +11,7 @@ import { ISyncState, syncReducer } from './sync';
 import { IAuthState, authReducer } from './auth';
 import { IProfileState, profileReducer } from './profile';
 import { IServiceWorkerState, serviceWorkerReducer } from './serviceWorker';
-import { AppState as OfflineAppState } from '@redux-offline/redux-offline/lib/types';
+import { AppState as OfflineAppState, Config, NetworkCallback } from '@redux-offline/redux-offline/lib/types';
 
 // state
 export interface IAppState {
@@ -45,8 +45,23 @@ const rootReducer = ((history: History) => combineReducers<IAppState>({
     serviceWorker: serviceWorkerReducer,
 }))(history);
 
-const offlineAppConfig = {
+let firstLoad: boolean = true;
+const offlineAppConfig: Config = {
     ...offlineConfig,
+    detectNetwork: (callback: NetworkCallback) => {
+        if (firstLoad) {
+            firstLoad = false;
+            callback(true);
+        }
+        setInterval(async () => {
+            try {
+                await fetch('https://collisioncoinservices.tyficonsulting.com/api/Sync/check-online', { method: 'HEAD' })
+                callback(true);
+            } catch(e) {
+                callback(false);
+            }
+        }, 2000)
+    },    
     persistOptions: { 
         blacklist: [ 'form', 'router', 'serviceWorker' ],
     },

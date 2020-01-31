@@ -28,7 +28,6 @@ const styles = (theme: Theme) => createStyles({
         borderWidth: 1,
         borderStyle: 'solid',
     },
-    navbarOffset: theme.mixins.toolbar,
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -110,7 +109,6 @@ const Navbar: React.FC<IProps> = ({
                         <Typography variant="h5">Collision Coin</Typography>
                     </Toolbar>
                 </AppBar>
-                <div className={classes.navbarOffset} />
             </>
         );
     }
