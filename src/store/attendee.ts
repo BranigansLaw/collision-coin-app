@@ -14,6 +14,7 @@ export interface IAttendee extends IAuditableEntity {
     position?: string;
     emailAddress?: string;
     linkedInUsername?: string;
+    userNotes: string;
 }
 
 export interface IAttendeeState {
@@ -31,9 +32,15 @@ export interface ICreateAttendeeCollisionAction extends Action<'CreateAttendeeCo
     lastName: string;
 }
 
+export interface IUpdateAttendeeNotesAction extends Action<'UpdateAttendeeNotes'> {
+    attendeeId: string;
+    updatedNotes: string;
+}
+
 export type AttendeeActions =
     | IReceivedDataSyncAction
     | ICreateAttendeeCollisionAction
+    | IUpdateAttendeeNotesAction
     | ILogoutAction;
 
 // Action Creators
@@ -57,6 +64,25 @@ export const createAttendeeCollisionActionCreator: ActionCreator<
             attendeeId,
             firstName,
             lastName,
+        };
+
+        dispatch(createAttendeeCollisionAction);
+    };
+};
+
+export const updateAttendeeCollisionNotesActionCreator: ActionCreator<
+    ThunkAction<
+        Promise<void>,        // The type of the last action to be dispatched - will always be promise<T> for async actions
+        IAppState,            // The type for the data within the last action
+        null,                 // The type of the parameter for the nested function 
+        ICreateAttendeeCollisionAction  // The type of the last action to be dispatched
+    >
+> = (attendeeId: string, updatedNotes: string) => {
+    return async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
+        const createAttendeeCollisionAction: IUpdateAttendeeNotesAction = {
+            type: 'UpdateAttendeeNotes',
+            attendeeId,
+            updatedNotes,
         };
 
         dispatch(createAttendeeCollisionAction);
@@ -91,6 +117,23 @@ export const attendeeReducer: Reducer<IAttendeeState, AttendeeActions> = (
                     firstName: action.firstName,
                     lastName: action.lastName,
                 } as IAttendee, ...state.collisions ]
+            };
+        }
+        case 'UpdateAttendeeNotes': {
+            const matchingCollisionQuery: IAttendee[] = state.collisions.filter(c => c.id.toString() === action.attendeeId);
+
+            if (matchingCollisionQuery.length !== 1) {
+                return state;
+            }
+
+            return {
+                ...state,
+                collisions: [ 
+                    {
+                        ...matchingCollisionQuery[0],
+                        userNotes: action.updatedNotes,
+                    } as IAttendee,
+                    ...state.collisions.filter(c => c.id.toString() !== action.attendeeId) ]
             };
         }
         case 'Logout': {

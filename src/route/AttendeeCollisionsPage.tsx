@@ -1,42 +1,28 @@
 import React from 'react';
-import { Box, WithStyles, createStyles, withStyles } from '@material-ui/core';
+import { WithStyles, createStyles, withStyles } from '@material-ui/core';
 import { Theme } from '@material-ui/core/styles/createMuiTheme';
-import { connect } from 'react-redux';
-import { IAppState } from '../store';
-import { IAttendee } from '../store/attendee';
+import AttendeeCollisionList from '../components/AttendeeCollisions/AttendeeCollisionList';
+import { Guid } from 'guid-typescript';
 
 const styles = (theme: Theme) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    collisions: IAttendee[];
     openedCollisionId?: string;
 }
 
 const AttendeeCollisionsPage: React.FC<IProps> = ({
-    collisions,
     openedCollisionId,
     classes,
 }) => {
+    let openedCollsionParsed: Guid | undefined = undefined;
+    if (openedCollisionId !== undefined && Guid.isGuid(openedCollisionId)) {
+        openedCollsionParsed = Guid.parse(openedCollisionId);
+    }
+
     return (
-        <>
-            Opened collision: {openedCollisionId}
-            {collisions.map(c =>
-                <Box key={c.id}>
-                    {c.firstName} {c.lastName} - {c.companyName}
-                </Box>
-            )}
-        </>
+        <AttendeeCollisionList openedCollision={openedCollsionParsed} />
     );
 }
 
-const mapStateToProps = (store: IAppState) => {
-    return {
-        collisions: store.attendeesState.collisions,
-    };
-};
-
-export default withStyles(styles)(connect(
-    mapStateToProps,
-    {},
-)(AttendeeCollisionsPage));
+export default withStyles(styles)(AttendeeCollisionsPage);
