@@ -3,17 +3,10 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IAppState } from '.';
 import { IReceivedDataSyncAction } from './sync';
 import { ILogoutAction } from './auth';
+import { IAttendeeBaseFields } from './attendee';
 
 // Store
-export interface IProfile {
-    id: string;
-    email: string;
-    firstName: string;
-    lastName: string;
-    companyName?: string;
-    position?: string;
-    linkedInUsername?: string;
-    profilePictureBase64Data?: string;
+export interface IProfile extends IAttendeeBaseFields {
     qrCodeBase64Data?: string;
 }
 

@@ -81,7 +81,7 @@ interface IProps {
 const readonlyFields: {name: string; label: string; value: (v: IProfile) => string}[] = [
     { name: 'firstName', label: 'First Name', value: v => v.firstName },
     { name: 'lastName', label: 'Last Name', value: v => v.lastName },
-    { name: 'email', label: 'Email', value: v => v.email },
+    { name: 'email', label: 'Email', value: v => v.email !== null ? v.email : '' },
 ];
 
 const EditProfile: React.FC<IProps> = ({
@@ -117,8 +117,8 @@ const EditProfile: React.FC<IProps> = ({
 
 const mapStateToProps = (store: IAppState) => {
     return {
-        currentCompanyName: store.profile.userProfile !== null && store.profile.userProfile.companyName !== undefined ? store.profile.userProfile.companyName : '',
-        currentPosition: store.profile.userProfile !== null && store.profile.userProfile.position !== undefined ? store.profile.userProfile.position : '',
+        currentCompanyName: store.profile.userProfile !== null && store.profile.userProfile.companyName !== null ? store.profile.userProfile.companyName : '',
+        currentPosition: store.profile.userProfile !== null && store.profile.userProfile.position !== null ? store.profile.userProfile.position : '',
         profileFields: store.profile.userProfile,
     };
 };

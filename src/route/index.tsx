@@ -5,7 +5,6 @@ import { Theme, WithStyles } from '@material-ui/core';
 import { history } from '../store';
 import { ConnectedRouter } from 'connected-react-router';
 import QrCodeReaderPage from './QrCodeReaderPage';
-import AttendeeDetailsPage from './AttendeeDetailsPage';
 import LoginPage from './LoginPage';
 import ThirdPartyAuthCallbackPage from './ThirdPartyAuthCallbackPage';
 import DashboardPage from './DashboardPage';
@@ -88,7 +87,6 @@ const AppRoute: React.FC<IProps> = ({
                     <AuthenticatedRoute exact path={RootUrls.firstDataSync()} component={FirstDataSyncInProgress} />
                     <AuthenticatedRoute exact path={RootUrls.attendeeCollisions()} component={AttendeeCollisionsPage} />
                     <AuthenticatedRoute exact path={RootUrls.attendeeCollisions(':id')} render={route => <AttendeeCollisionsPage openedCollisionId={route.match.params.id} />} />
-                    <Route exact path={RootUrls.attendeeDetails(':id')} render={route => <AttendeeDetailsPage viewingAttendeeId={route.match.params.id} />} />
                     <Route exact path='/offline-app-testing-area' component={OfflineFunctionalTestPage} />
                     <Route exact path='/styles-test-page' component={StylesTestPage} />
                     <AuthenticatedRoute exact path='/offline-app-testing-area-auth' component={OfflineFunctionalTestPage} />

@@ -5,15 +5,18 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { ILogoutAction } from './auth';
 
 // Store
-export interface IAttendee extends IAuditableEntity {
+export interface IAttendeeBaseFields extends IAuditableEntity {
     id: string;
-    name: string;
     firstName: string;
     lastName: string;
-    companyName?: string;
-    position?: string;
-    emailAddress?: string;
-    linkedInUsername?: string;
+    companyName: string | null;
+    position: string | null;
+    email: string | null;
+    linkedInUsername: string | null;
+    profilePictureBase64Data: string | null;
+}
+
+export interface IAttendee extends IAttendeeBaseFields {
     userNotes: string;
 }
 
