@@ -17,6 +17,7 @@ import {
     TextField,
     Grid,
     Fab,
+    Box,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
@@ -25,6 +26,7 @@ import TableRowWithHidden from '../UserInterface/TableRowWithHidden';
 import AttendeeAvatar from '../AttendeeAvatar';
 import CreateIcon from '@material-ui/icons/Create';
 import FabWithHidden from '../UserInterface/FabWithHidden';
+import EditProfile from '../EditProfile/EditProfile';
 
 const avatarWidth = 28;
 const avatarRightPadding = 10;
@@ -68,6 +70,7 @@ const styles = (theme: Theme) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     toDisplay: IAttendee | IProfile;
     expanded: boolean;
+    openEditing?: boolean;
     onChange: (attendeeId: string | false) => void;
     updateAttendeeCollisionNotes: (collisionId: string, updatedNotes: string) => void;
 }
@@ -76,9 +79,12 @@ const AttendeeCollision: React.FC<IProps> = ({
     classes,
     toDisplay,
     expanded,
+    openEditing,
     onChange,
     updateAttendeeCollisionNotes,
 }) => {
+    const [editing, setEditing] = React.useState<boolean>(openEditing !== undefined && openEditing);
+
     const showNotes = (object: IAttendee | IProfile) => {
         if ('userNotes' in object) {
             return (
@@ -109,7 +115,7 @@ const AttendeeCollision: React.FC<IProps> = ({
                         <AttendeeAvatar attendee={toDisplay} />
                     </Grid>
                     <Grid item className={classes.nameAndTitle}>
-                        <Grid container direction="column" justify="center" alignItems="flex-start">
+                        <Grid hidden={true} container direction="column" justify="center" alignItems="flex-start">
                             <Grid item>
                                 <Typography className={classes.heading}>{`${toDisplay.firstName} ${toDisplay.lastName}`}</Typography>
                             </Grid>
@@ -127,32 +133,37 @@ const AttendeeCollision: React.FC<IProps> = ({
                         <FabWithHidden size="small" onClick={() => onChange(toDisplay.id)} hidden={expanded}>
                             <ExpandMoreIcon />
                         </FabWithHidden>
-                        <FabWithHidden size="small" onClick={() => alert('Edit Profile')} hidden={!isProfile || !expanded}>
+                        <FabWithHidden size="small" onClick={() => setEditing(true)} hidden={!isProfile || !expanded}>
                             <CreateIcon />
                         </FabWithHidden>
                     </Grid>
                 </Grid>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails className={classes.details}>
-                <Table>
-                    <TableBody>
-                        <TableRowWithHidden hidden={!isProfile && toDisplay.email === null}>
-                            <TableCell component="th" scope="row">Email</TableCell>
-                            <TableCell align="right">{toDisplay.email}</TableCell>
-                        </TableRowWithHidden>
-                        <TableRowWithHidden hidden={!isProfile && toDisplay.linkedInUsername === null}>
-                            <TableCell component="th" scope="row">LinkedIn</TableCell>
-                            <TableCell align="right">{toDisplay.linkedInUsername}</TableCell>
-                        </TableRowWithHidden>
-                    </TableBody>
-                </Table>
-                {showNotes(toDisplay)}
-                <Grid className={classes.lastButton} container direction="row" justify="flex-start" alignItems="center">
-                    <div className={classes.grow} />
-                    <Fab size="small" onClick={() => onChange(false)}>
-                        <ExpandLessIcon />
-                    </Fab>
-                </Grid>
+                <Box hidden={editing && isProfile}>
+                    <Table>
+                        <TableBody>
+                            <TableRowWithHidden hidden={!isProfile && toDisplay.email === null}>
+                                <TableCell component="th" scope="row">Email</TableCell>
+                                <TableCell align="right">{toDisplay.email}</TableCell>
+                            </TableRowWithHidden>
+                            <TableRowWithHidden hidden={!isProfile && toDisplay.linkedInUsername === null}>
+                                <TableCell component="th" scope="row">LinkedIn</TableCell>
+                                <TableCell align="right">{toDisplay.linkedInUsername}</TableCell>
+                            </TableRowWithHidden>
+                        </TableBody>
+                    </Table>
+                    {showNotes(toDisplay)}
+                    <Grid className={classes.lastButton} container direction="row" justify="flex-start" alignItems="center">
+                        <div className={classes.grow} />
+                        <Fab size="small" onClick={() => onChange(false)}>
+                            <ExpandLessIcon />
+                        </Fab>
+                    </Grid>
+                </Box>
+                <Box hidden={!editing || !isProfile}>
+                    <EditProfile />
+                </Box>
             </ExpansionPanelDetails>
         </ExpansionPanel>);
 }
