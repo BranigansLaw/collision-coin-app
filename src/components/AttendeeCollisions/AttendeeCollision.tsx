@@ -14,11 +14,22 @@ import {
     ExpansionPanelSummary,
     Typography,
     ExpansionPanelDetails,
-    TextField
+    TextField,
+    Grid,
+    Fab,
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import { IProfile } from '../../store/profile';
 import TableRowWithHidden from '../UserInterface/TableRowWithHidden';
+import AttendeeAvatar from '../AttendeeAvatar';
+import CreateIcon from '@material-ui/icons/Create';
+import FabWithHidden from '../UserInterface/FabWithHidden';
+
+const avatarWidth = 28;
+const avatarRightPadding = 10;
+const buttonsWidth = 40;
+const headerItemPadding = 8;
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -28,23 +39,36 @@ const styles = (theme: Theme) => createStyles({
         display: 'block',
     },
     heading: {
-        fontSize: theme.typography.pxToRem(15),
-        flexBasis: '33.33%',
-        flexShrink: 0,
     },
     secondaryHeading: {
-        fontSize: theme.typography.pxToRem(15),
         color: theme.palette.text.secondary,
     },
     notes: {
         width: '100%',
+    },
+    grow: {
+        flexGrow: 1,
+    },
+    avatar: {
+        maxWidth: `${avatarWidth}px`,
+        marginRight: `${avatarRightPadding}px`,
+        padding: `${headerItemPadding}px`,
+    },
+    nameAndTitle: {
+        width: `calc(100% - ${avatarWidth}px - ${buttonsWidth}px - ${avatarRightPadding}px - ${headerItemPadding * 2}px)`,
+    },
+    headerButtons: {
+        maxWidth: `${buttonsWidth}px`,
+    },
+    lastButton: {
+        marginTop: theme.spacing(1),
     },
 });
 
 interface IProps extends WithStyles<typeof styles> {
     toDisplay: IAttendee | IProfile;
     expanded: boolean;
-    onChange: (attendeeId: string) => void;
+    onChange: (attendeeId: string | false) => void;
     updateAttendeeCollisionNotes: (collisionId: string, updatedNotes: string) => void;
 }
 
@@ -77,33 +101,59 @@ const AttendeeCollision: React.FC<IProps> = ({
             onChange={() => onChange(toDisplay.id)}
             className={classes.root}>
             <ExpansionPanelSummary
-                expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel1a-content"
                 id="panel1a-header"
             >
-                <Typography className={classes.heading}>{`${toDisplay.firstName} ${toDisplay.lastName}`}</Typography>
-                <Typography 
-                    hidden={toDisplay.position === null || toDisplay.companyName === null}
-                    variant="subtitle2" 
-                    className={classes.secondaryHeading}>
-                    {`${toDisplay.position} at ${toDisplay.companyName}`}
-                </Typography>
+                <Grid container spacing={2} direction="row" justify="flex-start" alignItems="center">
+                    <Grid item className={classes.avatar}>
+                        <AttendeeAvatar attendee={toDisplay} />
+                    </Grid>
+                    <Grid item className={classes.nameAndTitle}>
+                        <Grid container direction="column" justify="center" alignItems="flex-start">
+                            <Grid item>
+                                <Typography className={classes.heading}>{`${toDisplay.firstName} ${toDisplay.lastName}`}</Typography>
+                            </Grid>
+                            <Grid item>
+                                <Typography 
+                                    hidden={toDisplay.position === null || toDisplay.companyName === null}
+                                    variant="subtitle2" 
+                                    className={classes.secondaryHeading}>
+                                    {`${toDisplay.position} at ${toDisplay.companyName}`}
+                                </Typography>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid item className={classes.headerButtons}>
+                        <FabWithHidden size="small" onClick={() => onChange(toDisplay.id)} hidden={expanded}>
+                            <ExpandMoreIcon />
+                        </FabWithHidden>
+                        <FabWithHidden size="small" onClick={() => alert('Edit Profile')} hidden={!isProfile || !expanded}>
+                            <CreateIcon />
+                        </FabWithHidden>
+                    </Grid>
+                </Grid>
             </ExpansionPanelSummary>
-                <ExpansionPanelDetails className={classes.details}>
-                    <Table>
-                        <TableBody>
-                            <TableRowWithHidden hidden={!isProfile && toDisplay.email === null}>
-                                <TableCell component="th" scope="row">Email</TableCell>
-                                <TableCell align="right">{toDisplay.email}</TableCell>
-                            </TableRowWithHidden>
-                            <TableRowWithHidden hidden={!isProfile && toDisplay.linkedInUsername === null}>
-                                <TableCell component="th" scope="row">LinkedIn</TableCell>
-                                <TableCell align="right">{toDisplay.linkedInUsername}</TableCell>
-                            </TableRowWithHidden>
-                        </TableBody>
-                    </Table>
-                    {showNotes(toDisplay)}
-                </ExpansionPanelDetails>
+            <ExpansionPanelDetails className={classes.details}>
+                <Table>
+                    <TableBody>
+                        <TableRowWithHidden hidden={!isProfile && toDisplay.email === null}>
+                            <TableCell component="th" scope="row">Email</TableCell>
+                            <TableCell align="right">{toDisplay.email}</TableCell>
+                        </TableRowWithHidden>
+                        <TableRowWithHidden hidden={!isProfile && toDisplay.linkedInUsername === null}>
+                            <TableCell component="th" scope="row">LinkedIn</TableCell>
+                            <TableCell align="right">{toDisplay.linkedInUsername}</TableCell>
+                        </TableRowWithHidden>
+                    </TableBody>
+                </Table>
+                {showNotes(toDisplay)}
+                <Grid className={classes.lastButton} container direction="row" justify="flex-start" alignItems="center">
+                    <div className={classes.grow} />
+                    <Fab size="small" onClick={() => onChange(false)}>
+                        <ExpandLessIcon />
+                    </Fab>
+                </Grid>
+            </ExpansionPanelDetails>
         </ExpansionPanel>);
 }
 

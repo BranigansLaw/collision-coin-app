@@ -5,7 +5,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
-import { AppBar, Toolbar, Typography, Menu, MenuItem, ListItemText, ListItemIcon, Avatar } from '@material-ui/core';
+import { AppBar, Toolbar, Typography, Menu, MenuItem, ListItemText, ListItemIcon } from '@material-ui/core';
 import { headerHeight, RootUrls } from '.';
 import CreateIcon from '@material-ui/icons/Create';
 import HelpIcon from '@material-ui/icons/Help';
@@ -15,6 +15,7 @@ import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { IProfile } from '../store/profile';
 import { logoutActionCreator } from '../store/auth';
 import { push } from 'connected-react-router';
+import AttendeeAvatar from '../components/AttendeeAvatar';
 
 const styles = (theme: Theme) => createStyles({
     header: {
@@ -45,22 +46,13 @@ const Navbar: React.FC<IProps> = ({
 }) => {
     const [anchorEl, setAnchorEl] = React.useState<HTMLLIElement | null>(null);
 
-    if (profile !== null) {
-        const getAvatar = () => {
-            if (profile.profilePictureBase64Data) {
-                return <Avatar className={classes.avatar} alt="Remy Sharp" src={profile.profilePictureBase64Data} />;
-            }
-            else {
-                return <Avatar className={classes.avatar}>{profile.firstName[0]}{profile.lastName[0]}</Avatar>;
-            }
-        };
-    
+    if (profile !== null) {    
         return (
             <>
                 <AppBar position="fixed" className={classes.header}>
                     <Toolbar variant="dense" disableGutters={true} aria-controls="main-user-menu" aria-haspopup="true">
                         <MenuItem onClick={(event: React.MouseEvent<HTMLLIElement, MouseEvent>) => setAnchorEl(event.currentTarget)}>
-                            {getAvatar()}
+                            <AttendeeAvatar attendee={profile} />
                         </MenuItem>
                         <Menu
                             id="main-user-menu"

@@ -35,13 +35,13 @@ const AttendeeCollisionList: React.FC<IProps> = ({
                     key={profile.id.toString()} 
                     toDisplay={profile} 
                     expanded={expanded === profile.id.toString()}
-                    onChange={(id: string) => setExpanded(id)} /> : ''}
+                    onChange={(id: string | false) => setExpanded(id)} /> : ''}
             {collisions.sort((a, b) => a.lastName < b.lastName ? 1 : -1).map(c =>
                 <AttendeeCollision
                     key={c.id.toString()}
                     toDisplay={c}
                     expanded={expanded === c.id.toString()}
-                    onChange={(id: string) => setExpanded(id)} />)}
+                    onChange={(id: string | false) => setExpanded(id)} />)}
         </>;
 }
 
