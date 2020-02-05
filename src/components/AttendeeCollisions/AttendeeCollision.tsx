@@ -113,8 +113,7 @@ const AttendeeCollision: React.FC<IProps> = ({
     }
 
     const saveProfile = () => {
-        const result: FormAction = saveProfileChanges();
-        debugger;
+        saveProfileChanges();
         setEditing(false);
     }
 
