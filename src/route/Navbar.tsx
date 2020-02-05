@@ -6,7 +6,7 @@ import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
 import { AppBar, Toolbar, Typography, Menu, MenuItem, ListItemText, ListItemIcon, Avatar } from '@material-ui/core';
-import { headerHeight } from '.';
+import { headerHeight, RootUrls } from '.';
 import CreateIcon from '@material-ui/icons/Create';
 import HelpIcon from '@material-ui/icons/Help';
 import InfoIcon from '@material-ui/icons/Info';
@@ -14,6 +14,7 @@ import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { IProfile } from '../store/profile';
 import { logoutActionCreator } from '../store/auth';
+import { push } from 'connected-react-router';
 
 const styles = (theme: Theme) => createStyles({
     header: {
@@ -32,11 +33,13 @@ const styles = (theme: Theme) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     profile: IProfile | null;
+    push: (url: string) => void;
     logout: () => void;
 }
 
 const Navbar: React.FC<IProps> = ({
     profile,
+    push,
     logout,
     classes,
 }) => {
@@ -75,7 +78,7 @@ const Navbar: React.FC<IProps> = ({
                                 horizontal: 'left',
                             }}
                         >
-                            <MenuItem>
+                            <MenuItem onClick={() => push(RootUrls.attendeeCollisions(profile.id))}>
                                 <ListItemIcon>
                                     <CreateIcon fontSize="small" />
                                 </ListItemIcon>
@@ -126,6 +129,7 @@ const mapStateToProps = (store: IAppState) => {
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
         logout: () => dispatch(logoutActionCreator()),
+        push: (url: string) => dispatch(push(url)),
     };
 };
 

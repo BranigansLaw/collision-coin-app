@@ -23,12 +23,25 @@ interface IProps extends WithStyles<typeof styles> {
 
 const AttendeeCollisionList: React.FC<IProps> = ({
     classes,
+    openedCollision,
     collisions,
     profile,
 }) => {
+    const [expanded, setExpanded] = React.useState<string | false>(openedCollision !== undefined ? openedCollision.toString() : false);
+
     return <>
-            {profile !== null ? <AttendeeCollision key={profile.id.toString()} toDisplay={profile} /> : ''}
-            {collisions.sort((a, b) => a.lastName < b.lastName ? 1 : -1).map(c => <AttendeeCollision key={c.id.toString()} toDisplay={c} />)}
+            {profile !== null ?
+                <AttendeeCollision 
+                    key={profile.id.toString()} 
+                    toDisplay={profile} 
+                    expanded={expanded === profile.id.toString()}
+                    onChange={(id: string) => setExpanded(id)} /> : ''}
+            {collisions.sort((a, b) => a.lastName < b.lastName ? 1 : -1).map(c =>
+                <AttendeeCollision
+                    key={c.id.toString()}
+                    toDisplay={c}
+                    expanded={expanded === c.id.toString()}
+                    onChange={(id: string) => setExpanded(id)} />)}
         </>;
 }
 

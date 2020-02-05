@@ -11,7 +11,6 @@ import DashboardPage from './DashboardPage';
 import ThirdPartyAuthErrorPage from './ThirdPartyAuthErrorPage';
 import AuthenticatedRoute from './AuthenticatedRoute';
 import Navbar from './Navbar';
-import EditProfilePage from './EditProfilePage';
 import FirstDataSyncInProgress from './FirstDataSyncInProgress';
 import OfflineFunctionalTestPage from './OfflineFunctionalTestPage';
 import StylesTestPage from './StylesTestPage';
@@ -28,11 +27,9 @@ export class RootUrls {
     public static readonly login = () => '/login';
     public static readonly calendar = () => '/calendar';
     public static readonly qrCodeScan = () => '/scan';    
-    public static readonly attendeeDetails = (id: string): string => `/attendee/${id}`;
     public static readonly thirdPartyAuth = (): string => '/thirdPartyAuth';
     public static readonly dashboard = (): string => '/dashboard';
     public static readonly firstDataSync = (): string => '/first-data-sync';
-    public static readonly userProfile = (): string => '/profile';
     public static readonly attendeeCollisions = (id?: string): string => `/attendee-collisions${id ? `/${id}` : ''}`
 }
 
@@ -83,7 +80,6 @@ const AppRoute: React.FC<IProps> = ({
                     }}/>
                     <AuthenticatedRoute exact path={RootUrls.qrCodeScan()} component={QrCodeReaderPage} />
                     <AuthenticatedRoute exact path={RootUrls.calendar()} component={CalendarPage} />
-                    <AuthenticatedRoute exact path={RootUrls.userProfile()} component={EditProfilePage} />
                     <AuthenticatedRoute exact path={RootUrls.firstDataSync()} component={FirstDataSyncInProgress} />
                     <AuthenticatedRoute exact path={RootUrls.attendeeCollisions()} component={AttendeeCollisionsPage} />
                     <AuthenticatedRoute exact path={RootUrls.attendeeCollisions(':id')} render={route => <AttendeeCollisionsPage openedCollisionId={route.match.params.id} />} />

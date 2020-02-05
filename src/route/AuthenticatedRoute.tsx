@@ -13,6 +13,7 @@ interface IProps extends RouteProps {
     isAuthenticated: boolean;
     firstSyncRequired: boolean;
     profileDataValid: boolean;
+    loggedInUserId: string | undefined;
 }
 
 const AuthenticatedRoute = ({
@@ -21,6 +22,7 @@ const AuthenticatedRoute = ({
     isAuthenticated,
     firstSyncRequired,
     profileDataValid,
+    loggedInUserId,
     ...rest 
 }: IProps) => {
     const componentOrRender = (props: any) => {
@@ -48,8 +50,8 @@ const AuthenticatedRoute = ({
                         }
                     }
                     else {
-                        if (window.location.pathname !== RootUrls.userProfile()) {
-                            return <Redirect to={RootUrls.userProfile()} />;
+                        if (loggedInUserId !== undefined && window.location.pathname !== RootUrls.attendeeCollisions(loggedInUserId)) {
+                            return <Redirect to={RootUrls.attendeeCollisions(loggedInUserId)} />;
                         }
                         else {
                             return componentOrRender(props);
@@ -76,6 +78,7 @@ const mapStateToProps = (store: IAppState) => {
         isAuthenticated: store.authState.authToken !== undefined,
         firstSyncRequired: store.sync.lastSyncEpochMilliseconds === 0,
         profileDataValid: profileIsValid(store.profile.userProfile),
+        loggedInUserId: store.profile.userProfile !== null ? store.profile.userProfile.id : undefined,
     };
 }
 

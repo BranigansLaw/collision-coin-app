@@ -8,7 +8,6 @@ import { IAppState } from '../../store';
 import { IAttendee, updateAttendeeCollisionNotesActionCreator } from '../../store/attendee';
 import {
     Table,
-    TableRow,
     TableCell,
     TableBody,
     ExpansionPanel,
@@ -44,12 +43,16 @@ const styles = (theme: Theme) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     toDisplay: IAttendee | IProfile;
+    expanded: boolean;
+    onChange: (attendeeId: string) => void;
     updateAttendeeCollisionNotes: (collisionId: string, updatedNotes: string) => void;
 }
 
 const AttendeeCollision: React.FC<IProps> = ({
     classes,
     toDisplay,
+    expanded,
+    onChange,
     updateAttendeeCollisionNotes,
 }) => {
     const showNotes = (object: IAttendee | IProfile) => {
@@ -69,7 +72,10 @@ const AttendeeCollision: React.FC<IProps> = ({
     const isProfile: boolean = 'qrCodeBase64Data' in toDisplay;
 
     return (
-        <ExpansionPanel className={classes.root}>
+        <ExpansionPanel 
+            expanded={expanded}
+            onChange={() => onChange(toDisplay.id)}
+            className={classes.root}>
             <ExpansionPanelSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel1a-content"
@@ -92,7 +98,7 @@ const AttendeeCollision: React.FC<IProps> = ({
                             </TableRowWithHidden>
                             <TableRowWithHidden hidden={!isProfile && toDisplay.linkedInUsername === null}>
                                 <TableCell component="th" scope="row">LinkedIn</TableCell>
-                                <TableCell align="right">{toDisplay.linkedInUsername}{toDisplay.linkedInUsername === null ? 'Null' : ''}</TableCell>
+                                <TableCell align="right">{toDisplay.linkedInUsername}</TableCell>
                             </TableRowWithHidden>
                         </TableBody>
                     </Table>

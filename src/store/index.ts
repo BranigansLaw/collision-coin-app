@@ -55,7 +55,7 @@ const offlineAppConfig: Config = {
         }
         setInterval(async () => {
             try {
-                await fetch('https://collisioncoinservices.tyficonsulting.com/api/Sync/check-online', { method: 'HEAD' })
+                await fetch(`${process.env.REACT_APP_API_ROOT_URL}Sync/check-online`, { method: 'HEAD' })
                 callback(true);
             } catch(e) {
                 callback(false);
