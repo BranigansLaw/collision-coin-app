@@ -21,15 +21,16 @@ import {
 } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
-import { IProfile } from '../../store/profile';
+import { IProfile, profileIsValid } from '../../store/profile';
 import TableRowWithHidden from '../UserInterface/TableRowWithHidden';
 import AttendeeAvatar from '../AttendeeAvatar';
 import CreateIcon from '@material-ui/icons/Create';
 import FabWithHidden from '../UserInterface/FabWithHidden';
 import EditProfile, { EditProfileFormName } from '../EditProfile/EditProfile';
-import { submit, reset } from 'redux-form';
+import { reset, submit, FormAction } from 'redux-form';
 import SaveIcon from '@material-ui/icons/Save';
 import CancelIcon from '@material-ui/icons/Cancel';
+import { validNonEmptyString } from '../../util';
 
 const avatarWidth = 28;
 const avatarRightPadding = 10;
@@ -74,7 +75,7 @@ interface IProps extends WithStyles<typeof styles> {
     toDisplay: IAttendee | IProfile;
     expanded: boolean;
     openEditing?: boolean;
-    saveProfileChanges: () => void;
+    saveProfileChanges: () => FormAction;
     resetProfileChanges: () => void;
     onChange: (attendeeId: string | false) => void;
     updateAttendeeCollisionNotes: (collisionId: string, updatedNotes: string) => void;
@@ -112,7 +113,8 @@ const AttendeeCollision: React.FC<IProps> = ({
     }
 
     const saveProfile = () => {
-        saveProfileChanges();
+        const result: FormAction = saveProfileChanges();
+        debugger;
         setEditing(false);
     }
 
@@ -138,7 +140,7 @@ const AttendeeCollision: React.FC<IProps> = ({
                             </Grid>
                             <Grid item>
                                 <Typography 
-                                    hidden={toDisplay.position === null || toDisplay.companyName === null}
+                                    hidden={!validNonEmptyString(toDisplay.position) || validNonEmptyString(toDisplay.companyName)}
                                     variant="subtitle2" 
                                     className={classes.secondaryHeading}>
                                     {`${toDisplay.position} at ${toDisplay.companyName}`}
@@ -146,17 +148,17 @@ const AttendeeCollision: React.FC<IProps> = ({
                             </Grid>
                         </Grid>
                     </Grid>
-                    <Grid item className={classes.headerButtons} direction="row">
+                    <Grid item className={classes.headerButtons}>
                         <FabWithHidden size="small" onClick={() => onChange(toDisplay.id)} hidden={expanded}>
                             <ExpandMoreIcon />
                         </FabWithHidden>
                         <FabWithHidden size="small" onClick={() => setEditing(true)} hidden={!isProfile || !expanded || editing}>
                             <CreateIcon />
                         </FabWithHidden>
-                        <FabWithHidden size="small" onClick={() => saveProfile()} hidden={!isProfile || !expanded || !editing}>
+                        <FabWithHidden size="small" onClick={() => saveProfile()} hidden={true}>
                             <SaveIcon />
                         </FabWithHidden>
-                        <FabWithHidden size="small" onClick={() => cancelProfileChanges()} hidden={!isProfile || !expanded || !editing}>
+                        <FabWithHidden size="small" onClick={() => cancelProfileChanges()} hidden={!isProfile || !expanded || !editing || !profileIsValid(toDisplay)}>
                             <CancelIcon />
                         </FabWithHidden>
                     </Grid>
@@ -166,11 +168,11 @@ const AttendeeCollision: React.FC<IProps> = ({
                 <Box hidden={editing && isProfile}>
                     <Table>
                         <TableBody>
-                            <TableRowWithHidden hidden={!isProfile && toDisplay.email === null}>
+                            <TableRowWithHidden hidden={!isProfile && !validNonEmptyString(toDisplay.email)}>
                                 <TableCell component="th" scope="row">Email</TableCell>
                                 <TableCell align="right">{toDisplay.email}</TableCell>
                             </TableRowWithHidden>
-                            <TableRowWithHidden hidden={!isProfile && toDisplay.linkedInUsername === null}>
+                            <TableRowWithHidden hidden={!isProfile && !validNonEmptyString(toDisplay.linkedInUsername)}>
                                 <TableCell component="th" scope="row">LinkedIn</TableCell>
                                 <TableCell align="right">{toDisplay.linkedInUsername}</TableCell>
                             </TableRowWithHidden>
@@ -185,7 +187,7 @@ const AttendeeCollision: React.FC<IProps> = ({
                     </Grid>
                 </Box>
                 <Box hidden={!editing || !isProfile}>
-                    <EditProfile hideSubmit={true} />
+                    <EditProfile hideSubmit={false} />
                 </Box>
             </ExpansionPanelDetails>
         </ExpansionPanel>);

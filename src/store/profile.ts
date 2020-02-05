@@ -4,6 +4,7 @@ import { neverReached, IAppState } from '.';
 import { IReceivedDataSyncAction } from './sync';
 import { ILogoutAction } from './auth';
 import { IAttendeeBaseFields } from './attendee';
+import { validNonEmptyString } from '../util';
 
 // Store
 export interface IProfile extends IAttendeeBaseFields {
@@ -17,8 +18,8 @@ export interface IProfileState {
 // TODO: Replace this method with a lookup from the database
 export const profileIsValid = (profile: IProfile | null): boolean => {
     return profile !== null &&
-        profile.companyName !== null && profile.companyName !== undefined &&
-        profile.position !== null && profile.position !== undefined;
+        validNonEmptyString(profile.companyName) && validNonEmptyString(profile.companyName) &&
+        validNonEmptyString(profile.position) && validNonEmptyString(profile.position);
 }
 
 const initialProfileState: IProfileState = {

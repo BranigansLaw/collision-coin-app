@@ -46,7 +46,7 @@ const FormComponent: React.FC<InjectedFormProps<IEditProfileForm, IFormProps> & 
                     label="Position"
                     disabled={submitting || loading}
                     margin="normal"
-                    required
+                    required={true}
                 />
             </div>
             <div hidden={hideSubmit}>
@@ -62,7 +62,7 @@ const FormComponent: React.FC<InjectedFormProps<IEditProfileForm, IFormProps> & 
         </form>);
 };
 
-export const EditProfileFormName: string = 'loginForm';
+export const EditProfileFormName: string = 'editProfileForm';
 
 const ConnectedFormComponent = reduxForm<IEditProfileForm, IFormProps>({
     form: EditProfileFormName,
