@@ -50,8 +50,8 @@ const AuthenticatedRoute = ({
                         }
                     }
                     else {
-                        if (loggedInUserId !== undefined && window.location.pathname !== RootUrls.attendeeCollisions(loggedInUserId)) {
-                            return <Redirect to={RootUrls.attendeeCollisions(loggedInUserId)} />;
+                        if (loggedInUserId !== undefined && window.location.pathname !== RootUrls.attendeeCollisions(loggedInUserId, true)) {
+                            return <Redirect to={RootUrls.attendeeCollisions(loggedInUserId, true)} />;
                         }
                         else {
                             return componentOrRender(props);

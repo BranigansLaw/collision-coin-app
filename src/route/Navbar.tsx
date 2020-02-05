@@ -47,6 +47,16 @@ const Navbar: React.FC<IProps> = ({
     const [anchorEl, setAnchorEl] = React.useState<HTMLLIElement | null>(null);
 
     if (profile !== null) {    
+        const editProfileClick = () => {
+            setAnchorEl(null);
+            push(RootUrls.attendeeCollisions(profile.id, true))
+        }
+    
+        const logoutClick = () => {
+            setAnchorEl(null);
+            logout();
+        }
+    
         return (
             <>
                 <AppBar position="fixed" className={classes.header}>
@@ -70,7 +80,7 @@ const Navbar: React.FC<IProps> = ({
                                 horizontal: 'left',
                             }}
                         >
-                            <MenuItem onClick={() => push(RootUrls.attendeeCollisions(profile.id, true))}>
+                            <MenuItem onClick={() => editProfileClick()}>
                                 <ListItemIcon>
                                     <CreateIcon fontSize="small" />
                                 </ListItemIcon>
@@ -88,7 +98,7 @@ const Navbar: React.FC<IProps> = ({
                                 </ListItemIcon>
                                 <ListItemText primary="About" />
                             </MenuItem>
-                            <MenuItem onClick={() => logout()}>
+                            <MenuItem onClick={() => logoutClick()}>
                                 <ListItemIcon>
                                     <ExitToAppIcon fontSize="small" />
                                 </ListItemIcon>
