@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { reduxForm, InjectedFormProps, Field } from 'redux-form';
-import { Button, CircularProgress, Fade, TextField } from '@material-ui/core';
+import { Button, TextField } from '@material-ui/core';
 import { renderTextField } from '../muiReduxFormIntegration';
 import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
@@ -15,6 +15,7 @@ interface IEditProfileForm {
 
 interface IFormProps {
     loading: boolean;
+    hideSubmit: boolean;
 }
 
 const FormComponent: React.FC<InjectedFormProps<IEditProfileForm, IFormProps> & IFormProps> = ({
@@ -22,6 +23,7 @@ const FormComponent: React.FC<InjectedFormProps<IEditProfileForm, IFormProps> & 
     pristine,
     submitting,
     loading,
+    hideSubmit,
 }) => {
     return (
         <form onSubmit={handleSubmit}>
@@ -47,7 +49,7 @@ const FormComponent: React.FC<InjectedFormProps<IEditProfileForm, IFormProps> & 
                     required
                 />
             </div>
-            <div>
+            <div hidden={hideSubmit}>
                 <Button size="large"
                     variant="contained"
                     color="primary" 
@@ -56,25 +58,21 @@ const FormComponent: React.FC<InjectedFormProps<IEditProfileForm, IFormProps> & 
                     disabled={pristine || submitting || loading}>
                     Save Changes
                 </Button>
-                <Fade
-                    in={loading}
-                    unmountOnExit>
-                    <CircularProgress size={30} />
-                </Fade>
             </div>
         </form>);
 };
 
-const ReduxFormName: string = 'loginForm';
+export const EditProfileFormName: string = 'loginForm';
 
 const ConnectedFormComponent = reduxForm<IEditProfileForm, IFormProps>({
-    form: ReduxFormName,
+    form: EditProfileFormName,
 })(FormComponent);
 
 interface IProps {
     currentCompanyName: string;
     currentPosition: string;
     profileFields: IProfile | null;
+    hideSubmit?: boolean;
     updateProfile: (companyName: string, position: string) => void;
 }
 
@@ -88,6 +86,7 @@ const EditProfile: React.FC<IProps> = ({
     currentCompanyName,
     currentPosition,
     profileFields,
+    hideSubmit,
     updateProfile,
 }) => {
     return (
@@ -106,6 +105,7 @@ const EditProfile: React.FC<IProps> = ({
             ))}
             <ConnectedFormComponent
                 loading={false}
+                hideSubmit={hideSubmit !== undefined ? hideSubmit : false}
                 initialValues={{
                     companyName: currentCompanyName,
                     position: currentPosition,
