@@ -70,7 +70,7 @@ const Navbar: React.FC<IProps> = ({
                                 horizontal: 'left',
                             }}
                         >
-                            <MenuItem onClick={() => push(RootUrls.attendeeCollisions(profile.id))}>
+                            <MenuItem onClick={() => push(RootUrls.attendeeCollisions(profile.id, true))}>
                                 <ListItemIcon>
                                     <CreateIcon fontSize="small" />
                                 </ListItemIcon>

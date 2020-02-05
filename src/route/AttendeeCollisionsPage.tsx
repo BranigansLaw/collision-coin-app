@@ -9,10 +9,12 @@ const styles = (theme: Theme) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     openedCollisionId?: string;
+    editing?: boolean;
 }
 
 const AttendeeCollisionsPage: React.FC<IProps> = ({
     openedCollisionId,
+    editing,
     classes,
 }) => {
     let openedCollsionParsed: Guid | undefined = undefined;
@@ -21,7 +23,7 @@ const AttendeeCollisionsPage: React.FC<IProps> = ({
     }
 
     return (
-        <AttendeeCollisionList openedCollision={openedCollsionParsed} />
+        <AttendeeCollisionList openedCollision={openedCollsionParsed} editing={editing} />
     );
 }
 

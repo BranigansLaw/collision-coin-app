@@ -30,7 +30,7 @@ export class RootUrls {
     public static readonly thirdPartyAuth = (): string => '/thirdPartyAuth';
     public static readonly dashboard = (): string => '/dashboard';
     public static readonly firstDataSync = (): string => '/first-data-sync';
-    public static readonly attendeeCollisions = (id?: string): string => `/attendee-collisions${id ? `/${id}` : ''}`
+    public static readonly attendeeCollisions = (id?: string, editOpen?: boolean): string => `/attendee-collisions${id ? `/${id}` : ''}${editOpen && id ? '/edit' : ''}`
 }
 
 const styles = (theme: Theme) => createStyles({
@@ -83,6 +83,8 @@ const AppRoute: React.FC<IProps> = ({
                     <AuthenticatedRoute exact path={RootUrls.firstDataSync()} component={FirstDataSyncInProgress} />
                     <AuthenticatedRoute exact path={RootUrls.attendeeCollisions()} component={AttendeeCollisionsPage} />
                     <AuthenticatedRoute exact path={RootUrls.attendeeCollisions(':id')} render={route => <AttendeeCollisionsPage openedCollisionId={route.match.params.id} />} />
+                    <AuthenticatedRoute exact path={RootUrls.attendeeCollisions(':id', true)}
+                        render={route => <AttendeeCollisionsPage openedCollisionId={route.match.params.id} editing={true} />} />
                     <Route exact path='/offline-app-testing-area' component={OfflineFunctionalTestPage} />
                     <Route exact path='/styles-test-page' component={StylesTestPage} />
                     <AuthenticatedRoute exact path='/offline-app-testing-area-auth' component={OfflineFunctionalTestPage} />

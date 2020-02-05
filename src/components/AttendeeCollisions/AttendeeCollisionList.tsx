@@ -17,6 +17,7 @@ const styles = (theme: Theme) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     openedCollision?: Guid;
+    editing?: boolean;
     collisions: IAttendee[];
     profile: IProfile | null;
 }
@@ -24,6 +25,7 @@ interface IProps extends WithStyles<typeof styles> {
 const AttendeeCollisionList: React.FC<IProps> = ({
     classes,
     openedCollision,
+    editing,
     collisions,
     profile,
 }) => {
@@ -32,6 +34,7 @@ const AttendeeCollisionList: React.FC<IProps> = ({
     return <>
             {profile !== null ?
                 <AttendeeCollision 
+                    openEditing={editing}
                     key={profile.id.toString()} 
                     toDisplay={profile} 
                     expanded={expanded === profile.id.toString()}
