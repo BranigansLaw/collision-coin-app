@@ -10,6 +10,7 @@ import thunk from 'redux-thunk';
 import { ISyncState, syncReducer } from './sync';
 import { IAuthState, authReducer } from './auth';
 import { IProfileState, profileReducer } from './profile';
+import { IWalletState, walletReducer } from './wallet';
 import { IServiceWorkerState, serviceWorkerReducer } from './serviceWorker';
 import { AppState as OfflineAppState, Config, NetworkCallback } from '@redux-offline/redux-offline/lib/types';
 
@@ -22,6 +23,7 @@ export interface IAppState {
     readonly attendeesState: IAttendeeState;
     readonly authState: IAuthState;
     readonly profile: IProfileState;
+    readonly wallet: IWalletState;
     readonly serviceWorker: IServiceWorkerState;
 }
 
@@ -42,6 +44,7 @@ const rootReducer = ((history: History) => combineReducers<IAppState>({
     attendeesState: attendeeReducer,
     authState: authReducer,
     profile: profileReducer,
+    wallet: walletReducer,
     serviceWorker: serviceWorkerReducer,
 }))(history);
 

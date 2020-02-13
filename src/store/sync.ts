@@ -81,6 +81,7 @@ export const handleApiAction = async (action: ApiAction<ApiActions>, state: IOff
                         type: 'ReceivedDataSync',
                         attendeeCollisions: res.data.attendeeCollisions,
                         myProfile: res.data.myProfile,
+                        balance: res.data.balance,
                         epochUpdateTimeMilliseconds: res.data.epochUpdateTimeMilliseconds,
                     } as IReceivedDataSyncAction);
                 }
@@ -155,6 +156,7 @@ interface IIncrementNumTries extends Action<'IncrementTries'> {
 export interface IReceivedDataSyncAction extends Action<'ReceivedDataSync'> {
     attendeeCollisions: IAttendee[];
     myProfile: IProfile;
+    balance: number;
     epochUpdateTimeMilliseconds: number;
 }
 

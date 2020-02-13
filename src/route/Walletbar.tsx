@@ -6,9 +6,9 @@ import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
 import { Typography, Grid, Paper } from '@material-ui/core';
-import { IProfile } from '../store/profile';
 import { walletBarHeight } from '.';
 import { muiPaperOutlinedOverride } from '../theme';
+import RunningCounter from '../components/RunningCounter';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -18,31 +18,28 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    profile: IProfile | null;
+    balance: number;
 }
 
 const Walletbar: React.FC<IProps> = ({
-    profile,
+    balance,
     classes,
 }) => {
-    if (profile !== null) {        
-        return (
-            <Paper variant="outlined">
-                <Grid container direction="row" justify="center" alignItems="flex-end" className={classes.root}>
-                    <Typography variant="h3">4300</Typography>
+    return (
+        <Paper variant="outlined">
+            <Grid container justify="center" alignItems="center" className={classes.root}>
+                <Grid container direction="row" justify="center" alignItems="flex-end">
+                    <Typography variant="h3"><RunningCounter val={balance} /></Typography>
                     <Typography variant="subtitle1">Coins</Typography>
                 </Grid>
-            </Paper>
-        );
-    }
-    else {
-        return <></>;
-    }
+            </Grid>
+        </Paper>
+    );
 }
 
 const mapStateToProps = (store: IAppState) => {
     return {
-        profile: store.profile.userProfile,
+        balance: store.wallet.balance,
     };
 };
 
