@@ -11,7 +11,7 @@ import DashboardPage from './DashboardPage';
 import ThirdPartyAuthErrorPage from './ThirdPartyAuthErrorPage';
 import AuthenticatedRoute from './AuthenticatedRoute';
 import Navbar from './Navbar';
-import FirstDataSyncInProgress from './FirstDataSyncInProgress';
+import FirstDataSyncInProgress from './FirstDataSyncInProgressPage';
 import OfflineFunctionalTestPage from './OfflineFunctionalTestPage';
 import StylesTestPage from './StylesTestPage';
 import AttendeeCollisionsPage from './AttendeeCollisionsPage';
