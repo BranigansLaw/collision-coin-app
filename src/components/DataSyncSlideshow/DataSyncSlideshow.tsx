@@ -10,6 +10,8 @@ import { IAppState } from '../../store';
 import Slide1 from './loading-slide1.png';
 import Slide2 from './loading-slide2.png';
 import Slide3 from './loading-slide1.png';
+import { push } from 'connected-react-router';
+import { RootUrls } from '../../route';
 
 declare module '*.png'
 
@@ -18,6 +20,9 @@ const styles = (theme: Theme) => createStyles({
     },
     stepper: {
         backgroundColor: 'transparent',
+        '& .MuiStepIcon-text': {
+            display: 'none',
+        },
     },
     img: {
         display: 'block',
@@ -30,10 +35,12 @@ const styles = (theme: Theme) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     firstSyncCompleted: boolean;
+    push: (path: string) => void;
 }
 
 const DataSyncSlideshow: React.FC<IProps> = ({
     firstSyncCompleted,
+    push,
     classes,
 }) => {
     const steps = [
@@ -82,8 +89,8 @@ const DataSyncSlideshow: React.FC<IProps> = ({
             </Stepper>
             <Button 
                 disabled={!firstSyncCompleted} 
-                onClick={() => alert('Continue')}>
-                    Continue
+                onClick={() => push(RootUrls.dashboard())}>
+                    {firstSyncCompleted ? 'Contine' : 'Loading your profile ...'}
             </Button>
         </Grid>
     );
@@ -97,6 +104,7 @@ const mapStateToProps = (store: IAppState) => {
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
+        push: (path: string) => dispatch(push(path)),
     };
 };
 

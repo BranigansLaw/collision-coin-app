@@ -42,12 +42,7 @@ const AuthenticatedRoute = ({
             if (isAuthenticated) {
                 if (!firstSyncRequired) {
                     if (profileDataValid) {
-                        if (window.location.pathname === RootUrls.firstDataSync()) {
-                            return <Redirect to={RootUrls.dashboard()} />;
-                        }
-                        else {
-                            return componentOrRender(props);
-                        }
+                        return componentOrRender(props);
                     }
                     else {
                         if (loggedInUserId !== undefined && window.location.pathname !== RootUrls.attendeeCollisions(loggedInUserId, true)) {
