@@ -6,6 +6,13 @@ export const disabledCSS = {
     cursor: 'context-menu',
 }
 
+export const muiPaperOutlinedOverride = {
+    padding: 16,
+    borderRadius: 20,
+    borderWidth: 3,
+    margin: 8,
+};
+
 // A custom theme for this app
 const theme = createMuiTheme({
     palette: {
@@ -29,7 +36,13 @@ const theme = createMuiTheme({
                 boxShadow: '-8px -8px 32px 0px rgba(245, 245, 245 , .2), 8px 8px 32px 0px rgba(0, 0, 0 , .3)',
                 margin: '10px',
             },
-        }
+            containedPrimary: {
+                backgroundColor: 'white',
+            },
+        },
+        MuiPaper: {
+            outlined: muiPaperOutlinedOverride,
+        },
     }
 });
 

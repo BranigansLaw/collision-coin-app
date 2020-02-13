@@ -5,24 +5,15 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
-import { AppBar } from '@material-ui/core';
-import { headerHeight } from '.';
+import { Typography, Grid, Paper } from '@material-ui/core';
 import { IProfile } from '../store/profile';
-import MainMenu from './MainMenu';
-import Walletbar from './Walletbar';
+import { walletBarHeight } from '.';
+import { muiPaperOutlinedOverride } from '../theme';
 
 const styles = (theme: Theme) => createStyles({
-    header: {
-        height: headerHeight,
-    },
-    avatar: {
-        width: theme.spacing(3.5),
-        height: theme.spacing(3.5),
-        fontSize: theme.spacing(2),
-        fontWeight: 600,
-        borderColor: 'white',
-        borderWidth: 1,
-        borderStyle: 'solid',
+    root: {
+        height: `calc(${walletBarHeight} - ${muiPaperOutlinedOverride.borderWidth * 2}px - ${muiPaperOutlinedOverride.margin * 2}px - ${muiPaperOutlinedOverride.padding * 2}px)`,
+        overflow: 'hidden',
     },
 });
 
@@ -30,16 +21,18 @@ interface IProps extends WithStyles<typeof styles> {
     profile: IProfile | null;
 }
 
-const Navbar: React.FC<IProps> = ({
+const Walletbar: React.FC<IProps> = ({
     profile,
     classes,
 }) => {
-    if (profile !== null) {    
+    if (profile !== null) {        
         return (
-            <AppBar position="fixed" className={classes.header}>
-                <MainMenu profile={profile} />
-                <Walletbar />
-            </AppBar>
+            <Paper variant="outlined">
+                <Grid container direction="row" justify="center" alignItems="flex-end" className={classes.root}>
+                    <Typography variant="h3">4300</Typography>
+                    <Typography variant="subtitle1">Coins</Typography>
+                </Grid>
+            </Paper>
         );
     }
     else {
@@ -61,4 +54,4 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
 export default withStyles(styles)(connect(
     mapStateToProps,
     mapDispatchToProps,
-)(Navbar));
+)(Walletbar));

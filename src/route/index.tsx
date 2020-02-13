@@ -22,6 +22,7 @@ import CalendarPage from './CalendarPage';
 export const headerHeight: string = '48px';
 export const footerHeight: string = '20px';
 export const footerPadding: string = '10px';
+export const walletBarHeight: string = '105px';
 
 export class RootUrls {
     public static readonly login = () => '/login';

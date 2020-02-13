@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { IOfflineAppState } from '../../store';
 import { Typography, WithStyles, createStyles, withStyles, Theme, Box } from '@material-ui/core';
+import { headerHeight, walletBarHeight } from '../../route';
 
 const styles = (theme: Theme) => createStyles({
     offlineBanner: {
@@ -10,7 +11,9 @@ const styles = (theme: Theme) => createStyles({
         backgroundColor: theme.palette.error.light,
         color: theme.palette.error.contrastText,
     },
-    navbarOffset: theme.mixins.toolbar,
+    navbarOffset: {
+        height: `calc(${headerHeight} + ${walletBarHeight})`,
+    },
 });
 
 interface IProps extends WithStyles<typeof styles>  {
