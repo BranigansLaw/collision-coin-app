@@ -25,11 +25,10 @@ const styles = (theme: Theme) => createStyles({
         },
     },
     img: {
-        display: 'block',
-        overflow: 'hidden',
-        maxHeight: '600px',
-        maxWidth: '80%',
-        margin: 'auto',
+        height: '60vh',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'contain',
     },
 });
 
@@ -75,7 +74,7 @@ const DataSyncSlideshow: React.FC<IProps> = ({
                 {steps.map((step, index) => (
                     <div key={index}>
                         {Math.abs(activeStep - index) <= 2 ? (
-                            <img className={classes.img} src={step.imgPath} alt={step.label} />
+                            <div className={classes.img} style={{backgroundImage: `url(${step.imgPath})`}} />
                         ) : null}
                     </div>
                 ))}
