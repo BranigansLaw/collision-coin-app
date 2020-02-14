@@ -5,8 +5,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
-import { Box, Typography, Button } from '@material-ui/core';
-import { fireTestActionCreator } from '../store/wallet';
+import { Box, Typography } from '@material-ui/core';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -25,13 +24,11 @@ interface IProps extends WithStyles<typeof styles> {
 
 const DashboardPage: React.FC<IProps> = ({
     myQrCode,
-    addCoins,
     classes,
 }) => {
     return (
         <div className={classes.root}>
             Dashboard
-            <Button onClick={() => addCoins()}>Add Coins</Button>
             <Box>
                 <Typography variant="h4">My Code</Typography>
                 <div hidden={myQrCode === undefined} className={classes.qrCode} style={{backgroundImage: `url(${myQrCode})`}} />
@@ -48,7 +45,6 @@ const mapStateToProps = (store: IAppState) => {
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
-        addCoins: () => dispatch(fireTestActionCreator()),
     };
 };
 

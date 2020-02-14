@@ -13,6 +13,7 @@ import { IUpdateProfileAction } from './profile';
 // Store
 export interface ISyncState {
     readonly lastSyncEpochMilliseconds: number;
+    readonly syncIntervalMilliseconds: number;
     readonly actionQueue: ApiAction<ApiActions>[];
 }
 
@@ -81,7 +82,9 @@ export const handleApiAction = async (action: ApiAction<ApiActions>, state: IOff
                         type: 'ReceivedDataSync',
                         attendeeCollisions: res.data.attendeeCollisions,
                         myProfile: res.data.myProfile,
-                        balance: res.data.balance,
+                        balance: res.data.myWallet !== null ? res.data.myWallet.balance : null,
+                        addAttendeeCoins: res.data.appSettings !== null ? res.data.appSettings.attendeeCollisionCoinsEarned : null,
+                        syncIntervalMilliseconds: res.data.appSettings !== null ? res.data.appSettings.syncIntervalMilliseconds : null,
                         epochUpdateTimeMilliseconds: res.data.epochUpdateTimeMilliseconds,
                     } as IReceivedDataSyncAction);
                 }
@@ -133,6 +136,7 @@ export const handleApiAction = async (action: ApiAction<ApiActions>, state: IOff
 
 const initialSyncState: ISyncState = {
     lastSyncEpochMilliseconds: 0,
+    syncIntervalMilliseconds: 1000000,
     actionQueue: [],
 };
 
@@ -156,7 +160,9 @@ interface IIncrementNumTries extends Action<'IncrementTries'> {
 export interface IReceivedDataSyncAction extends Action<'ReceivedDataSync'> {
     attendeeCollisions: IAttendee[];
     myProfile: IProfile;
-    balance: number;
+    balance: number | null;
+    addAttendeeCoins: number | null;
+    syncIntervalMilliseconds: number | null;
     epochUpdateTimeMilliseconds: number;
 }
 
@@ -218,7 +224,7 @@ export const checkQueueActionCreator: ActionCreator<
                 if (getState().authState.authToken !== undefined && 
                     (
                         completedActions.filter(a => a.meta.type !== 'DataSync').length > 0 ||
-                        getCurrentTimeEpochMilliseconds() - getState().sync.lastSyncEpochMilliseconds > 30000
+                        getCurrentTimeEpochMilliseconds() - getState().sync.lastSyncEpochMilliseconds > getState().sync.syncIntervalMilliseconds
                     )) {
                     dispatch({
                         type: 'DataSync',
@@ -244,6 +250,7 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
             return {
                 ...state,
                 lastSyncEpochMilliseconds: action.epochUpdateTimeMilliseconds,
+                syncIntervalMilliseconds: action.syncIntervalMilliseconds !== null ? action.syncIntervalMilliseconds : state.syncIntervalMilliseconds,
             };
         }
         case 'Logout': {

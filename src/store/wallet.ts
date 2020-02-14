@@ -1,42 +1,26 @@
-import { ActionCreator, Reducer, AnyAction, Action } from 'redux';
-import { ThunkAction, ThunkDispatch } from 'redux-thunk';
-import { neverReached, IAppState } from '.';
+import { Reducer } from 'redux';
+import { neverReached, } from '.';
 import { IReceivedDataSyncAction } from './sync';
 import { ICreateAttendeeCollisionAction } from './attendee';
 
 // Store
 export interface IWalletState {
     readonly balance: number;
+    readonly addAttendeeCoins: number;
 }
 
 const initialProfileState: IWalletState = {
     balance: 0,
+    addAttendeeCoins: 0,
 };
 
 // Actions
-export interface ITestAction extends Action<'TestAction'> {
-}
 
 export type AttendeeActions =
-    | ITestAction
     | ICreateAttendeeCollisionAction
     | IReceivedDataSyncAction;
 
 // Action Creators
-export const fireTestActionCreator: ActionCreator<
-    ThunkAction<
-        Promise<void>,        // The type of the last action to be dispatched - will always be promise<T> for async actions
-        IAppState,            // The type for the data within the last action
-        null,                 // The type of the parameter for the nested function 
-        ITestAction  // The type of the last action to be dispatched
-    >
-> = () => {
-    return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
-        dispatch({
-            type: 'TestAction'
-        } as ITestAction);
-    };
-};
 
 // Reducers
 export const walletReducer: Reducer<IWalletState, AttendeeActions> = (
@@ -47,19 +31,14 @@ export const walletReducer: Reducer<IWalletState, AttendeeActions> = (
         case 'ReceivedDataSync': {
             return {
                 ...state,
-                balance: action.balance,
+                balance: action.balance !== null ? action.balance : state.balance,
             };
         }
         case 'CreateAttendeeCollision': {
             return {
                 ...state,
                 balance: state.balance + 500,
-            };
-        }
-        case 'TestAction': {
-            return {
-                ...state,
-                balance: state.balance + 100,
+                addAttendeeCoins: state.addAttendeeCoins,
             };
         }
         default:
