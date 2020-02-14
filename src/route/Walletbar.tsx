@@ -13,7 +13,6 @@ import RunningCounter from '../components/RunningCounter';
 const styles = (theme: Theme) => createStyles({
     root: {
         height: `calc(${walletBarHeight} - ${muiPaperOutlinedOverride.borderWidth * 2}px - ${muiPaperOutlinedOverride.margin * 2}px - ${muiPaperOutlinedOverride.padding * 2}px)`,
-        overflow: 'hidden',
     },
 });
 
