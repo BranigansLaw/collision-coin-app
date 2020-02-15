@@ -139,7 +139,7 @@ const AttendeeCollision: React.FC<IProps> = ({
                             </Grid>
                             <Grid item>
                                 <Typography 
-                                    hidden={!validNonEmptyString(toDisplay.position) || validNonEmptyString(toDisplay.companyName)}
+                                    hidden={!validNonEmptyString(toDisplay.position) || !validNonEmptyString(toDisplay.companyName)}
                                     variant="subtitle2" 
                                     className={classes.secondaryHeading}>
                                     {`${toDisplay.position} at ${toDisplay.companyName}`}

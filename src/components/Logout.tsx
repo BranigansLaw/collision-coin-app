@@ -4,7 +4,8 @@ import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
 import { logoutActionCreator } from '../store/auth';
-import { WithStyles, createStyles, withStyles, Theme, Box, Modal, MenuItem, Button, Typography } from '@material-ui/core';
+import { WithStyles, createStyles, withStyles, Theme, Box, Modal, MenuItem, Button, Typography, ListItemIcon, ListItemText } from '@material-ui/core';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 
 const styles = (theme: Theme) => createStyles({
     modalStyle: {
@@ -55,7 +56,10 @@ const Logout: React.FC<IProps> = ({
     return (
         <>
             <MenuItem hidden={isAuthenticated} onClick={() => tryLogout()}>
-                Logout
+                <ListItemIcon>
+                    <ExitToAppIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText primary="Log Out" />
             </MenuItem>
             <Modal
                 aria-labelledby="simple-modal-title"

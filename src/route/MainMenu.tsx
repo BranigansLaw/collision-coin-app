@@ -10,12 +10,11 @@ import { RootUrls, headerHeight } from '.';
 import CreateIcon from '@material-ui/icons/Create';
 import HelpIcon from '@material-ui/icons/Help';
 import InfoIcon from '@material-ui/icons/Info';
-import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import { IProfile } from '../store/profile';
-import { logoutActionCreator } from '../store/auth';
 import { push } from 'connected-react-router';
 import AttendeeAvatar from '../components/AttendeeAvatar';
+import Logout from '../components/Logout';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -26,13 +25,11 @@ const styles = (theme: Theme) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     profile: IProfile;
     push: (url: string) => void;
-    logout: () => void;
 }
 
 const Navbar: React.FC<IProps> = ({
     profile,
     push,
-    logout,
     classes,
 }) => {
     const [anchorEl, setAnchorEl] = React.useState<HTMLLIElement | null>(null);
@@ -42,11 +39,6 @@ const Navbar: React.FC<IProps> = ({
         push(RootUrls.attendeeCollisions(profile.id, true))
     }
 
-    const logoutClick = () => {
-        setAnchorEl(null);
-        logout();
-    }
-    
     return (
         <Toolbar className={classes.root} variant="dense" disableGutters={true} aria-controls="main-user-menu" aria-haspopup="true">
             <MenuItem onClick={(event: React.MouseEvent<HTMLLIElement, MouseEvent>) => setAnchorEl(event.currentTarget)}>
@@ -86,12 +78,7 @@ const Navbar: React.FC<IProps> = ({
                     </ListItemIcon>
                     <ListItemText primary="About" />
                 </MenuItem>
-                <MenuItem onClick={() => logoutClick()}>
-                    <ListItemIcon>
-                        <ExitToAppIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary="Log Out" />
-                </MenuItem>
+                <Logout />
                 <MenuItem>
                     <ListItemIcon>
                         <DeleteForeverIcon fontSize="small" />
@@ -111,7 +98,6 @@ const mapStateToProps = (store: IAppState) => {
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
-        logout: () => dispatch(logoutActionCreator()),
         push: (url: string) => dispatch(push(url)),
     };
 };

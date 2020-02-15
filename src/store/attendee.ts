@@ -119,6 +119,7 @@ export const attendeeReducer: Reducer<IAttendeeState, AttendeeActions> = (
                     id: action.attendeeId,
                     firstName: action.firstName,
                     lastName: action.lastName,
+                    userNotes: '',
                 } as IAttendee, ...state.collisions ]
             };
         }
