@@ -26,8 +26,6 @@ export type ApiActions =
     | ICreateAttendeeCollisionAction
     | ILogoutRequeueAction;
 
-export type ApiActionsWithResponses = IDataSyncAction;
-
 export class ApiAction<A extends ApiActions> {
     readonly timeEpochMilliseconds: number;
     readonly transactionId: Guid;
@@ -60,22 +58,42 @@ const wrapResponse = async (axiosPromise: Promise<AxiosResponse<any> | undefined
     }
 }
 
-export const handleApiAction = async (action: ApiAction<ApiActions>, state: IOfflineAppState, dispatch: ThunkDispatch<any, any, AnyAction>) => {
+export const handleApiAction = async (
+    action: ApiAction<ApiActions>,
+    getState: () => IOfflineAppState,
+    dispatch: ThunkDispatch<any, any, AnyAction>) => {
     let res: AxiosResponse<any> | undefined = undefined;
     const headers = {
         'Access-Control-Allow-Origin': '*',
-        authorization: `Bearer ${state.authState.authToken}`,
+        authorization: `Bearer ${getState().authState.authToken}`,
         TransactionId: action.transactionId.toString(),
     };
 
     try {
         switch (action.meta.type) {
             case 'DataSync':
+                debugger;
+                if (getState().sync.actionQueue.filter(a => a.meta.type !== action.meta.type).length > 0 ||
+                    getState().authState.authToken === undefined) {
+                    // Pretend the sync was successful, and skip for now. There are actions that need to be processed
+                    return {
+                        status: 200
+                    } as AxiosResponse;
+                }
+                
                 res = await wrapResponse(axios.get(
-                    `${process.env.REACT_APP_API_ROOT_URL}sync/${state.sync.lastSyncEpochMilliseconds}`,
+                    `${process.env.REACT_APP_API_ROOT_URL}sync/${getState().sync.lastSyncEpochMilliseconds}`,
                     {
                         headers
                     }), dispatch);
+
+                if (getState().sync.actionQueue.filter(a => a.meta.type !== action.meta.type).length > 0 ||
+                    getState().authState.authToken === undefined) {
+                    // Pretend the sync was successful
+                    return {
+                        status: 200
+                    } as AxiosResponse;
+                }    
                     
                 if (res !== undefined) {
                     dispatch({
@@ -193,7 +211,7 @@ export const checkQueueActionCreator: ActionCreator<
 
                 for (const action of getState().sync.actionQueue) {
                     const res: AxiosResponse<any> | undefined =
-                        await handleApiAction(action, getState(), dispatch);
+                        await handleApiAction(action, getState, dispatch);
 
                     if (res !== undefined && res.status === 401) {
                         // break immediately and logout
