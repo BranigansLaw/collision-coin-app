@@ -5,11 +5,11 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
-import { AppBar } from '@material-ui/core';
-import { headerHeight } from '.';
+import { headerHeight, RootUrls } from '.';
 import { IProfile } from '../store/profile';
 import MainMenu from './MainMenu';
 import Walletbar from './Walletbar';
+import AppBarWithHidden from '../components/UserInterface/AppBarWithHidden';
 
 const styles = (theme: Theme) => createStyles({
     header: {
@@ -28,18 +28,20 @@ const styles = (theme: Theme) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     profile: IProfile | null;
+    location: string;
 }
 
 const Navbar: React.FC<IProps> = ({
     profile,
+    location,
     classes,
 }) => {
     if (profile !== null) {    
         return (
-            <AppBar position="fixed" className={classes.header}>
+            <AppBarWithHidden position="fixed" className={classes.header} hidden={location === RootUrls.firstDataSync()}>
                 <MainMenu profile={profile} />
                 <Walletbar />
-            </AppBar>
+            </AppBarWithHidden>
         );
     }
     else {
@@ -50,6 +52,7 @@ const Navbar: React.FC<IProps> = ({
 const mapStateToProps = (store: IAppState) => {
     return {
         profile: store.profile.userProfile,
+        location: store.router.location.pathname,
     };
 };
 

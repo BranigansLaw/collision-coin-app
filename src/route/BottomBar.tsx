@@ -5,7 +5,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
-import { AppBar, Toolbar, Fab } from '@material-ui/core';
+import { Toolbar, Fab } from '@material-ui/core';
 import { footerPadding, footerHeight, RootUrls } from '.';
 import { IProfile } from '../store/profile';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
@@ -13,6 +13,7 @@ import PeopleIcon from '@material-ui/icons/People';
 import ButtonWithText from '../components/UserInterface/ButtonWithText';
 import CropFreeIcon from '@material-ui/icons/CropFree';
 import { push } from 'connected-react-router';
+import AppBarWithHidden from '../components/UserInterface/AppBarWithHidden';
 
 const scanButtonSize: number = 11;
 const barPadding: number = 3;
@@ -50,19 +51,21 @@ const styles = (theme: Theme) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     profile: IProfile | null;
+    location: string;
     push: (url: string) => void;
 }
 
 const BottomBar: React.FC<IProps> = ({
     classes,
     profile,
+    location,
     push,
 }) => {
     if (profile !== null) {
         return (
             <>
-                <div className={classes.navbarOffset} />
-                <AppBar position="fixed" className={classes.root}>
+                <div className={classes.navbarOffset} hidden={location === RootUrls.firstDataSync()} />
+                <AppBarWithHidden position="fixed" className={classes.root} hidden={location === RootUrls.firstDataSync()}>
                     <Toolbar>
                         <ButtonWithText color="secondary" aria-label="contacts list" text="Contacts" onClick={() => push(RootUrls.attendeeCollisions())}>
                             <PeopleIcon />
@@ -76,7 +79,7 @@ const BottomBar: React.FC<IProps> = ({
                             <CalendarTodayIcon />
                         </ButtonWithText>
                     </Toolbar>
-                </AppBar>
+                </AppBarWithHidden>
             </>
         );
     }
@@ -91,6 +94,7 @@ const BottomBar: React.FC<IProps> = ({
 const mapStateToProps = (store: IAppState) => {
     return {
         profile: store.profile.userProfile,
+        location: store.router.location.pathname,
     };
 };
 

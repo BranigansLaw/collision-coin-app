@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { IOfflineAppState } from '../../store';
 import { Typography, WithStyles, createStyles, withStyles, Theme, Box } from '@material-ui/core';
-import { headerHeight, walletBarHeight } from '../../route';
+import { headerHeight, walletBarHeight, RootUrls } from '../../route';
 
 const styles = (theme: Theme) => createStyles({
     offlineBanner: {
@@ -19,18 +19,20 @@ const styles = (theme: Theme) => createStyles({
 interface IProps extends WithStyles<typeof styles>  {
     online: boolean;
     authenticated: boolean;
+    location: string;
     children: React.ReactNode;
 }
 
 const OfflineWrapper: React.FC<IProps> = ({
     online,
     authenticated,
+    location,
     children,
     classes,
 }) => {
     return (
         <>
-            <div className={classes.navbarOffset} hidden={!authenticated} />
+            <div className={classes.navbarOffset} hidden={!authenticated || location === RootUrls.firstDataSync()} />
             <Box className={classes.offlineBanner} hidden={online}>
                 <Typography>The app is currently offline. Some functionality may not be available.</Typography>
             </Box>
@@ -43,6 +45,7 @@ const mapStateToProps = (store: IOfflineAppState) => {
     return {
         online: store.offline.online,
         authenticated: store.authState.authToken !== undefined,
+        location: store.router.location.pathname,
     };
 };
 

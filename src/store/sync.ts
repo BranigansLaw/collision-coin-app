@@ -72,7 +72,6 @@ export const handleApiAction = async (
     try {
         switch (action.meta.type) {
             case 'DataSync':
-                debugger;
                 if (getState().sync.actionQueue.filter(a => a.meta.type !== action.meta.type).length > 0 ||
                     getState().authState.authToken === undefined) {
                     // Pretend the sync was successful, and skip for now. There are actions that need to be processed
