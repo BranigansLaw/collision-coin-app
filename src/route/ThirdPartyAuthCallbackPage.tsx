@@ -8,6 +8,7 @@ import { IAppState } from '../store';
 import { RootUrls } from '.';
 import { push } from 'connected-react-router';
 import { thirdPartyRedeemTokenActionCreator } from '../store/auth';
+import DataSyncSlideshow from '../components/DataSyncSlideshow/DataSyncSlideshow';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -36,9 +37,9 @@ const ThirdPartyAuthCallbackPage: React.FC<IProps> = ({
     }
 
     return (
-        <div className={classes.root}>
-            Third Party Callback Page. Hold on this page till the given redemption code is validated and a JWT token is returned<br />
-        </div>
+        <>
+            <DataSyncSlideshow />
+        </>
     );
 }
 

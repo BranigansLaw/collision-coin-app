@@ -137,7 +137,11 @@ export const loginActionCreator: ActionCreator<
                     }
                 }));
         }
-        catch (e) { }
+        catch (e) {
+            if (e.isAxiosError) {
+                res = e.response;
+            }
+        }
 
         if (res !== undefined && res.status === 200) {
             dispatch({
@@ -147,11 +151,17 @@ export const loginActionCreator: ActionCreator<
 
             return true;
         }
+        else if (res !== undefined && res.status === 400) {
+            dispatch({
+                type: 'LoginFailed',
+                reason: res.data[0].description,
+            } as ILoginFailedAction);
+        }
         else if (res !== undefined && res.status === 401) {
             dispatch({
-                type: 'RegisterFailed',
+                type: 'LoginFailed',
                 reason: 'User/password combination was not found.',
-            } as IRegisterFailedAction);
+            } as ILoginFailedAction);
         }
         else if (res !== undefined) {
             dispatch({
@@ -198,8 +208,12 @@ export const registerActionCreator: ActionCreator<
                     }
                 }));
         }
-        catch (e) { }
-        
+        catch (e) {
+            if (e.isAxiosError) {
+                res = e.response;
+            }
+        }
+
         if (res !== undefined && res.status === 200) {
             dispatch({
                 type: 'RegisterSuccess',
@@ -208,10 +222,16 @@ export const registerActionCreator: ActionCreator<
 
             return true;
         }
+        else if (res !== undefined && res.status === 400) {
+            dispatch({
+                type: 'RegisterFailed',
+                reason: res.data[0].description,
+            } as IRegisterFailedAction);
+        }
         else if (res !== undefined && res.status === 404) {
             dispatch({
                 type: 'RegisterFailed',
-                reason: 'User not found',
+                reason: 'Registration was not found. Please contact support.',
             } as IRegisterFailedAction);
         }
         else if (res !== undefined) {
