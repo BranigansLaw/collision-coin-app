@@ -49,7 +49,7 @@ const FormComponent: React.FC<InjectedFormProps<ILoginForm, IFormProps> & IFormP
                     name="password"
                     component={renderTextField}
                     type="password"
-                    label="Password"
+                    label={isRegister ? "Choose your password" : "Password"}
                     disabled={submitting || loading}
                     margin="normal"
                     required
