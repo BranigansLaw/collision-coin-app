@@ -36,7 +36,6 @@ export class RootUrls {
 
 const styles = (theme: Theme) => createStyles({
     root: {
-        minHeight: '100%',
         position: 'relative',
     },
     main: {
