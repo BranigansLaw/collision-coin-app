@@ -5,7 +5,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
-import { Typography } from '@material-ui/core';
+import UserCalendar from '../components/Calendar/UserCalendar';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -20,7 +20,7 @@ const CalendarPage: React.FC<IProps> = ({
 }) => {
     return (
         <>
-            <Typography>Calendar Page</Typography>
+            <UserCalendar />
         </>
     );
 }

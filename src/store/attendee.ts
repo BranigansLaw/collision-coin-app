@@ -3,6 +3,7 @@ import { neverReached, IAppState } from '.';
 import { IReceivedDataSyncAction, IAuditableEntity } from './sync';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { ILogoutAction } from './auth';
+import { mergeLists } from '../util';
 
 // Store
 export interface IAttendeeBaseFields extends IAuditableEntity {
@@ -99,17 +100,9 @@ export const attendeeReducer: Reducer<IAttendeeState, AttendeeActions> = (
 ) => {
     switch (action.type) {
         case 'ReceivedDataSync': {
-            const newConnections: Map<string, IAttendee> = new Map();
-            action.attendeeCollisions.forEach(a => newConnections.set(a.id.toString(), a));
-            state.collisions.forEach(a => {
-                if (!newConnections.has(a.id.toString()) && !a.deleted) {
-                    newConnections.set(a.id.toString(), a);
-                }
-            });
-
             return {
                 ...state,
-                collisions: Array.from(newConnections.values()),
+                collisions: mergeLists(state.collisions, action.attendeeCollisions),
             };
         }
         case 'CreateAttendeeCollision': {

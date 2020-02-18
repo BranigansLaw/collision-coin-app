@@ -13,6 +13,7 @@ import { IProfileState, profileReducer } from './profile';
 import { IWalletState, walletReducer } from './wallet';
 import { IServiceWorkerState, serviceWorkerReducer } from './serviceWorker';
 import { AppState as OfflineAppState, Config, NetworkCallback } from '@redux-offline/redux-offline/lib/types';
+import { ICalendarState, calendarReducer } from './calendar';
 
 // state
 export interface IAppState {
@@ -21,6 +22,7 @@ export interface IAppState {
     readonly rehydrated: IRehydratedState;
     readonly sync: ISyncState;
     readonly attendeesState: IAttendeeState;
+    readonly calendarState: ICalendarState,
     readonly authState: IAuthState;
     readonly profile: IProfileState;
     readonly wallet: IWalletState;
@@ -42,6 +44,7 @@ const rootReducer = ((history: History) => combineReducers<IAppState>({
     rehydrated: rehydratedReducer,
     sync: syncReducer,
     attendeesState: attendeeReducer,
+    calendarState: calendarReducer,
     authState: authReducer,
     profile: profileReducer,
     wallet: walletReducer,
