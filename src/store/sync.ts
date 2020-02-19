@@ -186,6 +186,9 @@ export const handleApiAction = async (
                 break;
             case 'LogoutRequeue':
                 dispatch(action.meta);
+
+                // The final nuclear clear
+                localStorage.clear();
                 break;
             default:
                 neverReached(action.meta); // when a new action is created, this helps us remember to handle it in the reducer
