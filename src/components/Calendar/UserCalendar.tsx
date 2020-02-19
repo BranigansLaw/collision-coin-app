@@ -5,7 +5,6 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../../store';
-import { Typography } from '@material-ui/core';
 import { IEvent } from '../../store/calendar';
 
 const styles = (theme: Theme) => createStyles({
@@ -32,17 +31,20 @@ const UserCalendar: React.FC<IProps> = ({
     const calendarDict: { [ date: number ]: { [ hour: number ]: IEvent[] } } = {};
     calendar.map(e => {
         const date: Date = new Date(e.startTimeEpochMilliseconds);
-        const day = calendarDict[date.getDate()];
+        const epochHour: number = Math.round(Number(date) / 3600000);
+        const epcohDay: number = Math.round(epochHour / 24);
+
+        const day = calendarDict[epcohDay];
         if (day === undefined) {
-            calendarDict[date.getDate()] = { [ date.getHours() ]: [ e ] };
+            calendarDict[epcohDay] = { [ epochHour ]: [ e ] };
         }
         else {
-            const hour = day[date.getHours()];
+            const hour = day[epochHour];
             if (hour === undefined) {
-                day[date.getHours()] = [ e ];
+                day[epochHour] = [ e ];
             }
             else {
-                day[date.getHours()].push(e);
+                day[epochHour].push(e);
             }
         }
     });

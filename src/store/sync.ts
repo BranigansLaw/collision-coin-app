@@ -126,7 +126,7 @@ export const handleApiAction = async (
                                 location: 'Room 103A',
                             } as IEvent,
                             {
-                                id: Guid.parse('').toString(),
+                                id: Guid.parse('bc7e2a9b-b5c0-4764-a09e-7ad27008d931').toString(),
                                 name: 'The Event of Events',
                                 startTimeEpochMilliseconds: dateToEpochMilliseconds(new Date(2020, 2, 18, 9, 0, 0, 0)),
                                 endTimeEpockMilliseconds: dateToEpochMilliseconds(new Date(2020, 2, 18, 9, 30, 0)),
