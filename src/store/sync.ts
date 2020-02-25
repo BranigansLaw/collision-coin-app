@@ -145,7 +145,7 @@ export const handleApiAction = async (
                                 id: Guid.parse('3afc4678-67a7-43f0-b97c-193beb4bc3a2').toString(),
                                 name: 'The Event of Events 2',
                                 startTimeEpochMilliseconds: dateToEpochMilliseconds(new Date(2020, 2, 18, 10, 0, 0, 0)),
-                                endTimeEpochMilliseconds: dateToEpochMilliseconds(new Date(2020, 2, 18, 10, 10, 0)),
+                                endTimeEpochMilliseconds: dateToEpochMilliseconds(new Date(2020, 2, 18, 10, 30, 0)),
                                 description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi mattis faucibus aliquam. Ut euismod tortor eu ornare aliquet. Sed a finibus nibh. Quisque porta id enim id fringilla. Pellentesque efficitur hendrerit porta. Fusce dapibus cursus justo non condimentum. Praesent gravida tristique justo. Aenean eu nunc rutrum, iaculis est vel, elementum arcu. Nullam venenatis velit condimentum, pellentesque libero blandit, interdum neque. Curabitur efficitur lacus sed turpis malesuada, at tincidunt felis lobortis. Duis efficitur enim arcu, eu lacinia dolor dapibus at.',
                                 location: 'Room 103A',
                             } as IEvent,

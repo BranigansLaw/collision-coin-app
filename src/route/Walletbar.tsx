@@ -5,10 +5,11 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
-import { Typography, Grid, Paper } from '@material-ui/core';
+import { Typography, Grid } from '@material-ui/core';
 import { walletBarHeight } from '.';
 import { muiPaperOutlinedOverride } from '../theme';
 import RunningCounter from '../components/RunningCounter';
+import NeonPaper from '../components/UserInterface/NeonPaper';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -25,14 +26,14 @@ const Walletbar: React.FC<IProps> = ({
     classes,
 }) => {
     return (
-        <Paper variant="outlined">
+        <NeonPaper color="orange" density="normal">
             <Grid container justify="center" alignItems="center" className={classes.root}>
                 <Grid container direction="row" justify="center" alignItems="flex-end">
                     <Typography variant="h3"><RunningCounter val={balance} /></Typography>
                     <Typography variant="subtitle1">Coins</Typography>
                 </Grid>
             </Grid>
-        </Paper>
+        </NeonPaper>
     );
 }
 
