@@ -11,7 +11,7 @@ export interface IEvent extends IAuditableEntity {
     readonly location: string;
     readonly description: string;
     readonly startTimeEpochMilliseconds: number;
-    readonly endTimeEpockMilliseconds: number;
+    readonly endTimeEpochMilliseconds: number;
 }
 
 export interface ICalendarState {

@@ -29,3 +29,15 @@ export function mergeLists<T extends IMergeableObject>(
 
     return Array.from(newItems.values());
 }
+
+export function range(start: number, stop: number, step: number): number[] {
+    if (start >= stop) {
+        return [];
+    }
+
+    var a = [start], b = start;
+    while (b < stop) {
+        a.push(b += step || 1);
+    }
+    return a;
+}

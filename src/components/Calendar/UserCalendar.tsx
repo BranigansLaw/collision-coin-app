@@ -6,19 +6,12 @@ import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../../store';
 import { IEvent } from '../../store/calendar';
+import UserCalendarDayEntry from './UserCalendarDayEntry';
 
 const styles = (theme: Theme) => createStyles({
     root: {
     },
 });
-
-const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
-const weekdayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ];
-
-/*
-        const startDay = `${weekdayNames[date.getDay()]}, ${monthNames[date.getMonth()]} ${date.getDate()}`
-        const startHour = date.getHours();
-*/
 
 interface IProps extends WithStyles<typeof styles> {
     calendar: IEvent[];
@@ -29,30 +22,36 @@ const UserCalendar: React.FC<IProps> = ({
     calendar,
 }) => {
     const calendarDict: { [ date: number ]: { [ hour: number ]: IEvent[] } } = {};
-    calendar.map(e => {
-        const date: Date = new Date(e.startTimeEpochMilliseconds);
-        const epochHour: number = Math.round(Number(date) / 3600000);
-        const epcohDay: number = Math.round(epochHour / 24);
+    calendar.forEach(e => {
+        const epochHour: number = Math.floor(e.startTimeEpochMilliseconds / 3600000);
+        const epcohDay: number = Math.floor(epochHour / 24);
 
-        const day = calendarDict[epcohDay];
-        if (day === undefined) {
-            calendarDict[epcohDay] = { [ epochHour ]: [ e ] };
-        }
-        else {
-            const hour = day[epochHour];
-            if (hour === undefined) {
-                day[epochHour] = [ e ];
+        let currEpochHour = epochHour;
+        let finishEpochHour: number = Math.floor(e.endTimeEpochMilliseconds / 3600000);
+        while (currEpochHour <= finishEpochHour) {
+            const day = calendarDict[epcohDay];
+            if (day === undefined) {
+                calendarDict[epcohDay] = { [ currEpochHour ]: [ e ] };
             }
             else {
-                day[epochHour].push(e);
+                const hour = day[currEpochHour];
+                if (hour === undefined) {
+                    day[currEpochHour] = [ e ];
+                }
+                else {
+                    day[currEpochHour].push(e);
+                }
             }
+            currEpochHour++;
         }
     });
 
-    debugger;
-
     return (
         <>
+            {Object.keys(calendarDict).map((keyStr: string) => {
+                const key: number = Number(keyStr);
+                return <UserCalendarDayEntry key={key} dateEpochDays={key} hours={calendarDict[key]} />
+            })}
         </>
     );
 }
