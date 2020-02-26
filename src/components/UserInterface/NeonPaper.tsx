@@ -1,5 +1,8 @@
 import React from 'react';
 import { WithStyles, createStyles, withStyles, Theme, PaperProps, Paper, TypographyProps, Typography } from '@material-ui/core';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+import ExpandLessIcon from '@material-ui/icons/ExpandLess';
+import FabWithHidden from './FabWithHidden';
 
 const lightNeonPaperTextClassName: string = 'light-neon-text';
 const darkNeonPaperTextClassName: string = 'dark-neon-text';
@@ -9,7 +12,7 @@ const styles = (theme: Theme) => createStyles({
         padding: 16,
         borderRadius: 20,
         borderWidth: 1,
-        margin: 8,    
+        margin: 8,
     },
     normalDensity: {
         padding: theme.spacing(2),
@@ -20,8 +23,14 @@ const styles = (theme: Theme) => createStyles({
         paddingLeft: theme.spacing(1.5),
         paddingRight: theme.spacing(1.5),
     },
+    expandButton: {
+        float: 'right',
+    },
     green: {
         borderColor: 'rgb(0, 255, 0)',
+        '& .MuiFab-root': {
+            color: 'rgb(0, 255, 0)',
+        },
         '& .light-neon-text': {
             color: 'rgb(0, 255, 0)',
         },
@@ -43,6 +52,7 @@ const styles = (theme: Theme) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     color: ('green' | 'orange');
     density: ('normal' | 'dense');
+    hasExpander?: boolean;
 }
 
 const NeonPaper: React.FC<IProps & PaperProps> = ({
@@ -52,6 +62,7 @@ const NeonPaper: React.FC<IProps & PaperProps> = ({
     style,
     color,
     density,
+    hasExpander,
     ...rest
 }) => {
     const getDensityClass = () => {
@@ -77,7 +88,10 @@ const NeonPaper: React.FC<IProps & PaperProps> = ({
             variant="outlined"
             className={`${className} ${classes.root} ${getDensityClass()} ${getColorClass()}`} 
             {...rest}>
-            {children}
+                <FabWithHidden className={classes.expandButton} size="small" onClick={() => alert('Expand')} hidden={!hasExpander}>
+                    <ExpandMoreIcon />
+                </FabWithHidden>
+                {children}
         </Paper>
     );
 }

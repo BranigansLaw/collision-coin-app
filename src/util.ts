@@ -41,3 +41,14 @@ export function range(start: number, stop: number, step: number): number[] {
     }
     return a;
 }
+
+export function getTimeString(date: Date) {
+    const hourStr: string = date.getHours() + "";
+    let minStr: string = date.getMinutes() + "";
+
+    while (minStr.length < 2) {
+        minStr = "0" + minStr;
+    }
+
+    return `${hourStr}:${minStr}`;
+}
