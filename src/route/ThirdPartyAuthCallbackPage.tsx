@@ -36,7 +36,7 @@ const ThirdPartyAuthCallbackPage: React.FC<IProps> = ({
         else {
             redeemCode(redemptionCode);
         }
-    }, [authToken, redeemCode]);
+    }, [authToken, redemptionCode, push, redeemCode]);
 
     return (
         <>
