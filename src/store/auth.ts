@@ -289,7 +289,7 @@ export const thirdPartyLoginActionCreator: ActionCreator<
                 type: 'LoginThirdPartySuccess',
                 clientCode,
             } as ILoginThirdPartySuccessAction);
-    
+
             return res.data.redirectUrl;
         }
         else {

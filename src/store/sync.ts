@@ -29,14 +29,14 @@ export type ApiActions =
 
 export class ApiAction<A extends ApiActions> {
     readonly timeEpochMilliseconds: number;
-    readonly transactionId: Guid;
+    readonly transactionId: string;
     readonly meta: A;
     numTries: number;
 
     constructor(meta: A) {
         this.timeEpochMilliseconds = getCurrentTimeEpochMilliseconds();
         this.numTries = 0;
-        this.transactionId = Guid.create();
+        this.transactionId = Guid.create().toString();
         this.meta = meta;
     }
 }
@@ -80,7 +80,7 @@ export const handleApiAction = async (
                         status: 200
                     } as AxiosResponse;
                 }
-                
+
                 res = await wrapResponse(axios.get(
                     `${process.env.REACT_APP_API_ROOT_URL}sync/${getState().sync.lastSyncEpochMilliseconds}`,
                     {
@@ -237,7 +237,7 @@ interface IDequeueAction extends Action<'Deque'> {
 }
 
 interface IIncrementNumTries extends Action<'IncrementTries'> {
-    toIncrementTransactionId: Guid;
+    toIncrementTransactionId: string;
 }
 
 export interface IReceivedDataSyncAction extends Action<'ReceivedDataSync'> {

@@ -29,12 +29,14 @@ const ThirdPartyAuthCallbackPage: React.FC<IProps> = ({
     push,
     redeemCode,
 }) => {
-    if (authToken !== undefined) {
-        push(RootUrls.dashboard());
-    }
-    else {
-        redeemCode(redemptionCode);
-    }
+    React.useEffect(() => {
+        if (authToken !== undefined) {
+            push(RootUrls.dashboard());
+        }
+        else {
+            redeemCode(redemptionCode);
+        }
+    }, [authToken, redeemCode]);
 
     return (
         <>
