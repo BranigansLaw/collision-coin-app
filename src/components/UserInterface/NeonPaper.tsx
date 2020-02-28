@@ -4,6 +4,8 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import FabWithHidden from './FabWithHidden';
 import { headerHeight } from '../../route';
+import { IAppState } from '../../store';
+import { connect } from 'react-redux';
 
 const lightNeonPaperTextClassName: string = 'light-neon-text';
 const darkNeonPaperTextClassName: string = 'dark-neon-text';
@@ -54,6 +56,7 @@ interface IProps extends WithStyles<typeof styles> {
     color: ('green' | 'orange');
     density: ('normal' | 'dense');
     hasExpander?: boolean;
+    location: string;
 }
 
 const NeonPaper: React.FC<IProps & PaperProps> = ({
@@ -64,6 +67,7 @@ const NeonPaper: React.FC<IProps & PaperProps> = ({
     color,
     density,
     hasExpander,
+    location,
     ...rest
 }) => {
     const margin: string = '5px';
@@ -122,7 +126,16 @@ const NeonPaper: React.FC<IProps & PaperProps> = ({
     );
 }
 
-export default withStyles(styles)(NeonPaper);
+const mapStateToProps = (store: IAppState) => {
+    return {
+        location: store.router.location.hash,
+    };
+};
+
+export default withStyles(styles)(connect(
+    mapStateToProps,
+    undefined,
+)(NeonPaper));
 
 interface INeonPaperTypographyProps {
     shade: ('light' | 'dark');
