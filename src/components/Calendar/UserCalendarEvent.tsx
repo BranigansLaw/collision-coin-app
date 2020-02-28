@@ -34,7 +34,7 @@ const UserCalendarEvent: React.FC<IProps> = ({
         <NeonPaper color="green" className={classes.root} density="dense" hasExpander={true}>
             <NeonPaperTypography shade="light" className={classes.title}>{event.name}</NeonPaperTypography>
             <NeonPaperTypography shade="dark">{event.location} @ {getTimeString(startDate)}</NeonPaperTypography>
-            <Typography variant="subtitle2">{event.description}</Typography>
+            <Typography variant="body1">{event.description}</Typography>
         </NeonPaper>
     );
 }

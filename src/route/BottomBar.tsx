@@ -15,8 +15,8 @@ import CropFreeIcon from '@material-ui/icons/CropFree';
 import { push } from 'connected-react-router';
 import AppBarWithHidden from '../components/UserInterface/AppBarWithHidden';
 
-const scanButtonSize: number = 11;
-const barPadding: number = 3;
+export const scanButtonSize: number = 11;
+export const barPadding: number = 3;
 
 const styles = (theme: Theme) => createStyles({
     root: {

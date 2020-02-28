@@ -3,6 +3,7 @@ import { WithStyles, createStyles, withStyles, Theme, PaperProps, Paper, Typogra
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import FabWithHidden from './FabWithHidden';
+import { headerHeight } from '../../route';
 
 const lightNeonPaperTextClassName: string = 'light-neon-text';
 const darkNeonPaperTextClassName: string = 'dark-neon-text';
@@ -18,10 +19,10 @@ const styles = (theme: Theme) => createStyles({
         padding: theme.spacing(2),
     },
     denseDensity: {
-        paddingTop: theme.spacing(1),
-        paddingBottom: theme.spacing(1),
-        paddingLeft: theme.spacing(1.5),
-        paddingRight: theme.spacing(1.5),
+        paddingTop: theme.spacing(0.75),
+        paddingBottom: theme.spacing(0.75),
+        paddingLeft: theme.spacing(1.25),
+        paddingRight: theme.spacing(1.25),
     },
     expandButton: {
         float: 'right',
@@ -65,6 +66,19 @@ const NeonPaper: React.FC<IProps & PaperProps> = ({
     hasExpander,
     ...rest
 }) => {
+    const margin: string = '5px';
+    const expandedStyle: React.CSSProperties = {
+        top: `${headerHeight}`,
+        left: '0px',
+        position: 'fixed',
+        zIndex: 1500,
+        height: `calc(100vh - ${headerHeight} - 112px - (2 * ${margin}))`,
+        width: `calc(100% - (2 * ${margin}))`,
+        margin: margin,
+    };
+    
+    const [expanded, setExpanded] = React.useState(false);
+
     const getDensityClass = () => {
         switch (density) {
             case "dense":
@@ -83,13 +97,25 @@ const NeonPaper: React.FC<IProps & PaperProps> = ({
         }
     }
 
+    const expand = () => {
+        setExpanded(true);
+    }
+
+    const contract = () => {
+        setExpanded(false);
+    }
+
     return (
         <Paper
             variant="outlined"
             className={`${className} ${classes.root} ${getDensityClass()} ${getColorClass()}`} 
+            style={expanded ? expandedStyle : {}}
             {...rest}>
-                <FabWithHidden className={classes.expandButton} size="small" onClick={() => alert('Expand')} hidden={!hasExpander}>
-                    <ExpandMoreIcon />
+                <FabWithHidden className={classes.expandButton} size="small" onClick={() => expand()} hidden={!hasExpander || expanded}>
+                    <ExpandMoreIcon fontSize="small" />
+                </FabWithHidden>
+                <FabWithHidden className={classes.expandButton} size="small" onClick={() => contract()} hidden={!hasExpander || !expanded}>
+                    <ExpandLessIcon fontSize="small" />
                 </FabWithHidden>
                 {children}
         </Paper>
