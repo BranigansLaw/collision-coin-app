@@ -6,7 +6,7 @@ import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
 import { Toolbar, Fab } from '@material-ui/core';
-import { footerPadding, footerHeight, RootUrls } from '.';
+import { RootUrls } from '.';
 import { IProfile } from '../store/profile';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import PeopleIcon from '@material-ui/icons/People';
@@ -37,13 +37,8 @@ const styles = (theme: Theme) => createStyles({
         },
     },
     footer: {
-        width: `calc(100% - (2 * ${footerPadding}))`,
-        padding: footerPadding,
-        height: footerHeight,
-        position: 'absolute',
+        padding: theme.spacing(2),
         textAlign: 'center',
-        left: 0,
-        bottom: 0,
     },
 });
 

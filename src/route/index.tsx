@@ -17,16 +17,16 @@ import StylesTestPage from './StylesTestPage';
 import AttendeeCollisionsPage from './AttendeeCollisionsPage';
 import BottomBar from './BottomBar';
 import CalendarPage from './CalendarPage';
+import MyCodePage from './MyCodePage';
 
 // min height of 48 to work with AppBar
 export const headerHeight: string = '48px';
-export const footerHeight: string = '20px';
-export const footerPadding: string = '10px';
 export const walletBarHeight: string = '105px';
 
 export class RootUrls {
     public static readonly login = () => '/login';
     public static readonly calendar = () => '/calendar';
+    public static readonly myCode = () => '/my-code';    
     public static readonly qrCodeScan = () => '/scan';    
     public static readonly thirdPartyAuth = (): string => '/thirdPartyAuth';
     public static readonly dashboard = (): string => '/dashboard';
@@ -40,8 +40,6 @@ const styles = (theme: Theme) => createStyles({
     },
     main: {
         minHeight: '100%',
-        position: 'relative',
-        paddingBottom: `calc(${footerHeight} + (2 * ${footerPadding}))`,
     },
 });
 
@@ -78,6 +76,7 @@ const AppRoute: React.FC<IProps> = ({
                             return <ThirdPartyAuthErrorPage />;
                         }
                     }}/>
+                    <AuthenticatedRoute exact path={RootUrls.myCode()} component={MyCodePage} />
                     <AuthenticatedRoute exact path={RootUrls.qrCodeScan()} component={QrCodeReaderPage} />
                     <AuthenticatedRoute exact path={RootUrls.calendar()} component={CalendarPage} />
                     <AuthenticatedRoute exact path={RootUrls.firstDataSync()} component={FirstDataSyncInProgress} />

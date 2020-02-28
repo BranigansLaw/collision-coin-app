@@ -5,7 +5,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
-import { Toolbar, Typography, Menu, MenuItem, ListItemText, ListItemIcon } from '@material-ui/core';
+import { Toolbar, Menu, MenuItem, ListItemText, ListItemIcon } from '@material-ui/core';
 import { RootUrls, headerHeight } from '.';
 import CreateIcon from '@material-ui/icons/Create';
 import HelpIcon from '@material-ui/icons/Help';
@@ -42,7 +42,7 @@ const Navbar: React.FC<IProps> = ({
     }
 
     const qrCodeIconClick = () => {
-        push(RootUrls.qrCodeScan())
+        push(RootUrls.myCode())
     }
 
     return (
