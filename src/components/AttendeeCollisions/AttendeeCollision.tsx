@@ -31,6 +31,7 @@ import { reset, submit, FormAction } from 'redux-form';
 import SaveIcon from '@material-ui/icons/Save';
 import CancelIcon from '@material-ui/icons/Cancel';
 import { validNonEmptyString } from '../../util';
+import FlexGrow from '../UserInterface/FlewGrow';
 
 const avatarWidth = 28;
 const avatarRightPadding = 10;
@@ -51,9 +52,6 @@ const styles = (theme: Theme) => createStyles({
     },
     notes: {
         width: '100%',
-    },
-    grow: {
-        flexGrow: 1,
     },
     avatar: {
         maxWidth: `${avatarWidth}px`,
@@ -179,7 +177,7 @@ const AttendeeCollision: React.FC<IProps> = ({
                     </Table>
                     {showNotes(toDisplay)}
                     <Grid className={classes.lastButton} container direction="row" justify="flex-start" alignItems="center">
-                        <div className={classes.grow} />
+                        <FlexGrow />
                         <Fab size="small" onClick={() => onChange(false)}>
                             <ExpandLessIcon />
                         </Fab>

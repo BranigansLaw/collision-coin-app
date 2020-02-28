@@ -14,6 +14,7 @@ import ButtonWithText from '../components/UserInterface/ButtonWithText';
 import { push } from 'connected-react-router';
 import AppBarWithHidden from '../components/UserInterface/AppBarWithHidden';
 import QrCodeIcon from '../assets/svg/QrCodeIcon';
+import FlexGrow from '../components/UserInterface/FlewGrow';
 
 export const scanButtonSize: number = 9;
 export const barPadding: number = 3;
@@ -27,9 +28,6 @@ const styles = (theme: Theme) => createStyles({
     },
     navbarOffset: {
         height: theme.spacing(scanButtonSize + barPadding),
-    },
-    grow: {
-        flexGrow: 1,
     },
     scanButton: {
         width: theme.spacing(scanButtonSize),
@@ -70,11 +68,11 @@ const BottomBar: React.FC<IProps> = ({
                         <ButtonWithText color="secondary" aria-label="contacts list" text="Contacts" onClick={() => push(RootUrls.attendeeCollisions())}>
                             <PeopleIcon />
                         </ButtonWithText>
-                        <div className={classes.grow} />
+                        <FlexGrow />
                         <Fab color="primary" aria-label="scan" className={classes.scanButton} onClick={() => push(RootUrls.qrCodeScan())}>
                             <QrCodeIcon />
                         </Fab>
-                        <div className={classes.grow} />
+                        <FlexGrow />
                         <ButtonWithText color="secondary" aria-label="calendar of events" text="Calendar" onClick={() => push(RootUrls.calendar())}>
                             <CalendarTodayIcon />
                         </ButtonWithText>

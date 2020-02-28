@@ -15,6 +15,8 @@ import { IProfile } from '../store/profile';
 import { push } from 'connected-react-router';
 import AttendeeAvatar from '../components/AttendeeAvatar';
 import Logout from '../components/Logout';
+import QrCodeIcon from '../assets/svg/QrCodeIcon';
+import FlexGrow from '../components/UserInterface/FlewGrow';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -36,11 +38,19 @@ const Navbar: React.FC<IProps> = ({
 
     const editProfileClick = () => {
         setAnchorEl(null);
-        push(RootUrls.attendeeCollisions(profile.id, true))
+        push(RootUrls.attendeeCollisions(profile.id, true));
+    }
+
+    const qrCodeIconClick = () => {
+        push(RootUrls.qrCodeScan())
     }
 
     return (
         <Toolbar className={classes.root} variant="dense" disableGutters={true} aria-controls="main-user-menu" aria-haspopup="true">
+            <MenuItem onClick={(event: React.MouseEvent<HTMLLIElement, MouseEvent>) => qrCodeIconClick()}>
+                <QrCodeIcon />
+            </MenuItem>
+            <FlexGrow />
             <MenuItem onClick={(event: React.MouseEvent<HTMLLIElement, MouseEvent>) => setAnchorEl(event.currentTarget)}>
                 <AttendeeAvatar attendee={profile} />
             </MenuItem>
@@ -86,7 +96,6 @@ const Navbar: React.FC<IProps> = ({
                     <ListItemText primary="Revoke Permissions" />
                 </MenuItem>
             </Menu>
-            <Typography variant="h5">Collision Coin</Typography>
         </Toolbar>
     );
 }
