@@ -10,8 +10,8 @@ export interface IEvent extends IAuditableEntity {
     readonly name: string;
     readonly location: string;
     readonly description: string;
-    readonly startTimeEpochMilliseconds: number;
-    readonly endTimeEpochMilliseconds: number;
+    readonly startEpochMilliseconds: number;
+    readonly endEpochMilliseconds: number;
 }
 
 export interface ICalendarState {
@@ -38,7 +38,7 @@ export const calendarReducer: Reducer<ICalendarState, AttendeeActions> = (
         case 'ReceivedDataSync': {
             return {
                 ...state,
-                events: mergeLists(state.events, action.calendarEvents),
+                events: mergeLists(state.events, action.events),
             };
         }
         case 'Logout': {

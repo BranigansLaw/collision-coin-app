@@ -5,7 +5,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../../store';
-import { IEvent } from '../../store/calendar';
+import { IEvent } from '../../store/event';
 import UserCalendarDayEntry from './UserCalendarDayEntry';
 
 const styles = (theme: Theme) => createStyles({
@@ -23,11 +23,11 @@ const UserCalendar: React.FC<IProps> = ({
 }) => {
     const calendarDict: { [ date: number ]: { [ hour: number ]: IEvent[] } } = {};
     calendar.forEach(e => {
-        const epochHour: number = Math.floor(e.startTimeEpochMilliseconds / 3600000);
+        const epochHour: number = Math.floor(e.startEpochMilliseconds / 3600000);
         const epcohDay: number = Math.floor(epochHour / 24);
 
         let currEpochHour = epochHour;
-        let finishEpochHour: number = Math.floor(e.endTimeEpochMilliseconds / 3600000);
+        let finishEpochHour: number = Math.floor(e.endEpochMilliseconds / 3600000);
         while (currEpochHour <= finishEpochHour) {
             const day = calendarDict[epcohDay];
             if (day === undefined) {
@@ -58,7 +58,7 @@ const UserCalendar: React.FC<IProps> = ({
 
 const mapStateToProps = (store: IAppState) => {
     return {
-        calendar: store.calendarState.events,
+        calendar: store.eventState.events,
     };
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { WithStyles, createStyles, withStyles } from '@material-ui/styles';
 import { Theme } from '@material-ui/core/styles/createMuiTheme';
-import { IEvent } from '../../store/calendar';
+import { IEvent } from '../../store/event';
 import { Typography } from '@material-ui/core';
 import NeonPaper, { NeonPaperTypography } from '../UserInterface/NeonPaper';
 import { getTimeString } from '../../util';
@@ -29,7 +29,7 @@ const UserCalendarEvent: React.FC<IProps> = ({
     event,
     classes,
 }) => {
-    const startDate: Date = new Date(event.startTimeEpochMilliseconds);
+    const startDate: Date = new Date(event.startEpochMilliseconds);
     return (
         <NeonPaper color="green" className={classes.root} density="dense" hasExpander={true}>
             <NeonPaperTypography shade="light" className={classes.title}>{event.name}</NeonPaperTypography>

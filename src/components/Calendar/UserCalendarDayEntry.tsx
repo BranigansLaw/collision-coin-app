@@ -1,7 +1,7 @@
 import React from 'react';
 import { WithStyles, createStyles, withStyles } from '@material-ui/styles';
 import { Theme } from '@material-ui/core/styles/createMuiTheme';
-import { IEvent } from '../../store/calendar';
+import { IEvent } from '../../store/event';
 import { Box, Typography } from '@material-ui/core';
 import UserCalendarHourEntry from './UserCalendarHourEntry';
 import { range } from '../../util';
@@ -12,7 +12,7 @@ const styles = (theme: Theme) => createStyles({
 });
 
 const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
-const weekdayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" ];
+const weekdayNames = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" ];
 
 interface IProps extends WithStyles<typeof styles> {
     dateEpochDays: number;
@@ -30,20 +30,20 @@ const UserCalendarDayEntry: React.FC<IProps> = ({
     Object.keys(hours).forEach(h => {
         const events: IEvent[] = hours[Number(h)];
         events.forEach(e => {
-            if (minHour > e.startTimeEpochMilliseconds) {
-                minHour = e.startTimeEpochMilliseconds;
+            if (minHour > e.startEpochMilliseconds) {
+                minHour = e.startEpochMilliseconds;
             }
-            if (maxHour < e.endTimeEpochMilliseconds) {
-                maxHour = e.endTimeEpochMilliseconds;
+            if (maxHour < e.endEpochMilliseconds) {
+                maxHour = e.endEpochMilliseconds;
             }
         });
     });
-    minHour = minHour / 3600000;
-    maxHour = maxHour / 3600000;
+    minHour = Math.floor(minHour / 3600000);
+    maxHour = Math.max(Math.floor(maxHour / 3600000), minHour + 1);
 
     return (
         <Box className={classes.root}>
-            <Typography>{weekdayNames[date.getDay() - 1]}, {monthNames[date.getMonth() - 1]} {date.getDate()}</Typography>
+            <Typography>{weekdayNames[date.getDay()]}, {monthNames[date.getMonth()]} {date.getDate() + 1}</Typography>
             {range(minHour, maxHour, 1).map((hour: number) =>
                 <UserCalendarHourEntry
                     key={hour}

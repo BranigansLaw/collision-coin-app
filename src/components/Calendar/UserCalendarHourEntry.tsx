@@ -1,7 +1,7 @@
 import React from 'react';
 import { WithStyles, createStyles, withStyles } from '@material-ui/styles';
 import { Theme } from '@material-ui/core/styles/createMuiTheme';
-import { IEvent } from '../../store/calendar';
+import { IEvent } from '../../store/event';
 import { Box, Typography, Grid } from '@material-ui/core';
 import UserCalendarEvent from './UserCalendarEvent';
 
@@ -34,12 +34,11 @@ const UserCalendarHourEntry: React.FC<IProps> = ({
     classes,
 }) => {
     const date: Date = new Date(hoursEpochHours * 3600000);
-    const sortedEvents: IEvent[] = events.sort((a, b) => a.startTimeEpochMilliseconds - b.startTimeEpochMilliseconds);
-    
+    const sortedEvents: IEvent[] = events.sort((a, b) => a.startEpochMilliseconds - b.startEpochMilliseconds);
 
     let divisor: number = 1;
     for (let i = 0; i < sortedEvents.length - 1; i++) {
-        if (sortedEvents[i].endTimeEpochMilliseconds > sortedEvents[i+1].startTimeEpochMilliseconds) {
+        if (sortedEvents[i].endEpochMilliseconds > sortedEvents[i+1].startEpochMilliseconds) {
             divisor++;
         }
     }
@@ -52,18 +51,18 @@ const UserCalendarHourEntry: React.FC<IProps> = ({
             <Typography className={classes.hourTitle}>{date.getHours()}</Typography>
             <Grid item className={classes.eventsContainer}>
                 {sortedEvents.map(e => {
-                    const startTimeDate: Date = new Date(e.startTimeEpochMilliseconds);
-                    if (e.startTimeEpochMilliseconds < lastEndTime) {
+                    const startTimeDate: Date = new Date(e.startEpochMilliseconds);
+                    if (e.startEpochMilliseconds < lastEndTime) {
                         col++;
                     }
-                    lastEndTime = e.endTimeEpochMilliseconds;  
+                    lastEndTime = e.endEpochMilliseconds;  
 
-                    if (Math.floor(e.startTimeEpochMilliseconds / 3600000) === hoursEpochHours) {
+                    if (Math.floor(e.startEpochMilliseconds / 3600000) === hoursEpochHours) {
                         return <Box
                             key={e.id.toString()}
                             className={classes.calendarContainer}
                             style={{
-                                height: hourEntryHeight * ((e.endTimeEpochMilliseconds - e.startTimeEpochMilliseconds) / 3600000),
+                                height: hourEntryHeight * ((e.endEpochMilliseconds - e.startEpochMilliseconds) / 3600000),
                                 width: `${eventWidth}%`,
                                 left: `${eventWidth * col}%`,
                                 top: `${100 * (startTimeDate.getMinutes() / 60)}%`,
