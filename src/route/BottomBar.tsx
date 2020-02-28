@@ -11,11 +11,11 @@ import { IProfile } from '../store/profile';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
 import PeopleIcon from '@material-ui/icons/People';
 import ButtonWithText from '../components/UserInterface/ButtonWithText';
-import CropFreeIcon from '@material-ui/icons/CropFree';
 import { push } from 'connected-react-router';
 import AppBarWithHidden from '../components/UserInterface/AppBarWithHidden';
+import QrCodeIcon from '../assets/svg/QrCodeIcon';
 
-export const scanButtonSize: number = 11;
+export const scanButtonSize: number = 9;
 export const barPadding: number = 3;
 
 const styles = (theme: Theme) => createStyles({
@@ -35,7 +35,7 @@ const styles = (theme: Theme) => createStyles({
         width: theme.spacing(scanButtonSize),
         height: theme.spacing(scanButtonSize),
         "& svg": {
-            fontSize: theme.spacing(scanButtonSize - 3),
+            fontSize: theme.spacing(scanButtonSize - 5),
         },
     },
     footer: {
@@ -72,7 +72,7 @@ const BottomBar: React.FC<IProps> = ({
                         </ButtonWithText>
                         <div className={classes.grow} />
                         <Fab color="primary" aria-label="scan" className={classes.scanButton} onClick={() => push(RootUrls.qrCodeScan())}>
-                            <CropFreeIcon />
+                            <QrCodeIcon />
                         </Fab>
                         <div className={classes.grow} />
                         <ButtonWithText color="secondary" aria-label="calendar of events" text="Calendar" onClick={() => push(RootUrls.calendar())}>

@@ -6,6 +6,8 @@ import FabWithHidden from './FabWithHidden';
 import { headerHeight } from '../../route';
 import { IAppState } from '../../store';
 import { connect } from 'react-redux';
+import { ThunkDispatch } from 'redux-thunk';
+import { AnyAction } from 'redux';
 
 const lightNeonPaperTextClassName: string = 'light-neon-text';
 const darkNeonPaperTextClassName: string = 'dark-neon-text';
@@ -132,9 +134,11 @@ const mapStateToProps = (store: IAppState) => {
     };
 };
 
+const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => ({});
+
 export default withStyles(styles)(connect(
     mapStateToProps,
-    undefined,
+    mapDispatchToProps,
 )(NeonPaper));
 
 interface INeonPaperTypographyProps {
