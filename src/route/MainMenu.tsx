@@ -45,7 +45,7 @@ const Navbar: React.FC<IProps> = ({
         push(RootUrls.attendeeCollisions(profile.id, true));
     }
     const toggleUiMode = () => {
-        updateUiPreference(profile.uiMode === 'light' ? 'dark' : 'light');
+        updateUiPreference(profile.uiMode === 'dark' ? 'light' : 'dark');
     }
 
     const qrCodeIconClick = () => {
@@ -93,7 +93,7 @@ const Navbar: React.FC<IProps> = ({
                     <ListItemIcon>
                         {profile.uiMode === 'dark' ? <WbSunnyIcon fontSize="small" /> : <Brightness3Icon fontSize="small" />}
                     </ListItemIcon>
-                    <ListItemText primary={`Toggle ${profile.uiMode === 'light' ? 'Dark' : 'Light'} Mode`} />
+                    <ListItemText primary={`Toggle ${profile.uiMode === 'dark' ? 'Light' : 'Dark'} Mode`} />
                 </MenuItem>
                 <MenuItem>
                     <ListItemIcon>
