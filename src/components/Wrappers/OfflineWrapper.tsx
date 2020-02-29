@@ -3,6 +3,8 @@ import { connect } from 'react-redux';
 import { IOfflineAppState } from '../../store';
 import { Typography, WithStyles, createStyles, withStyles, Theme, Box } from '@material-ui/core';
 import { headerHeight, walletBarHeight, RootUrls } from '../../route';
+import { ThunkDispatch } from 'redux-thunk';
+import { AnyAction } from 'redux';
 
 const styles = (theme: Theme) => createStyles({
     offlineBanner: {
@@ -49,7 +51,12 @@ const mapStateToProps = (store: IOfflineAppState) => {
     };
 };
 
+const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
+    return {
+    };
+};
+
 export default withStyles(styles)(connect(
     mapStateToProps,
-    undefined,
+    mapDispatchToProps,
 )(OfflineWrapper));

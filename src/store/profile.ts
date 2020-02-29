@@ -7,8 +7,10 @@ import { IAttendeeBaseFields } from './attendee';
 import { validNonEmptyString } from '../util';
 
 // Store
+export type UiMode = 'light' | 'dark';
 export interface IProfile extends IAttendeeBaseFields {
-    qrCodeBase64Data?: string;
+    readonly qrCodeBase64Data?: string;
+    readonly uiMode: UiMode;
 }
 
 export interface IProfileState {
@@ -16,7 +18,7 @@ export interface IProfileState {
 }
 
 // TODO: Replace this method with a lookup from the database
-export const profileIsValid = (profile: IProfile | null): boolean => {
+export const profileIsValid = (profile: IAttendeeBaseFields | null): boolean => {
     return profile !== null &&
         validNonEmptyString(profile.companyName) && validNonEmptyString(profile.companyName) &&
         validNonEmptyString(profile.position) && validNonEmptyString(profile.position);
@@ -32,8 +34,13 @@ export interface IUpdateProfileAction extends Action<'UpdateProfile'> {
     newPosition: string;
 }
 
+export interface IUpdatePreferredUiModeAction extends Action<'UpdatePreferredUiMode'> {
+    newPreferredMode: UiMode;
+}
+
 export type AttendeeActions =
     | IUpdateProfileAction
+    | IUpdatePreferredUiModeAction
     | IReceivedDataSyncAction
     | ILogoutAction;
 
@@ -54,6 +61,24 @@ export const updateProfileActionCreator: ActionCreator<
         };
 
         dispatch(getDataSyncAction);
+    };
+};
+
+export const updateUiPreferenceCreator: ActionCreator<
+    ThunkAction<
+        Promise<void>,        // The type of the last action to be dispatched - will always be promise<T> for async actions
+        IAppState,            // The type for the data within the last action
+        null,                 // The type of the parameter for the nested function 
+        IUpdateProfileAction  // The type of the last action to be dispatched
+    >
+> = (preferredMode: UiMode) => {
+    return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
+        const updatePreferredUiModeAction: IUpdatePreferredUiModeAction = {
+            type: 'UpdatePreferredUiMode',
+            newPreferredMode: preferredMode,
+        };
+
+        dispatch(updatePreferredUiModeAction);
     };
 };
 
@@ -82,6 +107,15 @@ export const profileReducer: Reducer<IProfileState, AttendeeActions> = (
                 ...state,
                 userProfile: action.myProfile != null ? action.myProfile : state.userProfile,
             };
+        }
+        case 'UpdatePreferredUiMode': {
+            return {
+                ...state,
+                userProfile: state.userProfile !== null ? {
+                    ...state.userProfile,
+                    uiMode: action.newPreferredMode,
+                } : null,
+            }
         }
         case 'Logout': {
             return initialProfileState;

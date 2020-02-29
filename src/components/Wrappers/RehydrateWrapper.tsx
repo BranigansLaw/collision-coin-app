@@ -1,6 +1,8 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { IAppState } from '../../store';
+import { ThunkDispatch } from 'redux-thunk';
+import { AnyAction } from 'redux';
 
 interface IProps {
     rehydrated: boolean;
@@ -27,7 +29,12 @@ const mapStateToProps = (store: IAppState) => {
     };
 };
 
+const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
+    return {
+    };
+};
+
 export default connect(
     mapStateToProps,
-    undefined,
+    mapDispatchToProps,
 )(RehydrateWrapper);

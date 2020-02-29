@@ -10,8 +10,10 @@ import { RootUrls, headerHeight } from '.';
 import CreateIcon from '@material-ui/icons/Create';
 import HelpIcon from '@material-ui/icons/Help';
 import InfoIcon from '@material-ui/icons/Info';
+import WbSunnyIcon from '@material-ui/icons/WbSunny';
+import Brightness3Icon from '@material-ui/icons/Brightness3';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import { IProfile } from '../store/profile';
+import { IProfile, UiMode, updateUiPreferenceCreator } from '../store/profile';
 import { push } from 'connected-react-router';
 import AttendeeAvatar from '../components/AttendeeAvatar';
 import Logout from '../components/Logout';
@@ -27,11 +29,13 @@ const styles = (theme: Theme) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     profile: IProfile;
     push: (url: string) => void;
+    updateUiPreference: (uiMode: UiMode) => void;
 }
 
 const Navbar: React.FC<IProps> = ({
     profile,
     push,
+    updateUiPreference,
     classes,
 }) => {
     const [anchorEl, setAnchorEl] = React.useState<HTMLLIElement | null>(null);
@@ -39,6 +43,9 @@ const Navbar: React.FC<IProps> = ({
     const editProfileClick = () => {
         setAnchorEl(null);
         push(RootUrls.attendeeCollisions(profile.id, true));
+    }
+    const toggleUiMode = () => {
+        updateUiPreference(profile.uiMode === 'light' ? 'dark' : 'light');
     }
 
     const qrCodeIconClick = () => {
@@ -82,6 +89,12 @@ const Navbar: React.FC<IProps> = ({
                     </ListItemIcon>
                     <ListItemText primary="Help" />
                 </MenuItem>
+                <MenuItem onClick={() => toggleUiMode()}>
+                    <ListItemIcon>
+                        {profile.uiMode === 'dark' ? <WbSunnyIcon fontSize="small" /> : <Brightness3Icon fontSize="small" />}
+                    </ListItemIcon>
+                    <ListItemText primary={`Toggle ${profile.uiMode === 'light' ? 'Dark' : 'Light'} Mode`} />
+                </MenuItem>
                 <MenuItem>
                     <ListItemIcon>
                         <InfoIcon fontSize="small" />
@@ -108,6 +121,7 @@ const mapStateToProps = (store: IAppState) => {
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
         push: (url: string) => dispatch(push(url)),
+        updateUiPreference: (uiMode: UiMode) => dispatch(updateUiPreferenceCreator(uiMode)),
     };
 };
 

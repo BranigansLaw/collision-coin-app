@@ -29,13 +29,13 @@ class ButtonWithText extends React.Component<ButtonProps & IconButtonWithTextPro
         } = this.props;
     
         return (
-            <Button className={`${className} ${classes.root}`} {...buttonProps}>
+            <Button className={`${className !== undefined ? className : ''} ${classes.root}`} {...buttonProps}>
                 <Grid container direction="column" justify="center" alignItems="center">
                     <Grid item>
                         {children}
                     </Grid>
                     <Grid item>
-                        <Typography variant="subtitle2" className={classes.text}>{text}</Typography>
+                        <Typography className={classes.text}>{text}</Typography>
                     </Grid>
                 </Grid>
             </Button>);
