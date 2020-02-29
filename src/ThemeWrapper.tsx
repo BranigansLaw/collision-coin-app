@@ -20,7 +20,7 @@ const ThemeWrapper: React.FC<IProps> = ({
     uiMode,
 }) => {
     return (
-        <MuiThemeProvider theme={uiMode === 'light' ? lightTheme : darkTheme}>
+        <MuiThemeProvider theme={uiMode === 'dark' ? darkTheme : lightTheme}>
             <CssBaseline />
             <RehydrateWrapper>
                 <OfflineWrapper>
