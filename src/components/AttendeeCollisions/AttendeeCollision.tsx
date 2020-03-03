@@ -37,6 +37,11 @@ const styles = (theme: Theme) => createStyles({
         height: theme.spacing(10),
         overflow: 'hidden',
     },
+    header: {
+        width: 'initial',
+        whiteSpace: 'nowrap',
+        overflow: 'hidden',
+    },
     secondaryHeading: {
         color: theme.palette.text.secondary,
     },
@@ -135,7 +140,7 @@ const AttendeeCollision: React.FC<IProps> = ({
                     <CancelIcon />
                 </FabWithHidden>),
             ]}>
-            <Grid container spacing={2} direction="row" justify="flex-start" alignItems="center">
+            <Grid spacing={2} className={classes.header} container direction="row" justify="flex-start" alignItems="center">
                 <Grid item className={classes.avatar}>
                     <AttendeeAvatar attendee={toDisplay} />
                 </Grid>
