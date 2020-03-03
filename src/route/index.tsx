@@ -18,6 +18,7 @@ import AttendeeCollisionsPage from './AttendeeCollisionsPage';
 import BottomBar from './BottomBar';
 import CalendarPage from './CalendarPage';
 import MyCodePage from './MyCodePage';
+import UnauthenticatedRoute from './UnauthenticatedRoute';
 
 // min height of 48 to work with AppBar
 export const headerHeight: string = '48px';
@@ -55,8 +56,8 @@ const AppRoute: React.FC<IProps> = ({
                 <main className={classes.main}>
                     <Route exact path='/' render={route => <Redirect to={RootUrls.dashboard()} />} />
                     <AuthenticatedRoute exact path={RootUrls.dashboard()} component={DashboardPage} />
-                    <Route exact path={RootUrls.login()} component={LoginPage} />
-                    <Route exact path='/register' render={route => {
+                    <UnauthenticatedRoute exact path={RootUrls.login()} component={LoginPage} />
+                    <UnauthenticatedRoute exact path='/register' render={route => {
                         const search = window.location.search;
                         const params = new URLSearchParams(search);
                         const id: string | null = params.get('id');
