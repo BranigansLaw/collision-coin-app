@@ -1,5 +1,5 @@
 import React from 'react';
-import { WithStyles, createStyles, withStyles, Theme, PaperProps, Paper, TypographyProps, Typography } from '@material-ui/core';
+import { WithStyles, createStyles, withStyles, Theme, PaperProps, Paper, TypographyProps, Typography, Box } from '@material-ui/core';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import FabWithHidden from './FabWithHidden';
@@ -28,8 +28,11 @@ const styles = (theme: Theme) => createStyles({
         paddingLeft: theme.spacing(1.25),
         paddingRight: theme.spacing(1.25),
     },
-    expandButton: {
+    buttons: {
         float: 'right',
+        '& > .MuiFab-root': {
+            marginLeft: theme.spacing(0.5),
+        },
     },
     green: {
         borderColor: 'rgb(0, 255, 0)',
@@ -44,21 +47,38 @@ const styles = (theme: Theme) => createStyles({
         },
     },
     orange: {
-        borderColor: 'rgb(155, 155, 0)',
+        borderColor: 'rgb(230, 116, 0)',
+        '& .MuiFab-root': {
+            color: 'rgb(230, 116, 0)',
+        },
         '& .light-neon-text': {
-            color: 'rgb(155, 155, 0)',
+            color: 'rgb(230, 116, 0)',
         },
         '& .dark-neon-text': {
-            color: 'rgb(75, 75, 0)',
+            color: 'rgb(115, 58, 0)',
+        },
+    },
+    yellow: {
+        borderColor: 'rgb(242, 255, 0)',
+        '& .MuiFab-root': {
+            color: 'rgb(242, 255, 0)',
+        },
+        '& .light-neon-text': {
+            color: 'rgb(242, 255, 0)',
+        },
+        '& .dark-neon-text': {
+            color: 'rgb(121, 125, 0)',
         },
     },
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    color: ('green' | 'orange');
+    color: ('green' | 'orange' | 'yellow');
     density: ('normal' | 'dense');
+    headerButtons?: JSX.Element[];
     hasExpander?: boolean;
-    location: string;
+    expanded?: boolean;
+    onExpandContractClick?: () => void;
 }
 
 const NeonPaper: React.FC<IProps & PaperProps> = ({
@@ -68,8 +88,10 @@ const NeonPaper: React.FC<IProps & PaperProps> = ({
     style,
     color,
     density,
+    headerButtons,
     hasExpander,
-    location,
+    expanded,
+    onExpandContractClick,
     ...rest
 }) => {
     const margin: string = '5px';
@@ -83,7 +105,7 @@ const NeonPaper: React.FC<IProps & PaperProps> = ({
         margin: margin,
     };
     
-    const [expanded, setExpanded] = React.useState(false);
+    const [expandedLocal, setExpandedLocal] = React.useState(false);
 
     const getDensityClass = () => {
         switch (density) {
@@ -100,29 +122,44 @@ const NeonPaper: React.FC<IProps & PaperProps> = ({
                 return classes.green;
             case "orange":
                 return classes.orange;
-        }
+            case "yellow":
+                return classes.yellow;
+            }
     }
 
     const expand = () => {
-        setExpanded(true);
+        if (onExpandContractClick !== undefined) {
+            onExpandContractClick();
+        }
+        else {
+            setExpandedLocal(true);
+        }
     }
 
     const contract = () => {
-        setExpanded(false);
+        if (onExpandContractClick !== undefined) {
+            onExpandContractClick();
+        }
+        else {
+            setExpandedLocal(false);
+        }
     }
 
     return (
         <Paper
             variant="outlined"
             className={`${className} ${classes.root} ${getDensityClass()} ${getColorClass()}`} 
-            style={expanded ? expandedStyle : {}}
+            style={(expanded !== undefined ? expanded : expandedLocal) ? expandedStyle : {}}
             {...rest}>
-                <FabWithHidden className={classes.expandButton} size="small" onClick={() => expand()} hidden={!hasExpander || expanded}>
-                    <ExpandMoreIcon fontSize="small" />
-                </FabWithHidden>
-                <FabWithHidden className={classes.expandButton} size="small" onClick={() => contract()} hidden={!hasExpander || !expanded}>
-                    <ExpandLessIcon fontSize="small" />
-                </FabWithHidden>
+                <Box className={classes.buttons}>
+                    {headerButtons !== undefined ? headerButtons : ''}
+                    <FabWithHidden size="small" onClick={() => expand()} hidden={!hasExpander || expanded}>
+                        <ExpandMoreIcon fontSize="small" />
+                    </FabWithHidden>
+                    <FabWithHidden size="small" onClick={() => contract()} hidden={!hasExpander || !expanded}>
+                        <ExpandLessIcon fontSize="small" />
+                    </FabWithHidden>
+                </Box>
                 {children}
         </Paper>
     );

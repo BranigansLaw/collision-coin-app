@@ -29,22 +29,18 @@ const AttendeeCollisionList: React.FC<IProps> = ({
     collisions,
     profile,
 }) => {
-    const [expanded, setExpanded] = React.useState<string | false>(openedCollision !== undefined ? openedCollision.toString() : false);
-
     return <>
             {profile !== null ?
                 <AttendeeCollision 
                     openEditing={editing}
                     key={profile.id.toString()} 
                     toDisplay={profile} 
-                    expanded={expanded === profile.id.toString()}
-                    onChange={(id: string | false) => setExpanded(id)} /> : ''}
+                    expandedDefault={openedCollision !== undefined ? openedCollision.toString() === profile.id.toString() : false} /> : ''}
             {collisions.sort((a, b) => a.lastName < b.lastName ? 1 : -1).map(c =>
                 <AttendeeCollision
                     key={c.id.toString()}
                     toDisplay={c}
-                    expanded={expanded === c.id.toString()}
-                    onChange={(id: string | false) => setExpanded(id)} />)}
+                    expandedDefault={openedCollision !== undefined ? openedCollision.toString() === c.id.toString() : false} />)}
         </>;
 }
 

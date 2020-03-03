@@ -10,17 +10,11 @@ import {
     Table,
     TableCell,
     TableBody,
-    ExpansionPanel,
-    ExpansionPanelSummary,
     Typography,
-    ExpansionPanelDetails,
     TextField,
     Grid,
-    Fab,
     Box,
 } from '@material-ui/core';
-import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import { IProfile, profileIsValid } from '../../store/profile';
 import TableRowWithHidden from '../UserInterface/TableRowWithHidden';
 import AttendeeAvatar from '../AttendeeAvatar';
@@ -31,7 +25,7 @@ import { reset, submit, FormAction } from 'redux-form';
 import SaveIcon from '@material-ui/icons/Save';
 import CancelIcon from '@material-ui/icons/Cancel';
 import { validNonEmptyString } from '../../util';
-import FlexGrow from '../UserInterface/FlewGrow';
+import NeonPaper from '../UserInterface/NeonPaper';
 
 const avatarWidth = 28;
 const avatarRightPadding = 10;
@@ -40,12 +34,8 @@ const headerItemPadding = 8;
 
 const styles = (theme: Theme) => createStyles({
     root: {
-        margin: theme.spacing(2),
-    },
-    details: {
-        display: 'block',
-    },
-    heading: {
+        height: theme.spacing(10),
+        overflow: 'hidden',
     },
     secondaryHeading: {
         color: theme.palette.text.secondary,
@@ -61,9 +51,6 @@ const styles = (theme: Theme) => createStyles({
     nameAndTitle: {
         width: `calc(100% - ${avatarWidth}px - ${buttonsWidth}px - ${avatarRightPadding}px - ${headerItemPadding * 2}px)`,
     },
-    headerButtons: {
-        maxWidth: `${buttonsWidth}px`,
-    },
     lastButton: {
         marginTop: theme.spacing(1),
     },
@@ -71,24 +58,23 @@ const styles = (theme: Theme) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     toDisplay: IAttendee | IProfile;
-    expanded: boolean;
+    expandedDefault: boolean;
     openEditing?: boolean;
     saveProfileChanges: () => FormAction;
     resetProfileChanges: () => void;
-    onChange: (attendeeId: string | false) => void;
     updateAttendeeCollisionNotes: (collisionId: string, updatedNotes: string) => void;
 }
 
 const AttendeeCollision: React.FC<IProps> = ({
     classes,
     toDisplay,
-    expanded,
+    expandedDefault,
     openEditing,
     saveProfileChanges,
     resetProfileChanges,
-    onChange,
     updateAttendeeCollisionNotes,
 }) => {
+    const [expanded, setExpanded] = React.useState<boolean>(expandedDefault);
     const [editing, setEditing] = React.useState<boolean>(openEditing !== undefined && openEditing);
 
     const showNotes = (object: IAttendee | IProfile) => {
@@ -104,6 +90,10 @@ const AttendeeCollision: React.FC<IProps> = ({
                 />);
         }
     }
+    const startEditing = () => {
+        setExpanded(true);
+        setEditing(true)
+    }
 
     const cancelProfileChanges = () => {
         resetProfileChanges();
@@ -113,81 +103,77 @@ const AttendeeCollision: React.FC<IProps> = ({
     const saveProfile = () => {
         saveProfileChanges();
         setEditing(false);
+        setExpanded(false);
+    }
+
+    const toggleExpanded = () => {
+        if (expanded) {
+            setEditing(false);
+        }
+
+        setExpanded(!expanded)
     }
 
     const isProfile: boolean = 'qrCodeBase64Data' in toDisplay;
 
     return (
-        <ExpansionPanel 
+        <NeonPaper
+            color="yellow"
+            density="normal"
+            className={classes.root}
+            hasExpander={true}
             expanded={expanded}
-            onChange={() => onChange(toDisplay.id)}
-            className={classes.root}>
-            <ExpansionPanelSummary
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-            >
-                <Grid container spacing={2} direction="row" justify="flex-start" alignItems="center">
-                    <Grid item className={classes.avatar}>
-                        <AttendeeAvatar attendee={toDisplay} />
-                    </Grid>
-                    <Grid item className={classes.nameAndTitle}>
-                        <Grid hidden={true} container direction="column" justify="center" alignItems="flex-start">
-                            <Grid item>
-                                <Typography className={classes.heading}>{`${toDisplay.firstName} ${toDisplay.lastName}`}</Typography>
-                            </Grid>
-                            <Grid item>
-                                <Typography 
-                                    hidden={!validNonEmptyString(toDisplay.position) || !validNonEmptyString(toDisplay.companyName)}
-                                    variant="subtitle2" 
-                                    className={classes.secondaryHeading}>
-                                    {`${toDisplay.position} at ${toDisplay.companyName}`}
-                                </Typography>
-                            </Grid>
+            onExpandContractClick={() => toggleExpanded()}
+            headerButtons={[
+                (<FabWithHidden key="edit-button" size="small" onClick={() => startEditing()} hidden={!isProfile || editing}>
+                    <CreateIcon />
+                </FabWithHidden>),
+                (<FabWithHidden key="save-button" size="small" onClick={() => saveProfile()} hidden={true}>
+                    <SaveIcon />
+                </FabWithHidden>),
+                (<FabWithHidden key="cancel-button" size="small" onClick={() => cancelProfileChanges()} hidden={!isProfile || !editing || !profileIsValid(toDisplay)}>
+                    <CancelIcon />
+                </FabWithHidden>),
+            ]}>
+            <Grid container spacing={2} direction="row" justify="flex-start" alignItems="center">
+                <Grid item className={classes.avatar}>
+                    <AttendeeAvatar attendee={toDisplay} />
+                </Grid>
+                <Grid item className={classes.nameAndTitle}>
+                    <Grid hidden={true} container direction="column" justify="center" alignItems="flex-start">
+                        <Grid item>
+                            <Typography>{`${toDisplay.firstName} ${toDisplay.lastName}`}</Typography>
+                        </Grid>
+                        <Grid item>
+                            <Typography 
+                                hidden={!validNonEmptyString(toDisplay.position) || !validNonEmptyString(toDisplay.companyName)}
+                                variant="subtitle2" 
+                                className={classes.secondaryHeading}>
+                                {`${toDisplay.position} at ${toDisplay.companyName}`}
+                            </Typography>
                         </Grid>
                     </Grid>
-                    <Grid item className={classes.headerButtons}>
-                        <FabWithHidden size="small" onClick={() => onChange(toDisplay.id)} hidden={expanded}>
-                            <ExpandMoreIcon />
-                        </FabWithHidden>
-                        <FabWithHidden size="small" onClick={() => setEditing(true)} hidden={!isProfile || !expanded || editing}>
-                            <CreateIcon />
-                        </FabWithHidden>
-                        <FabWithHidden size="small" onClick={() => saveProfile()} hidden={true}>
-                            <SaveIcon />
-                        </FabWithHidden>
-                        <FabWithHidden size="small" onClick={() => cancelProfileChanges()} hidden={!isProfile || !expanded || !editing || !profileIsValid(toDisplay)}>
-                            <CancelIcon />
-                        </FabWithHidden>
-                    </Grid>
                 </Grid>
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails className={classes.details}>
-                <Box hidden={editing && isProfile}>
-                    <Table>
-                        <TableBody>
-                            <TableRowWithHidden hidden={!isProfile && !validNonEmptyString(toDisplay.email)}>
-                                <TableCell component="th" scope="row">Email</TableCell>
-                                <TableCell align="right">{toDisplay.email}</TableCell>
-                            </TableRowWithHidden>
-                            <TableRowWithHidden hidden={!isProfile && !validNonEmptyString(toDisplay.linkedInUsername)}>
-                                <TableCell component="th" scope="row">LinkedIn</TableCell>
-                                <TableCell align="right">{toDisplay.linkedInUsername}</TableCell>
-                            </TableRowWithHidden>
-                        </TableBody>
-                    </Table>
-                    {showNotes(toDisplay)}
-                    <Grid className={classes.lastButton} container direction="row" justify="flex-start" alignItems="center">
-                        <FlexGrow />
-                        <Fab size="small" onClick={() => onChange(false)}>
-                            <ExpandLessIcon />
-                        </Fab>
-                    </Grid>
-                </Box>
-                <Box hidden={!editing || !isProfile}>
-                    <EditProfile hideSubmit={false} />
-                </Box>
-            </ExpansionPanelDetails>
-        </ExpansionPanel>);
+            </Grid>
+            <Box hidden={editing && isProfile}>
+                <Table>
+                    <TableBody>
+                        <TableRowWithHidden hidden={!isProfile && !validNonEmptyString(toDisplay.email)}>
+                            <TableCell component="th" scope="row">Email</TableCell>
+                            <TableCell align="right">{toDisplay.email}</TableCell>
+                        </TableRowWithHidden>
+                        <TableRowWithHidden hidden={!isProfile && !validNonEmptyString(toDisplay.linkedInUsername)}>
+                            <TableCell component="th" scope="row">LinkedIn</TableCell>
+                            <TableCell align="right">{toDisplay.linkedInUsername}</TableCell>
+                        </TableRowWithHidden>
+                    </TableBody>
+                </Table>
+                {showNotes(toDisplay)}
+            </Box>
+            <Box hidden={!editing || !isProfile}>
+                <EditProfile hideSubmit={false} />
+            </Box>
+        </NeonPaper>);
 }
 
 const mapStateToProps = (store: IAppState) => {
