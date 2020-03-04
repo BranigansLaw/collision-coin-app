@@ -112,6 +112,7 @@ const EditProfile: React.FC<IProps> = ({
                     companyName: currentCompanyName,
                     position: currentPosition,
                 }}
+                enableReinitialize={true}
                 onSubmit={(values: IEditProfileForm) => { updateProfile(values.companyName, values.position); }} />
         </>
     );

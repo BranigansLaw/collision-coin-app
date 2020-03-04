@@ -21,11 +21,11 @@ import AttendeeAvatar from '../AttendeeAvatar';
 import CreateIcon from '@material-ui/icons/Create';
 import FabWithHidden from '../UserInterface/FabWithHidden';
 import EditProfile, { EditProfileFormName } from '../EditProfile/EditProfile';
-import { reset, submit, FormAction, FormState } from 'redux-form';
-import SaveIcon from '@material-ui/icons/Save';
+import { reset } from 'redux-form';
 import CancelIcon from '@material-ui/icons/Cancel';
 import { validNonEmptyString } from '../../util';
 import NeonPaper from '../UserInterface/NeonPaper';
+import SaveProfileButton from './SaveProfileButton';
 
 const avatarWidth = 28;
 const avatarRightPadding = 10;
@@ -65,8 +65,6 @@ interface IProps extends WithStyles<typeof styles> {
     toDisplay: IAttendee | IProfile;
     expandedDefault: boolean;
     openEditing?: boolean;
-    errors: FormState,
-    saveProfileChanges: () => FormAction;
     resetProfileChanges: () => void;
     updateAttendeeCollisionNotes: (collisionId: string, updatedNotes: string) => void;
 }
@@ -76,8 +74,6 @@ const AttendeeCollision: React.FC<IProps> = ({
     toDisplay,
     expandedDefault,
     openEditing,
-    errors,
-    saveProfileChanges,
     resetProfileChanges,
     updateAttendeeCollisionNotes,
 }) => {
@@ -108,8 +104,6 @@ const AttendeeCollision: React.FC<IProps> = ({
     }
 
     const saveProfile = () => {
-        const formAction = saveProfileChanges();
-        debugger;
         setEditing(false);
         setExpanded(false);
     }
@@ -121,9 +115,26 @@ const AttendeeCollision: React.FC<IProps> = ({
 
         setExpanded(!expanded)
     }
-
+    
     const isProfile: boolean = 'qrCodeBase64Data' in toDisplay;
-    debugger;
+    let headerButtons: JSX.Element[] = [
+        (<FabWithHidden key="edit-button" size="small" onClick={() => startEditing()} hidden={!isProfile || editing}>
+            <CreateIcon />
+        </FabWithHidden>),
+        (<FabWithHidden key="cancel-button" size="small" onClick={() => cancelProfileChanges()} hidden={!isProfile || !editing || !profileIsValid(toDisplay)}>
+            <CancelIcon />
+        </FabWithHidden>),
+    ];
+
+    if (isProfile && editing) {
+        headerButtons = [
+            <SaveProfileButton 
+                key="save-button"
+                closeFormCallback={saveProfile} />,
+            ...headerButtons
+        ];
+    }
+
     return (
         <NeonPaper
             color="yellow"
@@ -132,17 +143,7 @@ const AttendeeCollision: React.FC<IProps> = ({
             hasExpander={true}
             expanded={expanded}
             onExpandContractClick={() => toggleExpanded()}
-            headerButtons={[
-                (<FabWithHidden key="edit-button" size="small" onClick={() => startEditing()} hidden={!isProfile || editing}>
-                    <CreateIcon />
-                </FabWithHidden>),
-                (<FabWithHidden key="save-button" size="small" disabled={errors === undefined || !errors.anyTouched || errors.error !== undefined} onClick={() => saveProfile()} hidden={!isProfile || !editing}>
-                    <SaveIcon />
-                </FabWithHidden>),
-                (<FabWithHidden key="cancel-button" size="small" onClick={() => cancelProfileChanges()} hidden={!isProfile || !editing || !profileIsValid(toDisplay)}>
-                    <CancelIcon />
-                </FabWithHidden>),
-            ]}>
+            headerButtons={headerButtons}>
             <Grid spacing={2} className={classes.header} container direction="row" justify="flex-start" alignItems="center">
                 <Grid item className={classes.avatar}>
                     <AttendeeAvatar attendee={toDisplay} />
@@ -179,21 +180,19 @@ const AttendeeCollision: React.FC<IProps> = ({
                 {showNotes(toDisplay)}
             </Box>
             <Box hidden={!editing || !isProfile}>
-                <EditProfile hideSubmit={false} />
+                <EditProfile hideSubmit={true} />
             </Box>
         </NeonPaper>);
 }
 
 const mapStateToProps = (store: IAppState) => {
     return {
-        errors: store.form[EditProfileFormName],
     };
 };
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
         updateAttendeeCollisionNotes: (collisionId: string, updatedNotes: string) => dispatch(updateAttendeeCollisionNotesActionCreator(collisionId, updatedNotes)),
-        saveProfileChanges: () => dispatch(submit(EditProfileFormName)),
         resetProfileChanges: () => dispatch(reset(EditProfileFormName))
     };
 };
