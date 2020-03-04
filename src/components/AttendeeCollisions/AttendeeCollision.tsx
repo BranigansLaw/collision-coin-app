@@ -21,7 +21,7 @@ import AttendeeAvatar from '../AttendeeAvatar';
 import CreateIcon from '@material-ui/icons/Create';
 import FabWithHidden from '../UserInterface/FabWithHidden';
 import EditProfile, { EditProfileFormName } from '../EditProfile/EditProfile';
-import { reset, submit, FormAction } from 'redux-form';
+import { reset, submit, FormAction, FormState } from 'redux-form';
 import SaveIcon from '@material-ui/icons/Save';
 import CancelIcon from '@material-ui/icons/Cancel';
 import { validNonEmptyString } from '../../util';
@@ -65,6 +65,7 @@ interface IProps extends WithStyles<typeof styles> {
     toDisplay: IAttendee | IProfile;
     expandedDefault: boolean;
     openEditing?: boolean;
+    errors: FormState,
     saveProfileChanges: () => FormAction;
     resetProfileChanges: () => void;
     updateAttendeeCollisionNotes: (collisionId: string, updatedNotes: string) => void;
@@ -75,6 +76,7 @@ const AttendeeCollision: React.FC<IProps> = ({
     toDisplay,
     expandedDefault,
     openEditing,
+    errors,
     saveProfileChanges,
     resetProfileChanges,
     updateAttendeeCollisionNotes,
@@ -106,7 +108,8 @@ const AttendeeCollision: React.FC<IProps> = ({
     }
 
     const saveProfile = () => {
-        saveProfileChanges();
+        const formAction = saveProfileChanges();
+        debugger;
         setEditing(false);
         setExpanded(false);
     }
@@ -120,7 +123,7 @@ const AttendeeCollision: React.FC<IProps> = ({
     }
 
     const isProfile: boolean = 'qrCodeBase64Data' in toDisplay;
-
+    debugger;
     return (
         <NeonPaper
             color="yellow"
@@ -133,7 +136,7 @@ const AttendeeCollision: React.FC<IProps> = ({
                 (<FabWithHidden key="edit-button" size="small" onClick={() => startEditing()} hidden={!isProfile || editing}>
                     <CreateIcon />
                 </FabWithHidden>),
-                (<FabWithHidden key="save-button" size="small" onClick={() => saveProfile()} hidden={true}>
+                (<FabWithHidden key="save-button" size="small" disabled={errors === undefined || !errors.anyTouched || errors.error !== undefined} onClick={() => saveProfile()} hidden={!isProfile || !editing}>
                     <SaveIcon />
                 </FabWithHidden>),
                 (<FabWithHidden key="cancel-button" size="small" onClick={() => cancelProfileChanges()} hidden={!isProfile || !editing || !profileIsValid(toDisplay)}>
@@ -183,6 +186,7 @@ const AttendeeCollision: React.FC<IProps> = ({
 
 const mapStateToProps = (store: IAppState) => {
     return {
+        errors: store.form[EditProfileFormName],
     };
 };
 

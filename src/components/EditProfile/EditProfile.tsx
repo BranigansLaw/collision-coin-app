@@ -18,6 +18,8 @@ interface IFormProps {
     hideSubmit: boolean;
 }
 
+const required = (value: any) => (value || typeof value === 'number' ? undefined : 'Required');
+
 const FormComponent: React.FC<InjectedFormProps<IEditProfileForm, IFormProps> & IFormProps> = ({
     handleSubmit,
     pristine,
@@ -35,7 +37,7 @@ const FormComponent: React.FC<InjectedFormProps<IEditProfileForm, IFormProps> & 
                     label="Company Name"
                     disabled={submitting || loading}
                     margin="normal"
-                    required
+                    validate={[required]}
                 />
             </div>
             <div>
@@ -46,7 +48,7 @@ const FormComponent: React.FC<InjectedFormProps<IEditProfileForm, IFormProps> & 
                     label="Position"
                     disabled={submitting || loading}
                     margin="normal"
-                    required={true}
+                    validate={[required]}
                 />
             </div>
             <div hidden={hideSubmit}>
