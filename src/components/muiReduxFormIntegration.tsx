@@ -16,10 +16,11 @@ export const renderTextField = (
 ) => (
     <>
         <TextField
+            error={touched && (error || warning)}
+            helperText={error ? error : warning}
             label={label}
             {...input}
             {...custom}
         />
-        {touched && ((error && <span>{error}</span>) || (warning && <span>{warning}</span>))}
     </>
 );
