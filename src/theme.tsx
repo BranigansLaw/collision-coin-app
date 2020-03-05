@@ -22,9 +22,11 @@ export const darkTheme = createMuiTheme({
         },
         primary: {
             main: '#333333',
+            contrastText: '#F2F2F2',
         },
         secondary: {
             main: '#262633',
+            contrastText: '#E6E6E6',
         },
         background: {
             default: '#262633',
@@ -57,9 +59,11 @@ export const lightTheme = createMuiTheme({
         },
         primary: {
             main: '#F2F2F2',
+            contrastText: '#333333',
         },
         secondary: {
-            main: '#262633',
+            main: '#E6E6E6',
+            contrastText: '#333333',
         },
         background: {
             default: '#F2F2F2',

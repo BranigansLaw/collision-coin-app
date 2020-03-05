@@ -6,12 +6,7 @@ import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { IAppState } from '../../store';
-import { updateProfileActionCreator, IProfile } from '../../store/profile';
-
-interface IEditProfileForm {
-    companyName: string;
-    position: string;
-};
+import { updateProfileActionCreator, IProfile, IUpdateProfileFields } from '../../store/profile';
 
 interface IFormProps {
     loading: boolean;
@@ -20,7 +15,7 @@ interface IFormProps {
 
 const required = (value: any) => (value || typeof value === 'number' ? undefined : 'Required');
 
-const FormComponent: React.FC<InjectedFormProps<IEditProfileForm, IFormProps> & IFormProps> = ({
+const FormComponent: React.FC<InjectedFormProps<IUpdateProfileFields, IFormProps> & IFormProps> = ({
     handleSubmit,
     pristine,
     submitting,
@@ -51,6 +46,78 @@ const FormComponent: React.FC<InjectedFormProps<IEditProfileForm, IFormProps> & 
                     validate={[required]}
                 />
             </div>
+            <div>
+                <Field
+                    name="description"
+                    component={renderTextField}
+                    type="text"
+                    label="Tell us about yourself"
+                    disabled={submitting || loading}
+                    margin="normal"
+                    validate={[required]}
+                    multiline
+                />
+            </div>
+            <div>
+                <Field
+                    name="division"
+                    component={renderTextField}
+                    type="text"
+                    label="Company Division"
+                    disabled={submitting || loading}
+                    margin="normal"
+                />
+            </div>
+            <div>
+                <Field
+                    name="phone"
+                    component={renderTextField}
+                    type="tel"
+                    label="Phone Number"
+                    disabled={submitting || loading}
+                    margin="normal"
+                />
+            </div>
+            <div>
+                <Field
+                    name="skype"
+                    component={renderTextField}
+                    type="text"
+                    label="Skype"
+                    disabled={submitting || loading}
+                />
+            </div>
+            <div>
+                <Field
+                    name="website"
+                    component={renderTextField}
+                    type="url"
+                    label="Website"
+                    disabled={submitting || loading}
+                    margin="normal"
+                />
+            </div>
+            <div>
+                <Field
+                    name="linkedIn"
+                    component={renderTextField}
+                    type="text"
+                    label="Position"
+                    disabled={submitting || loading}
+                    margin="normal"
+                />
+            </div>
+            <div>
+                <Field
+                    name="workAddress"
+                    component={renderTextField}
+                    type="text"
+                    label="Work Address"
+                    disabled={submitting || loading}
+                    margin="normal"
+                    multiline
+                />
+            </div>
             <div hidden={hideSubmit}>
                 <Button size="large"
                     variant="contained"
@@ -66,7 +133,7 @@ const FormComponent: React.FC<InjectedFormProps<IEditProfileForm, IFormProps> & 
 
 export const EditProfileFormName: string = 'editProfileForm';
 
-const ConnectedFormComponent = reduxForm<IEditProfileForm, IFormProps>({
+const ConnectedFormComponent = reduxForm<IUpdateProfileFields, IFormProps>({
     form: EditProfileFormName,
 })(FormComponent);
 
@@ -75,7 +142,7 @@ interface IProps {
     currentPosition: string;
     profileFields: IProfile | null;
     hideSubmit?: boolean;
-    updateProfile: (companyName: string, position: string) => void;
+    updateProfile: (updateProfileFields: IUpdateProfileFields) => void;
 }
 
 const readonlyFields: {name: string; label: string; value: (v: IProfile) => string}[] = [
@@ -113,7 +180,7 @@ const EditProfile: React.FC<IProps> = ({
                     position: currentPosition,
                 }}
                 enableReinitialize={true}
-                onSubmit={(values: IEditProfileForm) => { updateProfile(values.companyName, values.position); }} />
+                onSubmit={(values: IUpdateProfileFields) => { updateProfile(values); }} />
         </>
     );
 }
@@ -128,7 +195,7 @@ const mapStateToProps = (store: IAppState) => {
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
-        updateProfile: (companyName: string, position: string) => dispatch(updateProfileActionCreator(companyName, position)),
+        updateProfile: (updateProfileFields: IUpdateProfileFields) => dispatch(updateProfileActionCreator(updateProfileFields)),
     };
 };
 

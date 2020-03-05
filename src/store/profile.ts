@@ -30,8 +30,7 @@ const initialProfileState: IProfileState = {
 
 // Actions
 export interface IUpdateProfileAction extends Action<'UpdateProfile'> {
-    newCompanyName: string;
-    newPosition: string;
+    updates: IUpdateProfileFields
 }
 
 export interface IUpdatePreferredUiModeAction extends Action<'UpdatePreferredUiMode'> {
@@ -45,6 +44,18 @@ export type AttendeeActions =
     | ILogoutAction;
 
 // Action Creators
+export interface IUpdateProfileFields {
+    companyName: string;
+    position: string;
+    description: string;
+    division: string;
+    phone: string;
+    skype: string;
+    website: string;
+    linkedIn: string;
+    workAddress: string;
+};
+
 export const updateProfileActionCreator: ActionCreator<
     ThunkAction<
         Promise<void>,        // The type of the last action to be dispatched - will always be promise<T> for async actions
@@ -52,12 +63,11 @@ export const updateProfileActionCreator: ActionCreator<
         null,                 // The type of the parameter for the nested function 
         IUpdateProfileAction  // The type of the last action to be dispatched
     >
-> = (companyName: string, position: string) => {
+> = (updates: IUpdateProfileFields) => {
     return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
         const getDataSyncAction: IUpdateProfileAction = {
             type: 'UpdateProfile',
-            newCompanyName: companyName,
-            newPosition: position,
+            updates,
         };
 
         dispatch(getDataSyncAction);
@@ -94,8 +104,15 @@ export const profileReducer: Reducer<IProfileState, AttendeeActions> = (
                     ...state,
                     userProfile: {
                         ...state.userProfile,
-                        companyName: action.newCompanyName,
-                        position: action.newPosition,
+                        companyName: action.updates.companyName,
+                        position: action.updates.position,
+                        description: action.updates.description,
+                        division: action.updates.division,
+                        linkedInUsername: action.updates.linkedIn,
+                        skype: action.updates.skype,
+                        website: action.updates.website,
+                        workAddress: action.updates.workAddress,
+                        phone: action.updates.phone,
                     }
                 };
             }

@@ -116,8 +116,8 @@ export const handleApiAction = async (
                 res = await wrapResponse(axios.post(
                     `${process.env.REACT_APP_API_ROOT_URL}profile/update`,
                     {
-                        newCompanyName: action.meta.newCompanyName,
-                        newPosition: action.meta.newPosition,
+                        newCompanyName: action.meta.updates.companyName,
+                        newPosition: action.meta.updates.position,
                     },
                     {
                         headers

@@ -35,12 +35,10 @@ const headerItemPadding = 8;
 const styles = (theme: Theme) => createStyles({
     root: {
         height: theme.spacing(10),
-        overflow: 'hidden',
     },
     header: {
         width: 'initial',
         whiteSpace: 'nowrap',
-        overflow: 'hidden',
     },
     secondaryHeading: {
         color: theme.palette.text.secondary,

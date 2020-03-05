@@ -18,6 +18,26 @@ const styles = (theme: Theme) => createStyles({
         borderRadius: 20,
         borderWidth: 1,
         margin: 8,
+        '&.hasExpander': {
+            overflow: 'hidden',
+        },
+        '&.expanded': {
+            overflowY: 'auto',
+            '&::-webkit-scrollbar-track': {
+                borderRadius: '10px',
+                backgroundColor: theme.palette.primary,
+            },
+            '&::-webkit-scrollbar': {
+                width: '12px',
+                backgroundColor: theme.palette.primary,
+                border: `1px solid ${theme.palette.primary.contrastText}`,
+                borderRadius: '10px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+                borderRadius: '10px',
+                backgroundColor: theme.palette.primary.contrastText,
+            },
+        },
     },
     normalDensity: {
         padding: theme.spacing(2),
@@ -145,18 +165,20 @@ const NeonPaper: React.FC<IProps & PaperProps> = ({
         }
     }
 
+    const expandedFinal: boolean = expanded !== undefined ? expanded : expandedLocal;
+
     return (
         <Paper
             variant="outlined"
-            className={`${className} ${classes.root} ${getDensityClass()} ${getColorClass()}`} 
-            style={(expanded !== undefined ? expanded : expandedLocal) ? expandedStyle : {}}
+            className={`${className} ${classes.root} ${hasExpander ? 'hasExpander' : ''} ${expandedFinal ? 'expanded' : ''} ${getDensityClass()} ${getColorClass()}`} 
+            style={expandedFinal ? expandedStyle : {}}
             {...rest}>
                 <Box className={classes.buttons}>
                     {headerButtons !== undefined ? headerButtons : ''}
-                    <FabWithHidden size="small" onClick={() => expand()} hidden={!hasExpander || expanded}>
+                    <FabWithHidden size="small" onClick={() => expand()} hidden={!hasExpander || expandedFinal}>
                         <ExpandMoreIcon fontSize="small" />
                     </FabWithHidden>
-                    <FabWithHidden size="small" onClick={() => contract()} hidden={!hasExpander || !expanded}>
+                    <FabWithHidden size="small" onClick={() => contract()} hidden={!hasExpander || !expandedFinal}>
                         <ExpandLessIcon fontSize="small" />
                     </FabWithHidden>
                 </Box>
