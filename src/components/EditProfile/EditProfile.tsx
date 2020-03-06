@@ -7,6 +7,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { IAppState } from '../../store';
 import { updateProfileActionCreator, IProfile, IUpdateProfileFields } from '../../store/profile';
+import { nullValueToUndefined } from '../../util';
 
 interface IFormProps {
     loading: boolean;
@@ -14,6 +15,8 @@ interface IFormProps {
 }
 
 const required = (value: any) => (value || typeof value === 'number' ? undefined : 'Required');
+const minLength = (minLength: number) => (value: any) =>
+    (value && typeof value === 'string' && value.length >= minLength ? undefined : `Miniumum length of ${minLength} characters required.`);
 
 const FormComponent: React.FC<InjectedFormProps<IUpdateProfileFields, IFormProps> & IFormProps> = ({
     handleSubmit,
@@ -54,13 +57,13 @@ const FormComponent: React.FC<InjectedFormProps<IUpdateProfileFields, IFormProps
                     label="Tell us about yourself"
                     disabled={submitting || loading}
                     margin="normal"
-                    validate={[required]}
+                    validate={[minLength(150)]}
                     multiline
                 />
             </div>
             <div>
                 <Field
-                    name="division"
+                    name="companyDivision"
                     component={renderTextField}
                     type="text"
                     label="Company Division"
@@ -102,14 +105,14 @@ const FormComponent: React.FC<InjectedFormProps<IUpdateProfileFields, IFormProps
                     name="linkedIn"
                     component={renderTextField}
                     type="text"
-                    label="Position"
+                    label="LinkedIn Username"
                     disabled={submitting || loading}
                     margin="normal"
                 />
             </div>
             <div>
                 <Field
-                    name="workAddress"
+                    name="address"
                     component={renderTextField}
                     type="text"
                     label="Work Address"
@@ -138,8 +141,6 @@ const ConnectedFormComponent = reduxForm<IUpdateProfileFields, IFormProps>({
 })(FormComponent);
 
 interface IProps {
-    currentCompanyName: string;
-    currentPosition: string;
     profileFields: IProfile | null;
     hideSubmit?: boolean;
     updateProfile: (updateProfileFields: IUpdateProfileFields) => void;
@@ -152,8 +153,6 @@ const readonlyFields: {name: string; label: string; value: (v: IProfile) => stri
 ];
 
 const EditProfile: React.FC<IProps> = ({
-    currentCompanyName,
-    currentPosition,
     profileFields,
     hideSubmit,
     updateProfile,
@@ -172,23 +171,29 @@ const EditProfile: React.FC<IProps> = ({
                     />
                 </div>
             ))}
-            <ConnectedFormComponent
-                loading={false}
-                hideSubmit={hideSubmit !== undefined ? hideSubmit : false}
-                initialValues={{
-                    companyName: currentCompanyName,
-                    position: currentPosition,
-                }}
-                enableReinitialize={true}
-                onSubmit={(values: IUpdateProfileFields) => { updateProfile(values); }} />
+            {profileFields === null ? "" : (
+                <ConnectedFormComponent
+                    hideSubmit={hideSubmit !== undefined ? hideSubmit : false}
+                    loading={false}
+                    initialValues={{
+                        companyName: nullValueToUndefined(profileFields.companyName),
+                        position: nullValueToUndefined(profileFields.position),
+                        description: nullValueToUndefined(profileFields.description),
+                        companyDivision: nullValueToUndefined(profileFields.companyDivision),
+                        linkedIn: nullValueToUndefined(profileFields.linkedInUsername),
+                        phone: nullValueToUndefined(profileFields.phone),
+                        skype: nullValueToUndefined(profileFields.skype),
+                        website: nullValueToUndefined(profileFields.website),
+                        address: nullValueToUndefined(profileFields.address),
+                    }}
+                    enableReinitialize={true}
+                    onSubmit={(values: IUpdateProfileFields) => { updateProfile(values); }} />)}
         </>
     );
 }
 
 const mapStateToProps = (store: IAppState) => {
     return {
-        currentCompanyName: store.profile.userProfile !== null && store.profile.userProfile.companyName !== null ? store.profile.userProfile.companyName : '',
-        currentPosition: store.profile.userProfile !== null && store.profile.userProfile.position !== null ? store.profile.userProfile.position : '',
         profileFields: store.profile.userProfile,
     };
 };

@@ -48,6 +48,11 @@ export const darkTheme = createMuiTheme({
         MuiPaper: {
             outlined: muiPaperOutlinedOverride,
         },
+        MuiFormControl: {
+            root: {
+                width: '100%',
+            },
+        },
     }
 });
 
@@ -85,6 +90,11 @@ export const lightTheme = createMuiTheme({
         },
         MuiPaper: {
             outlined: muiPaperOutlinedOverride,
+        },
+        MuiFormControl: {
+            root: {
+                width: '100%',
+            },
         },
     }
 });

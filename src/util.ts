@@ -10,6 +10,14 @@ export function validNonEmptyString(toTest: string | null | undefined) : boolean
     return toTest !== undefined && toTest !== null && toTest !== '';
 }
 
+export function minLengthString(toTest: string | null | undefined, minLength: number) : boolean {
+    return toTest !== undefined && toTest !== null && toTest !== '' && toTest.length >= minLength;
+}
+
+export function nullValueToUndefined<T>(toChange: T | null): T | undefined {
+    return toChange === null ? undefined : toChange;
+}
+
 export interface IMergeableObject {
     id: string;
     deleted?: boolean;

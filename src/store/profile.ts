@@ -4,7 +4,7 @@ import { neverReached, IAppState } from '.';
 import { IReceivedDataSyncAction } from './sync';
 import { ILogoutAction } from './auth';
 import { IAttendeeBaseFields } from './attendee';
-import { validNonEmptyString } from '../util';
+import { validNonEmptyString, minLengthString } from '../util';
 
 // Store
 export type UiMode = 'light' | 'dark';
@@ -20,8 +20,9 @@ export interface IProfileState {
 // TODO: Replace this method with a lookup from the database
 export const profileIsValid = (profile: IAttendeeBaseFields | null): boolean => {
     return profile !== null &&
-        validNonEmptyString(profile.companyName) && validNonEmptyString(profile.companyName) &&
-        validNonEmptyString(profile.position) && validNonEmptyString(profile.position);
+        validNonEmptyString(profile.companyName) &&
+        validNonEmptyString(profile.position) &&
+        minLengthString(profile.description, 150);
 }
 
 const initialProfileState: IProfileState = {
@@ -48,12 +49,12 @@ export interface IUpdateProfileFields {
     companyName: string;
     position: string;
     description: string;
-    division: string;
+    companyDivision: string;
     phone: string;
     skype: string;
     website: string;
     linkedIn: string;
-    workAddress: string;
+    address: string;
 };
 
 export const updateProfileActionCreator: ActionCreator<
@@ -107,11 +108,11 @@ export const profileReducer: Reducer<IProfileState, AttendeeActions> = (
                         companyName: action.updates.companyName,
                         position: action.updates.position,
                         description: action.updates.description,
-                        division: action.updates.division,
+                        companyDivision: action.updates.companyDivision,
                         linkedInUsername: action.updates.linkedIn,
                         skype: action.updates.skype,
                         website: action.updates.website,
-                        workAddress: action.updates.workAddress,
+                        address: action.updates.address,
                         phone: action.updates.phone,
                     }
                 };

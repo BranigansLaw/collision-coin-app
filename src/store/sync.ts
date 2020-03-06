@@ -118,6 +118,13 @@ export const handleApiAction = async (
                     {
                         newCompanyName: action.meta.updates.companyName,
                         newPosition: action.meta.updates.position,
+                        newDescription: action.meta.updates.description,
+                        newCompanyDivision: action.meta.updates.companyDivision,
+                        newLinkedInUsername: action.meta.updates.linkedIn,
+                        newSkype: action.meta.updates.skype,
+                        newWebsite: action.meta.updates.website,
+                        newAddress: action.meta.updates.address,
+                        newPhone: action.meta.updates.phone,
                     },
                     {
                         headers
@@ -306,7 +313,7 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
         case 'UpdateProfile': {
             return {
                 ...state,
-                actionQueue: [ ...state.actionQueue, new ApiAction<IUpdateProfileAction>(action) ],
+                actionQueue: [ ...state.actionQueue.filter(a => a.meta.type !== 'UpdateProfile'), new ApiAction<IUpdateProfileAction>(action) ],
             }
         }
         case 'UpdateAttendeeNotes': {

@@ -15,11 +15,11 @@ export interface IAttendeeBaseFields extends IAuditableEntity {
     email: string | null;
     description: string | null
     linkedInUsername: string | null;
-    division: string | null;
+    companyDivision: string | null;
     phone: string | null;
     skype: string | null;
     website: string | null;
-    workAddress: string | null;
+    address: string | null;
     profilePictureBase64Data: string | null;
 }
 

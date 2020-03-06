@@ -8,7 +8,6 @@ import { IAppState } from '../../store';
 import { IAttendee, updateAttendeeCollisionNotesActionCreator } from '../../store/attendee';
 import {
     Table,
-    TableCell,
     TableBody,
     Typography,
     TextField,
@@ -16,7 +15,6 @@ import {
     Box,
 } from '@material-ui/core';
 import { IProfile, profileIsValid } from '../../store/profile';
-import TableRowWithHidden from '../UserInterface/TableRowWithHidden';
 import AttendeeAvatar from '../AttendeeAvatar';
 import CreateIcon from '@material-ui/icons/Create';
 import FabWithHidden from '../UserInterface/FabWithHidden';
@@ -26,6 +24,7 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import { validNonEmptyString } from '../../util';
 import NeonPaper from '../UserInterface/NeonPaper';
 import SaveProfileButton from './SaveProfileButton';
+import AttendeeFieldDisplay from './AttendeeFieldDisplay';
 
 const avatarWidth = 28;
 const avatarRightPadding = 10;
@@ -165,14 +164,14 @@ const AttendeeCollision: React.FC<IProps> = ({
             <Box hidden={editing && isProfile}>
                 <Table>
                     <TableBody>
-                        <TableRowWithHidden hidden={!isProfile && !validNonEmptyString(toDisplay.email)}>
-                            <TableCell component="th" scope="row">Email</TableCell>
-                            <TableCell align="right">{toDisplay.email}</TableCell>
-                        </TableRowWithHidden>
-                        <TableRowWithHidden hidden={!isProfile && !validNonEmptyString(toDisplay.linkedInUsername)}>
-                            <TableCell component="th" scope="row">LinkedIn</TableCell>
-                            <TableCell align="right">{toDisplay.linkedInUsername}</TableCell>
-                        </TableRowWithHidden>
+                        <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Email" fieldSelector={(p : IProfile | IAttendee) => p.email} />
+                        <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="LinkedIn" fieldSelector={(p : IProfile | IAttendee) => p.linkedInUsername} />
+                        <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Bio" fieldSelector={(p : IProfile | IAttendee) => p.description} />
+                        <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Division" fieldSelector={(p : IProfile | IAttendee) => p.companyDivision} />
+                        <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Phone" fieldSelector={(p : IProfile | IAttendee) => p.phone} />
+                        <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Skype Username" fieldSelector={(p : IProfile | IAttendee) => p.skype} />
+                        <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Website" fieldSelector={(p : IProfile | IAttendee) => p.website} />
+                        <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Address" fieldSelector={(p : IProfile | IAttendee) => p.address} />
                     </TableBody>
                 </Table>
                 {showNotes(toDisplay)}
