@@ -14,13 +14,10 @@ export const renderTextField = (
         };
     },
 ) => (
-    <>
-        <TextField
-            error={touched && (error !== undefined || warning !== undefined)}
-            helperText={error ? error : warning}
-            label={label}
-            {...input}
-            {...custom}
-        />
-    </>
-);
+    <TextField
+        error={touched && (error !== undefined || warning !== undefined)}
+        helperText={error ? error : warning}
+        label={label}
+        {...input}
+        {...custom}
+    />);

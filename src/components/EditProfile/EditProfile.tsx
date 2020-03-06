@@ -27,110 +27,92 @@ const FormComponent: React.FC<InjectedFormProps<IUpdateProfileFields, IFormProps
 }) => {
     return (
         <form onSubmit={handleSubmit}>
-            <div>
-                <Field
-                    name="companyName"
-                    component={renderTextField}
-                    type="text"
-                    label="Company Name"
-                    disabled={submitting || loading}
-                    margin="normal"
-                    validate={[required]}
-                />
-            </div>
-            <div>
-                <Field
-                    name="position"
-                    component={renderTextField}
-                    type="text"
-                    label="Position"
-                    disabled={submitting || loading}
-                    margin="normal"
-                    validate={[required]}
-                />
-            </div>
-            <div>
-                <Field
-                    name="description"
-                    component={renderTextField}
-                    type="text"
-                    label="Tell us about yourself"
-                    disabled={submitting || loading}
-                    margin="normal"
-                    validate={[minLength(150)]}
-                    multiline
-                />
-            </div>
-            <div>
-                <Field
-                    name="companyDivision"
-                    component={renderTextField}
-                    type="text"
-                    label="Company Division"
-                    disabled={submitting || loading}
-                    margin="normal"
-                />
-            </div>
-            <div>
-                <Field
-                    name="phone"
-                    component={renderTextField}
-                    type="tel"
-                    label="Phone Number"
-                    disabled={submitting || loading}
-                    margin="normal"
-                />
-            </div>
-            <div>
-                <Field
-                    name="skype"
-                    component={renderTextField}
-                    type="text"
-                    label="Skype"
-                    disabled={submitting || loading}
-                />
-            </div>
-            <div>
-                <Field
-                    name="website"
-                    component={renderTextField}
-                    type="url"
-                    label="Website"
-                    disabled={submitting || loading}
-                    margin="normal"
-                />
-            </div>
-            <div>
-                <Field
-                    name="linkedIn"
-                    component={renderTextField}
-                    type="text"
-                    label="LinkedIn Username"
-                    disabled={submitting || loading}
-                    margin="normal"
-                />
-            </div>
-            <div>
-                <Field
-                    name="address"
-                    component={renderTextField}
-                    type="text"
-                    label="Work Address"
-                    disabled={submitting || loading}
-                    margin="normal"
-                    multiline
-                />
-            </div>
-            <div hidden={hideSubmit}>
-                <Button size="large"
+            <Field
+                name="companyName"
+                component={renderTextField}
+                type="text"
+                label="Company Name"
+                disabled={submitting || loading}
+                margin="normal"
+                validate={[required]}
+            />
+            <Field
+                name="position"
+                component={renderTextField}
+                type="text"
+                label="Position"
+                disabled={submitting || loading}
+                margin="normal"
+                validate={[required]}
+            />
+            <Field
+                name="description"
+                component={renderTextField}
+                type="text"
+                label="Tell us about yourself"
+                disabled={submitting || loading}
+                margin="normal"
+                validate={[minLength(150)]}
+                multiline
+            />
+            <Field
+                name="companyDivision"
+                component={renderTextField}
+                type="text"
+                label="Company Division"
+                disabled={submitting || loading}
+                margin="normal"
+            />
+            <Field
+                name="phone"
+                component={renderTextField}
+                type="tel"
+                label="Phone Number"
+                disabled={submitting || loading}
+                margin="normal"
+            />
+            <Field
+                name="skype"
+                component={renderTextField}
+                type="text"
+                label="Skype"
+                disabled={submitting || loading}
+            />
+            <Field
+                name="website"
+                component={renderTextField}
+                type="url"
+                label="Website"
+                disabled={submitting || loading}
+                margin="normal"
+            />
+            <Field
+                name="linkedIn"
+                component={renderTextField}
+                type="text"
+                label="LinkedIn Username"
+                disabled={submitting || loading}
+                margin="normal"
+            />
+            <Field
+                name="address"
+                component={renderTextField}
+                type="text"
+                label="Work Address"
+                disabled={submitting || loading}
+                margin="normal"
+                multiline
+            />
+            {hideSubmit ? '' : (
+                <Button
+                    size="large"
                     variant="contained"
                     color="primary" 
                     aria-label="add" 
                     type="submit"
                     disabled={pristine || submitting || loading}>
                     Save Changes
-                </Button>
-            </div>
+                </Button>)}
         </form>);
 };
 

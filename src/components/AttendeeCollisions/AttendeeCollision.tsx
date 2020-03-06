@@ -43,7 +43,6 @@ const styles = (theme: Theme) => createStyles({
         color: theme.palette.text.secondary,
     },
     notes: {
-        width: '100%',
     },
     avatar: {
         maxWidth: `${avatarWidth}px`,
@@ -77,13 +76,17 @@ const AttendeeCollision: React.FC<IProps> = ({
     const [expanded, setExpanded] = React.useState<boolean>(expandedDefault);
     const [editing, setEditing] = React.useState<boolean>(openEditing !== undefined && openEditing);
 
+    React.useEffect(() => {
+        // Hack to fix multiline inputs that don't show content on first load
+        window.dispatchEvent(new Event('resize'));
+    }, [expanded]);
+
     const showNotes = (object: IAttendee | IProfile) => {
         if ('userNotes' in object) {
             return (
                 <TextField
                     className={classes.notes}
                     label="Notes"
-                    placeholder="Notes"
                     multiline
                     value={object.userNotes}
                     onChange={e => updateAttendeeCollisionNotes(toDisplay.id.toString(), e.target.value)}
@@ -92,7 +95,7 @@ const AttendeeCollision: React.FC<IProps> = ({
     }
     const startEditing = () => {
         setExpanded(true);
-        setEditing(true)
+        setEditing(true);
     }
 
     const cancelProfileChanges = () => {
