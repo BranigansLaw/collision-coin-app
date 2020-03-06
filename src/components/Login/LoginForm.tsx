@@ -39,7 +39,7 @@ const FormComponent: React.FC<InjectedFormProps<ILoginForm, IFormProps> & IFormP
                     component={renderTextField}
                     type="text"
                     label="Username"
-                    disabled={submitting || loading/* || isRegister*/}
+                    disabled={submitting || loading || isRegister}
                     margin="normal"
                     required
                 />

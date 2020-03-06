@@ -15,6 +15,7 @@ export const renderTextField = (
     },
 ) => (
     <TextField
+        type={type}
         error={touched && (error !== undefined || warning !== undefined)}
         helperText={error ? error : warning}
         label={label}
