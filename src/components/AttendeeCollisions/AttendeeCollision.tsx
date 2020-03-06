@@ -76,11 +76,6 @@ const AttendeeCollision: React.FC<IProps> = ({
     const [expanded, setExpanded] = React.useState<boolean>(expandedDefault);
     const [editing, setEditing] = React.useState<boolean>(openEditing !== undefined && openEditing);
 
-    React.useEffect(() => {
-        // Hack to fix multiline inputs that don't show content on first load
-        window.dispatchEvent(new Event('resize'));
-    }, [expanded]);
-
     const showNotes = (object: IAttendee | IProfile) => {
         if ('userNotes' in object) {
             return (
@@ -94,8 +89,10 @@ const AttendeeCollision: React.FC<IProps> = ({
         }
     }
     const startEditing = () => {
-        setExpanded(true);
         setEditing(true);
+        // Trigger resize for hidden text areas
+        window.dispatchEvent(new Event('resize'));
+        setExpanded(true);
     }
 
     const cancelProfileChanges = () => {

@@ -7,7 +7,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { IAppState } from '../../store';
 import { updateProfileActionCreator, IProfile, IUpdateProfileFields } from '../../store/profile';
-import { nullValueToUndefined } from '../../util';
+import { nullStringToEmpty } from '../../util';
 
 interface IFormProps {
     loading: boolean;
@@ -158,15 +158,15 @@ const EditProfile: React.FC<IProps> = ({
                     hideSubmit={hideSubmit !== undefined ? hideSubmit : false}
                     loading={false}
                     initialValues={{
-                        companyName: nullValueToUndefined(profileFields.companyName),
-                        position: nullValueToUndefined(profileFields.position),
-                        description: nullValueToUndefined(profileFields.description),
-                        companyDivision: nullValueToUndefined(profileFields.companyDivision),
-                        linkedIn: nullValueToUndefined(profileFields.linkedInUsername),
-                        phone: nullValueToUndefined(profileFields.phone),
-                        skype: nullValueToUndefined(profileFields.skype),
-                        website: nullValueToUndefined(profileFields.website),
-                        address: nullValueToUndefined(profileFields.address),
+                        companyName: nullStringToEmpty(profileFields.companyName),
+                        position: nullStringToEmpty(profileFields.position),
+                        description: nullStringToEmpty(profileFields.description),
+                        companyDivision: nullStringToEmpty(profileFields.companyDivision),
+                        linkedIn: nullStringToEmpty(profileFields.linkedInUsername),
+                        phone: nullStringToEmpty(profileFields.phone),
+                        skype: nullStringToEmpty(profileFields.skype),
+                        website: nullStringToEmpty(profileFields.website),
+                        address: nullStringToEmpty(profileFields.address),
                     }}
                     enableReinitialize={true}
                     onSubmit={(values: IUpdateProfileFields) => { updateProfile(values); }} />)}

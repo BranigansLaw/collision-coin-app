@@ -14,8 +14,8 @@ export function minLengthString(toTest: string | null | undefined, minLength: nu
     return toTest !== undefined && toTest !== null && toTest !== '' && toTest.length >= minLength;
 }
 
-export function nullValueToUndefined<T>(toChange: T | null): T | undefined {
-    return toChange === null ? undefined : toChange;
+export function nullStringToEmpty(toChange: string | null): string {
+    return toChange === null ? '' : toChange;
 }
 
 export interface IMergeableObject {
