@@ -18,6 +18,12 @@ export function nullStringToEmpty(toChange: string | null): string {
     return toChange === null ? '' : toChange;
 }
 
+export function ab2str(buf: ArrayBuffer): string {
+    const bytes = new Uint8Array(buf);
+    const dv = new DataView(bytes.buffer);
+    return dv.getUint16(0, true).toString();
+}
+
 export interface IMergeableObject {
     id: string;
     deleted?: boolean;

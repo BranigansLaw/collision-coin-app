@@ -25,6 +25,7 @@ import { validNonEmptyString } from '../../util';
 import NeonPaper from '../UserInterface/NeonPaper';
 import SaveProfileButton from './SaveProfileButton';
 import AttendeeFieldDisplay from './AttendeeFieldDisplay';
+import ProfileImage from './ProfileImage';
 
 const avatarWidth = 28;
 const avatarRightPadding = 10;
@@ -162,6 +163,7 @@ const AttendeeCollision: React.FC<IProps> = ({
                 </Grid>
             </Grid>
             <Box hidden={editing && isProfile}>
+                <ProfileImage toDisplay={toDisplay} />
                 <Table>
                     <TableBody>
                         <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Email" fieldSelector={(p : IProfile | IAttendee) => p.email} />
