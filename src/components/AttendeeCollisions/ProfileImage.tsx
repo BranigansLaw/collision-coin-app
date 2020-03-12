@@ -78,7 +78,7 @@ const ProfileImage: React.FC<IProps> = ({
                     type="file"
                     accept="image/*"
                     onChange={onSelectFile} />
-                <label htmlFor={elementId}>
+                <label htmlFor={elementId} style={{cursor: 'pointer'}}>
                     <LargeCenteredAvatar toDisplay={toDisplay} />
                 </label>
                 <CropProfileImageModal
