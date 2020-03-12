@@ -7,6 +7,7 @@ import Slider from '@material-ui/core/Slider';
 import Cropper from 'react-easy-crop';
 import { Area } from 'react-easy-crop/types';
 import { getCroppedImg, resizeImage } from '../../imageUtil';
+import FlexGrow from '../UserInterface/FlewGrow';
 
 const buttonPaneHeight: number = 100;
 
@@ -25,6 +26,16 @@ const styles = (theme: Theme) => createStyles({
     buttonPane: {
         position: 'absolute',
         bottom: 0,
+        width: '100%',
+    },
+    buttons: {
+        display: 'flex',
+    },
+    zoomSlider: {
+        marginLeft: theme.spacing(2),
+        marginRight: theme.spacing(2),
+        width: `calc(100% - (2 * ${theme.spacing(2)}px))`,
+        color: theme.palette.primary.contrastText,
     },
 });
 
@@ -119,6 +130,7 @@ const CropProfileImageModal: React.FC<IProps> = ({
                 />
                 <Box className={classes.buttonPane}>
                     <Slider
+                        className={classes.zoomSlider}
                         value={zoom}
                         min={1}
                         max={3}
@@ -126,8 +138,11 @@ const CropProfileImageModal: React.FC<IProps> = ({
                         aria-labelledby="Zoom"
                         onChange={(e: React.ChangeEvent<{}>, zoom: number | number[]) => sliderSetZoom(zoom)}
                     />
-                    <Button disabled={imageData === undefined} onClick={() => cropImage()}>Crop</Button>
-                    <Button onClick={() => cropCancelCallback()}>Cancel</Button>
+                    <Box className={classes.buttons}>
+                        <Button disabled={imageData === undefined} onClick={() => cropImage()}>Crop</Button>
+                        <FlexGrow />
+                        <Button onClick={() => cropCancelCallback()}>Cancel</Button>
+                    </Box>
                 </Box>
             </Paper>
         </Modal>
