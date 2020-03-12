@@ -1,10 +1,12 @@
 import React from 'react';
 import { WithStyles, createStyles, withStyles } from '@material-ui/styles';
 import { Theme } from '@material-ui/core/styles/createMuiTheme';
-import ReactCrop, { Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 import { Modal, Paper, Box, Button } from '@material-ui/core';
-import { withResizeDetector } from 'react-resize-detector';
+import Slider from '@material-ui/core/Slider';
+import Cropper from 'react-easy-crop';
+import { Area } from 'react-easy-crop/types';
+import getCroppedImg from '../../imageUtil';
 
 const buttonPaneHeight: number = 100;
 
@@ -27,75 +29,98 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    imageData: string;
-    imageWidth: number;
-    imageHeight: number;
+    imageData: string | undefined;
+    cropCompleteCallback: (data: string) => void;
+    cropCancelCallback: () => void;
 }
 
-type Props =
-    IProps & {
-        height: number;
-        width: number;
-    };
+interface ICrop {
+    x: number;
+    y: number;
+}
 
-const CropProfileImageModal: React.FC<Props> = ({
+const CropProfileImageModal: React.FC<IProps> = ({
     imageData,
-    imageWidth,
-    imageHeight,
-    width,
-    height,
+    cropCompleteCallback,
+    cropCancelCallback,
     classes,
 }) => {
-    const [crop, setCrop] = React.useState<Crop>({});
+    const [crop, setCrop] = React.useState<ICrop>({x:0, y:0});
+    const [zoom, setZoom] = React.useState<number>(1);
+    const [croppedAreaPixels, setCroppedAreaPixels] = React.useState<Area | null>(null);
 
-    React.useEffect(() => {
-        setCrop({
-            unit: '%',
-            aspect: 1,
-            width: 50,
-            height: 50,
-            x: 25,
-            y: 25,
-        });
-    }, [imageData]);
+    const onCropChange = (crop: ICrop) => {
+        setCrop(crop);
+    }
 
-    const getCropperStyle = () => {
-        if (width > height) {
-            return {
-                height: `${height}px`,
-            };
+    const sliderSetZoom = (zoom: number | number[]) => {
+        if (zoom instanceof Array) {
+            setZoom(zoom[0]);
         }
         else {
-            return {
-                height: '100%',
-            };
+            setZoom(zoom);
         }
     }
+
+    const onCropComplete = React.useCallback((croppedArea: Area, croppedAreaPixels: Area) => {
+        setCroppedAreaPixels(croppedAreaPixels);
+    }, []);
+
+    const cropImage = React.useCallback(async () => {
+        if (imageData === undefined) {
+            return;
+        }
+
+        try {
+            const croppedImage: string | null = await getCroppedImg(
+                imageData,
+                croppedAreaPixels,
+            );
+
+            if (croppedImage !== null) {
+                cropCompleteCallback(croppedImage);
+            }
+            else {
+                console.error("Crop returned null");
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }, [imageData, croppedAreaPixels, cropCompleteCallback]);
 
     return (
         <Modal
             className={classes.root}
             aria-labelledby="profile-image-crop"
-            open={imageData !== null}
+            open={imageData !== undefined}
         >
             <Paper className={classes.container}>
-                <ReactCrop
-                    src={imageData}
+                <Cropper
+                    image={imageData}
                     crop={crop}
-                    ruleOfThirds
-                    /*onImageLoaded={this.onImageLoaded}
-                    onComplete={this.onCropComplete}*/
-                    onChange={(c: any) => setCrop(c)}
-                    style={getCropperStyle()}
-                    className={classes.cropContainer}
+                    zoom={zoom}
+                    aspect={1}
+                    cropShape="round"
+                    showGrid={false}
+                    onCropChange={onCropChange}
+                    onZoomChange={(zoom: number) => setZoom(zoom)}
+                    onCropComplete={onCropComplete}
                 />
                 <Box className={classes.buttonPane}>
-                    <Button onClick={() => alert('Crop')}>Crop</Button>
-                    <Button onClick={() => alert('Cancel')}>Cancel</Button>
+                    <Slider
+                        value={zoom}
+                        min={1}
+                        max={3}
+                        step={0.1}
+                        aria-labelledby="Zoom"
+                        onChange={(e: React.ChangeEvent<{}>, zoom: number | number[]) => sliderSetZoom(zoom)}
+                    />
+                    <Button disabled={imageData === undefined} onClick={() => cropImage()}>Crop</Button>
+                    <Button onClick={() => cropCancelCallback()}>Cancel</Button>
                 </Box>
             </Paper>
         </Modal>
     );
 }
 
-export default withStyles(styles)(withResizeDetector(CropProfileImageModal));
+export default withStyles(styles)(CropProfileImageModal);

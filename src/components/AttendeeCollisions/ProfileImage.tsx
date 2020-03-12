@@ -26,11 +26,8 @@ const ProfileImage: React.FC<IProps> = ({
     classes,
     toDisplay,
 }) => {
-    const [imageData, setImageData] = React.useState<{
-        data: string;
-        width: number;
-        height: number;
-    } | null>(null);
+    const [imageData, setImageData] = React.useState<string | undefined>(undefined);
+    const [croppedImageData, setCroppedImageData] = React.useState<string | undefined>(undefined);
 
     const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length === 1) {
@@ -38,7 +35,7 @@ const ProfileImage: React.FC<IProps> = ({
             const reader = new FileReader();
             reader.addEventListener('load', () => {
                 if (reader.result === null) {
-                    setImageData(null);
+                    setImageData(undefined);
                     return;
                 }
 
@@ -50,16 +47,7 @@ const ProfileImage: React.FC<IProps> = ({
                     dataString = ab2str(reader.result);
                 }
 
-                const i: HTMLImageElement = new Image();
-                i.onload = function() {
-                    setImageData({
-                        data: dataString,
-                        width: i.width,
-                        height: i.height,
-                    });
-                };
-
-                i.src = dataString;
+                setImageData(dataString);
             });
             reader.readAsDataURL(loadedImage);
         }
@@ -74,7 +62,12 @@ const ProfileImage: React.FC<IProps> = ({
                 type="file"
                 accept="image/*"
                 onChange={onSelectFile} />
-            {imageData !== null ? <CropProfileImageModal imageData={imageData.data} imageWidth={imageData.width} imageHeight={imageData.height}/> : ''}
+            <CropProfileImageModal
+                imageData={imageData} 
+                cropCompleteCallback={(data: string) => setCroppedImageData(data)}
+                cropCancelCallback={() => setImageData(undefined)}
+            />
+            <img src={croppedImageData} />
         </>);
 }
 
