@@ -13,7 +13,7 @@ import InfoIcon from '@material-ui/icons/Info';
 import WbSunnyIcon from '@material-ui/icons/WbSunny';
 import Brightness3Icon from '@material-ui/icons/Brightness3';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import { IProfile, UiMode, updateUiPreferenceCreator } from '../store/profile';
+import { IProfile, UiMode, updateUiPreferenceActionCreator } from '../store/profile';
 import { push } from 'connected-react-router';
 import AttendeeAvatar from '../components/AttendeeAvatar';
 import Logout from '../components/Logout';
@@ -121,7 +121,7 @@ const mapStateToProps = (store: IAppState) => {
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
         push: (url: string) => dispatch(push(url)),
-        updateUiPreference: (uiMode: UiMode) => dispatch(updateUiPreferenceCreator(uiMode)),
+        updateUiPreference: (uiMode: UiMode) => dispatch(updateUiPreferenceActionCreator(uiMode)),
     };
 };
 

@@ -42,9 +42,14 @@ export interface IUpdatePreferredUiModeAction extends Action<'UpdatePreferredUiM
     newPreferredMode: UiMode;
 }
 
+export interface IUpdateProfileImageAction extends Action<'UpdateProfileImage'> {
+    imageData: string;
+}
+
 export type AttendeeActions =
     | IUpdateProfileAction
     | IUpdatePreferredUiModeAction
+    | IUpdateProfileImageAction
     | IReceivedDataSyncAction
     | ILogoutAction;
 
@@ -79,7 +84,7 @@ export const updateProfileActionCreator: ActionCreator<
     };
 };
 
-export const updateUiPreferenceCreator: ActionCreator<
+export const updateUiPreferenceActionCreator: ActionCreator<
     ThunkAction<
         Promise<void>,        // The type of the last action to be dispatched - will always be promise<T> for async actions
         IAppState,            // The type for the data within the last action
@@ -94,6 +99,24 @@ export const updateUiPreferenceCreator: ActionCreator<
         };
 
         dispatch(updatePreferredUiModeAction);
+    };
+};
+
+export const updateUserProfilePictureActionCreator: ActionCreator<
+    ThunkAction<
+        Promise<void>,        // The type of the last action to be dispatched - will always be promise<T> for async actions
+        IAppState,            // The type for the data within the last action
+        null,                 // The type of the parameter for the nested function 
+        IUpdateProfileAction  // The type of the last action to be dispatched
+    >
+> = (imageData: string) => {
+    return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
+        const updateProfileImageAction: IUpdateProfileImageAction = {
+            type: 'UpdateProfileImage',
+            imageData,
+        };
+
+        dispatch(updateProfileImageAction);
     };
 };
 
@@ -138,6 +161,15 @@ export const profileReducer: Reducer<IProfileState, AttendeeActions> = (
                     uiMode: action.newPreferredMode,
                 } : null,
             }
+        }
+        case 'UpdateProfileImage': {
+            return {
+                ...state,
+                userProfile: state.userProfile !== null ? {
+                    ...state.userProfile,
+                    profilePictureBase64Data: action.imageData,
+                } : null,
+            };
         }
         case 'Logout': {
             return initialProfileState;

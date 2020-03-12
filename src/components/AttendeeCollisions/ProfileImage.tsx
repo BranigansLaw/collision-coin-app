@@ -6,7 +6,7 @@ import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../../store';
 import { IAttendee } from '../../store/attendee';
-import { IProfile, isProfile } from '../../store/profile';
+import { IProfile, isProfile, updateUserProfilePictureActionCreator } from '../../store/profile';
 import 'react-image-crop/dist/ReactCrop.css';
 import { ab2str } from '../../util';
 import CropProfileImageModal from './CropProfileImageModal';
@@ -29,14 +29,15 @@ const styles = (theme: Theme) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     toDisplay: IAttendee | IProfile;
+    updateProfileImage: (imageData: string) => void;
 }
 
 const ProfileImage: React.FC<IProps> = ({
     classes,
     toDisplay,
+    updateProfileImage,
 }) => {
     const [imageData, setImageData] = React.useState<string | undefined>(undefined);
-    const [croppedImageData, setCroppedImageData] = React.useState<string | undefined>(undefined);
 
     const onSelectFile = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files.length === 1) {
@@ -63,7 +64,7 @@ const ProfileImage: React.FC<IProps> = ({
     }
 
     const setCroppedImage = (data: string) => {
-        setCroppedImageData(data);
+        updateProfileImage(data);
         setImageData(undefined);
     }
 
@@ -99,6 +100,7 @@ const mapStateToProps = (store: IAppState) => {
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
+        updateProfileImage: (imageData: string) => dispatch(updateUserProfilePictureActionCreator(imageData)),
     };
 };
 

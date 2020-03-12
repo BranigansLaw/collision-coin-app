@@ -3,7 +3,7 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IOfflineAppState } from '.';
 import axios, { AxiosResponse } from 'axios';
 import { IAttendee, ICreateAttendeeCollisionAction, IUpdateAttendeeNotesAction } from './attendee';
-import { IProfile } from './profile';
+import { IProfile, IUpdateProfileImageAction } from './profile';
 import { ILogoutAction, ILoginThirdPartySuccessAction, IRegisterSuccessAction, ILoginSuccessAction } from './auth';
 import { OfflineAction } from '@redux-offline/redux-offline/lib/types';
 import { Guid } from 'guid-typescript';
@@ -23,6 +23,7 @@ interface ILogoutRequeueAction extends Action<'LogoutRequeue'> {}
 export type ApiActions = 
     | IDataSyncAction
     | IUpdateProfileAction
+    | IUpdateProfileImageAction
     | IUpdateAttendeeNotesAction
     | ICreateAttendeeCollisionAction
     | ILogoutRequeueAction;
@@ -130,6 +131,10 @@ export const handleApiAction = async (
                         headers
                     }), dispatch);
                 break;
+            case 'UpdateProfileImage': {
+                // TODO: Send the data to the server
+                break;
+            }
             case 'UpdateAttendeeNotes':
                 res = await wrapResponse(axios.post(
                     `${process.env.REACT_APP_API_ROOT_URL}collision/attendee/${action.meta.attendeeId.toString()}/update`,
@@ -316,12 +321,19 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
                 actionQueue: [ ...state.actionQueue.filter(a => a.meta.type !== 'UpdateProfile'), new ApiAction<IUpdateProfileAction>(action) ],
             }
         }
+        case 'UpdateProfileImage': {
+            return {
+                ...state,
+                actionQueue: [ ...state.actionQueue.filter(a => a.meta.type !== 'UpdateProfileImage'), new ApiAction<IUpdateProfileImageAction>(action) ],
+            }
+        }
         case 'UpdateAttendeeNotes': {
             return {
                 ...state,
                 actionQueue: [ 
                     ...state.actionQueue.filter(q => q.meta.type !== 'UpdateAttendeeNotes' || q.meta.attendeeId !== action.attendeeId), 
-                    new ApiAction<IUpdateAttendeeNotesAction>(action) ],
+                    new ApiAction<IUpdateAttendeeNotesAction>(action)
+                ],
             }
         }
         case 'Deque': {
