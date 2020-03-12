@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { reduxForm, InjectedFormProps, Field } from 'redux-form';
-import { Button, CircularProgress, Fade, Typography } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 import { renderTextField } from '../muiReduxFormIntegration';
 import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
@@ -9,6 +9,7 @@ import { IOfflineAppState } from '../../store';
 import { loginActionCreator, registerActionCreator } from '../../store/auth';
 import { push } from 'connected-react-router';
 import { RootUrls } from '../../route';
+import LoadingButton from '../UserInterface/LoadingButton';
 
 interface ILoginForm {
     username: string;
@@ -59,19 +60,17 @@ const FormComponent: React.FC<InjectedFormProps<ILoginForm, IFormProps> & IFormP
                 <Typography hidden={errorMessage === undefined}>{errorMessage}</Typography>
             </div>
             <div>
-                <Button size="large"
+                <LoadingButton
+                    size="large"
                     variant="contained"
                     color="primary" 
-                    aria-label="add" 
+                    aria-label={isRegister ? 'Register' : 'Login'} 
                     type="submit"
-                    disabled={pristine || submitting || loading || !online}>
+                    disabled={pristine || submitting || !online}
+                    loading={loading}
+                >
                     {isRegister ? 'Register' : 'Login'}
-                </Button>
-                <Fade
-                    in={loading}
-                    unmountOnExit>
-                    <CircularProgress size={30} />
-                </Fade>
+                </LoadingButton>
             </div>
         </form>);
 };

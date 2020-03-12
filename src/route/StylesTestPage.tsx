@@ -2,6 +2,7 @@ import React from 'react';
 import { WithStyles, createStyles, withStyles, Button, Fab, Paper } from '@material-ui/core';
 import { Theme } from '@material-ui/core/styles/createMuiTheme';
 import AddToPhotosIcon from '@material-ui/icons/AddToPhotos';
+import LoadingButton from '../components/UserInterface/LoadingButton';
 
 const styles = (theme: Theme) => createStyles({
 });
@@ -29,6 +30,8 @@ const StylesTestPage: React.FC<IProps> = ({
             <Button color="secondary" variant="contained" size="large" onClick={() => alert('Click')}>Button Secondary Large Contained</Button>
             <Button color="default" variant="contained" size="small" onClick={() => alert('Click')}>Button Default Small Contained</Button>
             <Button color="default" variant="contained" size="large" onClick={() => alert('Click')}>Button Default Large Contained</Button>
+            <LoadingButton loading={true}>Loading</LoadingButton>
+            <LoadingButton loading={false}>Not Loading</LoadingButton>
             <Fab 
                 size="small"
                 color="primary" 

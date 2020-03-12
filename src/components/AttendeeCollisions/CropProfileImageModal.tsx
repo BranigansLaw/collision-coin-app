@@ -8,6 +8,7 @@ import Cropper from 'react-easy-crop';
 import { Area } from 'react-easy-crop/types';
 import { getCroppedImg, resizeImage } from '../../imageUtil';
 import FlexGrow from '../UserInterface/FlewGrow';
+import LoadingButton from '../UserInterface/LoadingButton';
 
 const buttonPaneHeight: number = 100;
 
@@ -57,6 +58,7 @@ const CropProfileImageModal: React.FC<IProps> = ({
     classes,
 }) => {
     const [crop, setCrop] = React.useState<ICrop>({x:0, y:0});
+    const [cropping, setCropping] = React.useState<boolean>(false);
     const [zoom, setZoom] = React.useState<number>(1);
     const [croppedAreaPixels, setCroppedAreaPixels] = React.useState<Area | null>(null);
 
@@ -82,6 +84,7 @@ const CropProfileImageModal: React.FC<IProps> = ({
             return;
         }
 
+        setCropping(true);
         try {
             const croppedImage: string | null = await getCroppedImg(
                 imageData,
@@ -89,8 +92,7 @@ const CropProfileImageModal: React.FC<IProps> = ({
             );
 
             if (croppedImage === null) {
-                console.error("Crop returned null");
-                return;
+                throw new Error('Error cropping image');
             }
 
             const resizedImage: string | null =
@@ -103,11 +105,12 @@ const CropProfileImageModal: React.FC<IProps> = ({
                 cropCompleteCallback(resizedImage);
             }
             else {
-                console.error("Resize returned null");
+                throw new Error("Resize returned null");
             }
         } catch (e) {
             console.error(e);
         }
+        setCropping(false);
     }, [imageData, croppedAreaPixels, cropCompleteCallback]);
 
     return (
@@ -139,7 +142,9 @@ const CropProfileImageModal: React.FC<IProps> = ({
                         onChange={(e: React.ChangeEvent<{}>, zoom: number | number[]) => sliderSetZoom(zoom)}
                     />
                     <Box className={classes.buttons}>
-                        <Button disabled={imageData === undefined} onClick={() => cropImage()}>Crop</Button>
+                        <LoadingButton loading={cropping} onClick={() => cropImage()}>
+                            {cropping ? 'Loading...' : 'Crop'}
+                        </LoadingButton>
                         <FlexGrow />
                         <Button onClick={() => cropCancelCallback()}>Cancel</Button>
                     </Box>

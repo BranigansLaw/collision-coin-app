@@ -8,6 +8,7 @@ const iconButtonWithTextStyles = (theme: Theme) => createStyles({
         width: theme.spacing(8),
         padding: 0,
         borderRadius: 10,
+        color: 'inherit',
     },
     text: {
         fontSize: theme.spacing(1),
