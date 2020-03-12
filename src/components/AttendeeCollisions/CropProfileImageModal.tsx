@@ -6,7 +6,7 @@ import { Modal, Paper, Box, Button } from '@material-ui/core';
 import Slider from '@material-ui/core/Slider';
 import Cropper from 'react-easy-crop';
 import { Area } from 'react-easy-crop/types';
-import getCroppedImg from '../../imageUtil';
+import { getCroppedImg, resizeImage } from '../../imageUtil';
 
 const buttonPaneHeight: number = 100;
 
@@ -77,11 +77,22 @@ const CropProfileImageModal: React.FC<IProps> = ({
                 croppedAreaPixels,
             );
 
-            if (croppedImage !== null) {
-                cropCompleteCallback(croppedImage);
+            if (croppedImage === null) {
+                console.error("Crop returned null");
+                return;
+            }
+
+            const resizedImage: string | null =
+                await resizeImage(
+                    croppedImage,
+                    {width: 200, height: 200},
+                );
+
+            if (resizedImage !== null) {
+                cropCompleteCallback(resizedImage);
             }
             else {
-                console.error("Crop returned null");
+                console.error("Resize returned null");
             }
         } catch (e) {
             console.error(e);

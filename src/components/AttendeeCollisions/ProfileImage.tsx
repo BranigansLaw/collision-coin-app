@@ -53,6 +53,11 @@ const ProfileImage: React.FC<IProps> = ({
         }
     }
 
+    const setCroppedImage = (data: string) => {
+        setCroppedImageData(data);
+        setImageData(undefined);
+    }
+
     const isProfile: boolean = 'qrCodeBase64Data' in toDisplay;
 
     return (
@@ -64,7 +69,7 @@ const ProfileImage: React.FC<IProps> = ({
                 onChange={onSelectFile} />
             <CropProfileImageModal
                 imageData={imageData} 
-                cropCompleteCallback={(data: string) => setCroppedImageData(data)}
+                cropCompleteCallback={(data: string) => setCroppedImage(data)}
                 cropCancelCallback={() => setImageData(undefined)}
             />
             <img src={croppedImageData} />
