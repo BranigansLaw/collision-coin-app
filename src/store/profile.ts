@@ -3,7 +3,7 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IAppState } from '.';
 import { IReceivedDataSyncAction } from './sync';
 import { ILogoutAction } from './auth';
-import { IAttendeeBaseFields } from './attendee';
+import { IAttendeeBaseFields, IAttendee } from './attendee';
 import { validNonEmptyString, minLengthString } from '../util';
 
 // Store
@@ -23,6 +23,10 @@ export const profileIsValid = (profile: IAttendeeBaseFields | null): boolean => 
         validNonEmptyString(profile.companyName) &&
         validNonEmptyString(profile.position) &&
         minLengthString(profile.description, 150);
+}
+
+export function isProfile(toTest: IAttendee | IProfile): boolean {
+    return 'qrCodeBase64Data' in toTest;
 }
 
 const initialProfileState: IProfileState = {

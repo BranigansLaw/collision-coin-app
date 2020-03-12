@@ -14,7 +14,7 @@ import {
     Grid,
     Box,
 } from '@material-ui/core';
-import { IProfile, profileIsValid } from '../../store/profile';
+import { IProfile, isProfile, profileIsValid } from '../../store/profile';
 import AttendeeAvatar from '../AttendeeAvatar';
 import CreateIcon from '@material-ui/icons/Create';
 import FabWithHidden from '../UserInterface/FabWithHidden';
@@ -114,17 +114,17 @@ const AttendeeCollision: React.FC<IProps> = ({
         setExpanded(!expanded)
     }
     
-    const isProfile: boolean = 'qrCodeBase64Data' in toDisplay;
+    const isProfileRes: boolean = isProfile(toDisplay);
     let headerButtons: JSX.Element[] = [
-        (<FabWithHidden key="edit-button" size="small" onClick={() => startEditing()} hidden={!isProfile || editing}>
+        (<FabWithHidden key="edit-button" size="small" onClick={() => startEditing()} hidden={!isProfileRes || editing}>
             <CreateIcon />
         </FabWithHidden>),
-        (<FabWithHidden key="cancel-button" size="small" onClick={() => cancelProfileChanges()} hidden={!isProfile || !editing || !profileIsValid(toDisplay)}>
+        (<FabWithHidden key="cancel-button" size="small" onClick={() => cancelProfileChanges()} hidden={!isProfileRes || !editing || !profileIsValid(toDisplay)}>
             <CancelIcon />
         </FabWithHidden>),
     ];
 
-    if (isProfile && editing) {
+    if (isProfileRes && editing) {
         headerButtons = [
             <SaveProfileButton 
                 key="save-button"
@@ -162,7 +162,7 @@ const AttendeeCollision: React.FC<IProps> = ({
                     </Grid>
                 </Grid>
             </Grid>
-            <Box hidden={(editing && isProfile) || !expanded}>
+            <Box hidden={(editing && isProfileRes) || !expanded}>
                 <ProfileImage toDisplay={toDisplay} />
                 <Table>
                     <TableBody>
@@ -178,7 +178,7 @@ const AttendeeCollision: React.FC<IProps> = ({
                 </Table>
                 {showNotes(toDisplay)}
             </Box>
-            <Box hidden={!editing || !isProfile}>
+            <Box hidden={!editing || !isProfileRes}>
                 <EditProfile hideSubmit={true} />
             </Box>
         </NeonPaper>);

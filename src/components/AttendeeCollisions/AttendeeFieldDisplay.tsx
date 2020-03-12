@@ -3,7 +3,7 @@ import { WithStyles, createStyles, withStyles } from '@material-ui/styles';
 import { Theme } from '@material-ui/core/styles/createMuiTheme';
 import { IAttendee } from '../../store/attendee';
 import { TableCell } from '@material-ui/core';
-import { IProfile } from '../../store/profile';
+import { IProfile, isProfile } from '../../store/profile';
 import TableRowWithHidden from '../UserInterface/TableRowWithHidden';
 import { validNonEmptyString } from '../../util';
 
@@ -25,10 +25,9 @@ const AttendeeFieldDisplay: React.FC<IProps> = ({
     fieldSelector,
 }) => {
     const field: string | null = fieldSelector(toDisplay);
-    const isProfile: boolean = 'qrCodeBase64Data' in toDisplay;
 
     return (
-        <TableRowWithHidden hidden={!isProfile && !validNonEmptyString(field)}>
+        <TableRowWithHidden hidden={!isProfile(toDisplay) && !validNonEmptyString(field)}>
             <TableCell component="th" scope="row">{fieldName}</TableCell>
             <TableCell align="right">{field}</TableCell>
         </TableRowWithHidden>);

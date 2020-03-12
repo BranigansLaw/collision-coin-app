@@ -6,13 +6,12 @@ import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../../store';
 import { IAttendee } from '../../store/attendee';
-import { IProfile } from '../../store/profile';
+import { IProfile, isProfile } from '../../store/profile';
 import 'react-image-crop/dist/ReactCrop.css';
 import { ab2str } from '../../util';
 import CropProfileImageModal from './CropProfileImageModal';
-import AttendeeAvatar from '../AttendeeAvatar';
-import { Box } from '@material-ui/core';
-import FlexGrow from '../UserInterface/FlewGrow';
+import { Guid } from 'guid-typescript';
+import LargeCenteredAvatar from './LargeCenteredAvatar';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -20,6 +19,11 @@ const styles = (theme: Theme) => createStyles({
         marginTop: theme.spacing(1.5),
     },
     changeButton: {
+        opacity: 0,
+        position: 'absolute',
+        pointerEvents: 'none',
+        width: '1px',
+        height: '1px',
     },
 });
 
@@ -63,15 +67,19 @@ const ProfileImage: React.FC<IProps> = ({
         setImageData(undefined);
     }
 
-    const isProfile: boolean = 'qrCodeBase64Data' in toDisplay;
-    if (isProfile) {
+    const elementId: string = Guid.create().toString();
+    if (isProfile(toDisplay)) {
         return (
             <>
                 <input
+                    id={elementId}
                     className={classes.changeButton}
                     type="file"
                     accept="image/*"
                     onChange={onSelectFile} />
+                <label htmlFor={elementId}>
+                    <LargeCenteredAvatar toDisplay={toDisplay} />
+                </label>
                 <CropProfileImageModal
                     imageData={imageData} 
                     cropCompleteCallback={(data: string) => setCroppedImage(data)}
@@ -80,15 +88,7 @@ const ProfileImage: React.FC<IProps> = ({
             </>);    
     }
     else {
-        return (
-            <Box className={classes.root}>
-                <FlexGrow />
-                <AttendeeAvatar
-                    size="large"
-                    attendee={toDisplay}
-                />
-                <FlexGrow />
-            </Box>);
+        return <LargeCenteredAvatar toDisplay={toDisplay} />;
     }
 }
 
