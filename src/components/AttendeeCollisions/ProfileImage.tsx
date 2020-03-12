@@ -10,9 +10,14 @@ import { IProfile } from '../../store/profile';
 import 'react-image-crop/dist/ReactCrop.css';
 import { ab2str } from '../../util';
 import CropProfileImageModal from './CropProfileImageModal';
+import AttendeeAvatar from '../AttendeeAvatar';
+import { Box } from '@material-ui/core';
+import FlexGrow from '../UserInterface/FlewGrow';
 
 const styles = (theme: Theme) => createStyles({
     root: {
+        display: 'flex',
+        marginTop: theme.spacing(1.5),
     },
     changeButton: {
     },
@@ -59,21 +64,32 @@ const ProfileImage: React.FC<IProps> = ({
     }
 
     const isProfile: boolean = 'qrCodeBase64Data' in toDisplay;
-
-    return (
-        <>
-            <input
-                className={classes.changeButton}
-                type="file"
-                accept="image/*"
-                onChange={onSelectFile} />
-            <CropProfileImageModal
-                imageData={imageData} 
-                cropCompleteCallback={(data: string) => setCroppedImage(data)}
-                cropCancelCallback={() => setImageData(undefined)}
-            />
-            <img src={croppedImageData} />
-        </>);
+    if (isProfile) {
+        return (
+            <>
+                <input
+                    className={classes.changeButton}
+                    type="file"
+                    accept="image/*"
+                    onChange={onSelectFile} />
+                <CropProfileImageModal
+                    imageData={imageData} 
+                    cropCompleteCallback={(data: string) => setCroppedImage(data)}
+                    cropCancelCallback={() => setImageData(undefined)}
+                />
+            </>);    
+    }
+    else {
+        return (
+            <Box className={classes.root}>
+                <FlexGrow />
+                <AttendeeAvatar
+                    size="large"
+                    attendee={toDisplay}
+                />
+                <FlexGrow />
+            </Box>);
+    }
 }
 
 const mapStateToProps = (store: IAppState) => {

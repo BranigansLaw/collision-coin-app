@@ -10,33 +10,49 @@ import { IAttendeeBaseFields } from '../store/attendee';
 
 const styles = (theme: Theme) => createStyles({
     avatar: {
-        width: theme.spacing(3.5),
-        height: theme.spacing(3.5),
-        fontSize: theme.spacing(2),
         fontWeight: 600,
         borderColor: 'white',
         borderWidth: 1,
         borderStyle: 'solid',
     },
+    small: {
+        width: theme.spacing(3.5),
+        height: theme.spacing(3.5),
+        fontSize: theme.spacing(2),
+    },
+    large: {
+        width: theme.spacing(16),
+        height: theme.spacing(16),
+        fontSize: theme.spacing(10),
+    },
 });
 
 interface IProps extends WithStyles<typeof styles> {
     attendee: IAttendeeBaseFields | null;
+    size?: 'small' | 'large';
 }
 
 const AttendeeAvatar: React.FC<IProps> = ({
     attendee,
+    size,
     classes,
 }) => {
-    if (attendee !== null && attendee.profilePictureBase64Data) {
-        return <Avatar className={classes.avatar} alt="Remy Sharp" src={attendee.profilePictureBase64Data} />;
+    let sizeClass: string = classes.small;
+    if (size !== undefined) {
+        sizeClass = size === 'large' ? classes.large : classes.small;
     }
-    else if (attendee !== null) {
-        return <Avatar className={classes.avatar}>{attendee.firstName[0]}{attendee.lastName[0]}</Avatar>;
-    }
-    else {
-        return <Avatar className={classes.avatar}>CC</Avatar>;
-    }
+
+    const src: string | undefined = attendee !== null && attendee.profilePictureBase64Data ? attendee.profilePictureBase64Data : undefined;
+    const alt: string = attendee !== null ? `Profile image for ${attendee.firstName[0]} ${attendee.lastName[0]}` : 'Collision Coin';
+    const children: string = attendee !== null ? `${attendee.firstName[0]}${attendee.lastName[0]}` : '';
+
+    return <Avatar
+        className={`${classes.avatar} ${sizeClass}`}
+        alt={alt}
+        src={src}
+    >
+        {children}
+    </Avatar>;
 }
 
 const mapStateToProps = (store: IAppState) => {

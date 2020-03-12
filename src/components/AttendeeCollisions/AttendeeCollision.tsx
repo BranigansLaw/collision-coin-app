@@ -162,7 +162,7 @@ const AttendeeCollision: React.FC<IProps> = ({
                     </Grid>
                 </Grid>
             </Grid>
-            <Box hidden={editing && isProfile}>
+            <Box hidden={(editing && isProfile) || !expanded}>
                 <ProfileImage toDisplay={toDisplay} />
                 <Table>
                     <TableBody>
