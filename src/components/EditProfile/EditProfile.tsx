@@ -15,8 +15,6 @@ interface IFormProps {
 }
 
 const required = (value: any) => (value || typeof value === 'number' ? undefined : 'Required');
-const minLength = (minLength: number) => (value: any) =>
-    (value && typeof value === 'string' && value.length >= minLength ? undefined : `Miniumum length of ${minLength} characters required.`);
 
 const FormComponent: React.FC<InjectedFormProps<IUpdateProfileFields, IFormProps> & IFormProps> = ({
     handleSubmit,
@@ -52,7 +50,7 @@ const FormComponent: React.FC<InjectedFormProps<IUpdateProfileFields, IFormProps
                 label="Tell us about yourself"
                 disabled={submitting || loading}
                 margin="normal"
-                validate={[minLength(150)]}
+                validate={[required]}
                 multiline
             />
             <Field
