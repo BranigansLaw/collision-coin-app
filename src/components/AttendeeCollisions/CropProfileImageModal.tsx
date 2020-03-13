@@ -18,7 +18,7 @@ const styles = (theme: Theme) => createStyles({
     container: {
         margin: theme.spacing(2),
         width: `calc(100% - ${theme.spacing(2) * 2}px)`,
-        height: `calc(100vh - ${theme.spacing(2) * 2}px)`,
+        height: `calc(100% - ${theme.spacing(2) * 2}px)`,
         position: 'relative',
     },
     cropContainer: {

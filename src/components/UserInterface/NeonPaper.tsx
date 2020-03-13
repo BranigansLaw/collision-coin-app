@@ -120,7 +120,7 @@ const NeonPaper: React.FC<IProps & PaperProps> = ({
         left: '0px',
         position: 'fixed',
         zIndex: 1200,
-        height: `calc(100vh - ${headerHeight} - 112px - (2 * ${margin}))`,
+        height: `calc(100% - ${headerHeight} - 112px - (2 * ${margin}))`,
         width: `calc(100% - (2 * ${margin}))`,
         margin: margin,
     };
