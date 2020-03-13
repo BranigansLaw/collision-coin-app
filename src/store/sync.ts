@@ -132,7 +132,14 @@ export const handleApiAction = async (
                     }), dispatch);
                 break;
             case 'UpdateProfileImage': {
-                // TODO: Send the data to the server
+                res = await wrapResponse(axios.post(
+                    `${process.env.REACT_APP_API_ROOT_URL}profile/update/photo`,
+                    {
+                        imageData: action.meta.imageData,
+                    },
+                    {
+                        headers
+                    }), dispatch);
                 break;
             }
             case 'UpdateAttendeeNotes':

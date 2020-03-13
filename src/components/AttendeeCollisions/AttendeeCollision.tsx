@@ -162,8 +162,10 @@ const AttendeeCollision: React.FC<IProps> = ({
                     </Grid>
                 </Grid>
             </Grid>
-            <Box hidden={(editing && isProfileRes) || !expanded}>
+            <Box hidden={!expanded}>>
                 <ProfileImage toDisplay={toDisplay} />
+            </Box>
+            <Box hidden={(editing && isProfileRes) || !expanded}>
                 <Table>
                     <TableBody>
                         <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Email" fieldSelector={(p : IProfile | IAttendee) => p.email} />
