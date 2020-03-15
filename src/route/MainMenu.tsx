@@ -44,6 +44,17 @@ const Navbar: React.FC<IProps> = ({
         setAnchorEl(null);
         push(RootUrls.attendeeCollisions(profile.id, true));
     }
+
+    const aboutUsClick = () => {
+        setAnchorEl(null);
+        push(RootUrls.about());
+    }
+
+    const helpClick = () => {
+        setAnchorEl(null);
+        push(RootUrls.help());
+    }
+
     const toggleUiMode = () => {
         updateUiPreference(profile.uiMode === 'dark' ? 'light' : 'dark');
     }
@@ -83,19 +94,19 @@ const Navbar: React.FC<IProps> = ({
                     </ListItemIcon>
                     <ListItemText primary="Edit Profile" />
                 </MenuItem>
-                <MenuItem>
-                    <ListItemIcon>
-                        <HelpIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary="Help" />
-                </MenuItem>
                 <MenuItem onClick={() => toggleUiMode()}>
                     <ListItemIcon>
                         {profile.uiMode === 'dark' ? <WbSunnyIcon fontSize="small" /> : <Brightness3Icon fontSize="small" />}
                     </ListItemIcon>
                     <ListItemText primary={`Toggle ${profile.uiMode === 'dark' ? 'Light' : 'Dark'} Mode`} />
                 </MenuItem>
-                <MenuItem>
+                <MenuItem onClick={() => helpClick()}>
+                    <ListItemIcon>
+                        <HelpIcon fontSize="small" />
+                    </ListItemIcon>
+                    <ListItemText primary="Help" />
+                </MenuItem>
+                <MenuItem onClick={() => aboutUsClick()}>
                     <ListItemIcon>
                         <InfoIcon fontSize="small" />
                     </ListItemIcon>

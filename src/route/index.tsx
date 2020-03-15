@@ -19,8 +19,8 @@ import BottomBar from './BottomBar';
 import CalendarPage from './CalendarPage';
 import MyCodePage from './MyCodePage';
 import UnauthenticatedRoute from './UnauthenticatedRoute';
-import { Guid } from 'guid-typescript';
 import { CollisionCoinId } from '../components/AttendeeCollisions/AttendeeCollisionList';
+import HelpPage from './HelpPage';
 
 // min height of 48 to work with AppBar
 export const headerHeight: string = '48px';
@@ -35,6 +35,7 @@ export class RootUrls {
     public static readonly dashboard = (): string => '/dashboard';
     public static readonly firstDataSync = (): string => '/first-data-sync';
     public static readonly about = (): string => '/about';
+    public static readonly help = (): string => '/help';
     public static readonly attendeeCollisions = (id?: string, editOpen?: boolean): string => `/attendee-collisions${id ? `/${id}` : ''}${editOpen && id ? '/edit' : ''}`
 }
 
@@ -89,6 +90,7 @@ const AppRoute: React.FC<IProps> = ({
                     <AuthenticatedRoute exact path={RootUrls.attendeeCollisions(':id', true)}
                         render={route => <AttendeeCollisionsPage openedCollisionId={route.match.params.id} editing={true} />} />
                     <AuthenticatedRoute exact path={RootUrls.about()} render={route => <AttendeeCollisionsPage openedCollisionId={CollisionCoinId} />} />
+                    <AuthenticatedRoute exact path={RootUrls.help()} component={HelpPage} />
                     <Route exact path='/offline-app-testing-area' component={OfflineFunctionalTestPage} />
                     <Route exact path='/styles-test-page' component={StylesTestPage} />
                     <AuthenticatedRoute exact path='/offline-app-testing-area-auth' component={OfflineFunctionalTestPage} />
