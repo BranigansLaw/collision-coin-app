@@ -7,10 +7,9 @@ import { IAttendeeBaseFields, IAttendee } from './attendee';
 import { validNonEmptyString } from '../util';
 
 // Store
-export type UiMode = 'light' | 'dark';
 export interface IProfile extends IAttendeeBaseFields {
     readonly qrCodeBase64Data?: string;
-    readonly uiMode: UiMode;
+    readonly isLightMode: boolean;
 }
 
 export interface IProfileState {
@@ -39,7 +38,7 @@ export interface IUpdateProfileAction extends Action<'UpdateProfile'> {
 }
 
 export interface IUpdatePreferredUiModeAction extends Action<'UpdatePreferredUiMode'> {
-    newPreferredMode: UiMode;
+    isLightMode: boolean;
 }
 
 export interface IUpdateProfileImageAction extends Action<'UpdateProfileImage'> {
@@ -91,11 +90,11 @@ export const updateUiPreferenceActionCreator: ActionCreator<
         null,                 // The type of the parameter for the nested function 
         IUpdateProfileAction  // The type of the last action to be dispatched
     >
-> = (preferredMode: UiMode) => {
+> = (isLightMode: boolean) => {
     return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
         const updatePreferredUiModeAction: IUpdatePreferredUiModeAction = {
             type: 'UpdatePreferredUiMode',
-            newPreferredMode: preferredMode,
+            isLightMode,
         };
 
         dispatch(updatePreferredUiModeAction);
@@ -158,7 +157,7 @@ export const profileReducer: Reducer<IProfileState, AttendeeActions> = (
                 ...state,
                 userProfile: state.userProfile !== null ? {
                     ...state.userProfile,
-                    uiMode: action.newPreferredMode,
+                    isLightMode: action.isLightMode,
                 } : null,
             }
         }

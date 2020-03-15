@@ -13,7 +13,7 @@ import InfoIcon from '@material-ui/icons/Info';
 import WbSunnyIcon from '@material-ui/icons/WbSunny';
 import Brightness3Icon from '@material-ui/icons/Brightness3';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
-import { IProfile, UiMode, updateUiPreferenceActionCreator } from '../store/profile';
+import { IProfile, updateUiPreferenceActionCreator } from '../store/profile';
 import { push } from 'connected-react-router';
 import AttendeeAvatar from '../components/AttendeeAvatar';
 import Logout from '../components/Logout';
@@ -29,7 +29,7 @@ const styles = (theme: Theme) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     profile: IProfile;
     push: (url: string) => void;
-    updateUiPreference: (uiMode: UiMode) => void;
+    updateUiPreference: (isLightMode: boolean) => void;
 }
 
 const Navbar: React.FC<IProps> = ({
@@ -56,7 +56,7 @@ const Navbar: React.FC<IProps> = ({
     }
 
     const toggleUiMode = () => {
-        updateUiPreference(profile.uiMode === 'dark' ? 'light' : 'dark');
+        updateUiPreference(!profile.isLightMode);
     }
 
     const qrCodeIconClick = () => {
@@ -96,9 +96,9 @@ const Navbar: React.FC<IProps> = ({
                 </MenuItem>
                 <MenuItem onClick={() => toggleUiMode()}>
                     <ListItemIcon>
-                        {profile.uiMode === 'dark' ? <WbSunnyIcon fontSize="small" /> : <Brightness3Icon fontSize="small" />}
+                        {profile.isLightMode ? <Brightness3Icon fontSize="small" /> : <WbSunnyIcon fontSize="small" />}
                     </ListItemIcon>
-                    <ListItemText primary={`Toggle ${profile.uiMode === 'dark' ? 'Light' : 'Dark'} Mode`} />
+                    <ListItemText primary={`Toggle ${profile.isLightMode ? 'Dark' : 'Light'} Mode`} />
                 </MenuItem>
                 <MenuItem onClick={() => helpClick()}>
                     <ListItemIcon>
@@ -132,7 +132,7 @@ const mapStateToProps = (store: IAppState) => {
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
         push: (url: string) => dispatch(push(url)),
-        updateUiPreference: (uiMode: UiMode) => dispatch(updateUiPreferenceActionCreator(uiMode)),
+        updateUiPreference: (isLightMode: boolean) => dispatch(updateUiPreferenceActionCreator(isLightMode)),
     };
 };
 

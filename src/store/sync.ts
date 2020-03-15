@@ -3,7 +3,7 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IOfflineAppState } from '.';
 import axios, { AxiosResponse } from 'axios';
 import { IAttendee, ICreateAttendeeCollisionAction, IUpdateAttendeeNotesAction } from './attendee';
-import { IProfile, IUpdateProfileImageAction } from './profile';
+import { IProfile, IUpdateProfileImageAction, IUpdatePreferredUiModeAction } from './profile';
 import { ILogoutAction, ILoginThirdPartySuccessAction, IRegisterSuccessAction, ILoginSuccessAction } from './auth';
 import { OfflineAction } from '@redux-offline/redux-offline/lib/types';
 import { Guid } from 'guid-typescript';
@@ -24,6 +24,7 @@ export type ApiActions =
     | IDataSyncAction
     | IUpdateProfileAction
     | IUpdateProfileImageAction
+    | IUpdatePreferredUiModeAction
     | IUpdateAttendeeNotesAction
     | ICreateAttendeeCollisionAction
     | ILogoutRequeueAction;
@@ -131,17 +132,28 @@ export const handleApiAction = async (
                         headers
                     }), dispatch);
                 break;
-            case 'UpdateProfileImage': {
-                res = await wrapResponse(axios.post(
-                    `${process.env.REACT_APP_API_ROOT_URL}profile/update/photo`,
-                    {
-                        imageData: action.meta.imageData,
-                    },
-                    {
-                        headers
-                    }), dispatch);
-                break;
-            }
+                case 'UpdateProfileImage': {
+                    res = await wrapResponse(axios.post(
+                        `${process.env.REACT_APP_API_ROOT_URL}profile/update/photo`,
+                        {
+                            imageData: action.meta.imageData,
+                        },
+                        {
+                            headers
+                        }), dispatch);
+                    break;
+                }
+            case 'UpdatePreferredUiMode': {
+                    res = await wrapResponse(axios.post(
+                        `${process.env.REACT_APP_API_ROOT_URL}profile/update/ui-mode`,
+                        {
+                            isLightMode: action.meta.isLightMode,
+                        },
+                        {
+                            headers
+                        }), dispatch);
+                    break;
+                }
             case 'UpdateAttendeeNotes':
                 res = await wrapResponse(axios.post(
                     `${process.env.REACT_APP_API_ROOT_URL}collision/attendee/${action.meta.attendeeId.toString()}/update`,
@@ -332,6 +344,12 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
             return {
                 ...state,
                 actionQueue: [ ...state.actionQueue.filter(a => a.meta.type !== 'UpdateProfileImage'), new ApiAction<IUpdateProfileImageAction>(action) ],
+            }
+        }
+        case 'UpdatePreferredUiMode': {
+            return {
+                ...state,
+                actionQueue: [ ...state.actionQueue.filter(a => a.meta.type !== 'UpdatePreferredUiMode'), new ApiAction<IUpdatePreferredUiModeAction>(action) ],
             }
         }
         case 'UpdateAttendeeNotes': {

@@ -10,17 +10,16 @@ import { lightTheme, darkTheme } from './theme';
 import { CssBaseline } from '@material-ui/core';
 import { IAppState } from './store';
 import { connect } from 'react-redux';
-import { UiMode } from './store/profile';
 
 interface IProps {
-    uiMode: UiMode;
+    isLightMode: boolean;
 }
 
 const ThemeWrapper: React.FC<IProps> = ({
-    uiMode,
+    isLightMode,
 }) => {
     return (
-        <MuiThemeProvider theme={uiMode === 'dark' ? darkTheme : lightTheme}>
+        <MuiThemeProvider theme={isLightMode ? lightTheme : darkTheme }>
             <CssBaseline />
             <RehydrateWrapper>
                 <OfflineWrapper>
@@ -35,7 +34,7 @@ const ThemeWrapper: React.FC<IProps> = ({
 
 const mapStateToProps = (store: IAppState) => {
     return {
-        uiMode: store.profile.userProfile !== null ? store.profile.userProfile.uiMode : 'light',
+        isLightMode: store.profile.userProfile !== null ? store.profile.userProfile.isLightMode : true,
     };
 };
 
