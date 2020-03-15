@@ -25,11 +25,11 @@ const styles = (theme: Theme) => createStyles({
             overflowY: 'auto',
             '&::-webkit-scrollbar-track': {
                 borderRadius: '10px',
-                backgroundColor: theme.palette.primary,
+                backgroundColor: theme.palette.primary.main,
             },
             '&::-webkit-scrollbar': {
                 width: '12px',
-                backgroundColor: theme.palette.primary,
+                backgroundColor: theme.palette.primary.main,
                 border: `1px solid ${theme.palette.primary.contrastText}`,
                 borderRadius: '10px',
             },

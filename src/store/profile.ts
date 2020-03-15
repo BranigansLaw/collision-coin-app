@@ -4,7 +4,7 @@ import { neverReached, IAppState } from '.';
 import { IReceivedDataSyncAction } from './sync';
 import { ILogoutAction } from './auth';
 import { IAttendeeBaseFields, IAttendee } from './attendee';
-import { validNonEmptyString, minLengthString } from '../util';
+import { validNonEmptyString } from '../util';
 
 // Store
 export type UiMode = 'light' | 'dark';
@@ -22,7 +22,7 @@ export const profileIsValid = (profile: IAttendeeBaseFields | null): boolean => 
     return profile !== null &&
         validNonEmptyString(profile.companyName) &&
         validNonEmptyString(profile.position) &&
-        minLengthString(profile.description, 150);
+        validNonEmptyString(profile.description);
 }
 
 export function isProfile(toTest: IAttendee | IProfile): boolean {

@@ -10,6 +10,8 @@ import AttendeeCollision from './AttendeeCollision';
 import { Guid } from 'guid-typescript';
 import { IProfile } from '../../store/profile';
 
+export const CollisionCoinId: string = Guid.EMPTY.toString();
+
 const styles = (theme: Theme) => createStyles({
     root: {
     },
@@ -30,6 +32,10 @@ const AttendeeCollisionList: React.FC<IProps> = ({
     profile,
 }) => {
     return <>
+            <AttendeeCollision 
+                key={CollisionCoinId} 
+                toDisplay={null} 
+                expandedDefault={openedCollision !== undefined ? openedCollision.toString() === CollisionCoinId : false} />
             {profile !== null ?
                 <AttendeeCollision 
                     openEditing={editing}

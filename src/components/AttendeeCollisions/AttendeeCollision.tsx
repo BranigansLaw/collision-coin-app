@@ -5,53 +5,23 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../../store';
-import { IAttendee, updateAttendeeCollisionNotesActionCreator } from '../../store/attendee';
-import {
-    Table,
-    TableBody,
-    Typography,
-    TextField,
-    Grid,
-    Box,
-} from '@material-ui/core';
+import { IAttendee } from '../../store/attendee';
+import { Box } from '@material-ui/core';
 import { IProfile, isProfile, profileIsValid } from '../../store/profile';
-import AttendeeAvatar from '../AttendeeAvatar';
 import CreateIcon from '@material-ui/icons/Create';
 import FabWithHidden from '../UserInterface/FabWithHidden';
-import EditProfile, { EditProfileFormName } from '../EditProfile/EditProfile';
+import { EditProfileFormName } from '../EditProfile/EditProfile';
 import { reset } from 'redux-form';
 import CancelIcon from '@material-ui/icons/Cancel';
-import { validNonEmptyString } from '../../util';
 import NeonPaper from '../UserInterface/NeonPaper';
 import SaveProfileButton from './SaveProfileButton';
-import AttendeeFieldDisplay from './AttendeeFieldDisplay';
-import ProfileImage from './ProfileImage';
-
-const avatarWidth = 28;
-const avatarRightPadding = 10;
-const buttonsWidth = 40;
-const headerItemPadding = 8;
+import AttendeeCollisionHeader from './AttendeeCollisionHeader';
+import AttendeeCollisionBody from './AttendeeCollisionBody';
+import AttendeeCollisionAboutContent from './AttendeeCollisionAboutContent';
 
 const styles = (theme: Theme) => createStyles({
     root: {
         height: theme.spacing(10),
-    },
-    header: {
-        width: 'initial',
-        whiteSpace: 'nowrap',
-    },
-    secondaryHeading: {
-        color: theme.palette.text.secondary,
-    },
-    notes: {
-    },
-    avatar: {
-        maxWidth: `${avatarWidth}px`,
-        marginRight: `${avatarRightPadding}px`,
-        padding: `${headerItemPadding}px`,
-    },
-    nameAndTitle: {
-        width: `calc(100% - ${avatarWidth}px - ${buttonsWidth}px - ${avatarRightPadding}px - ${headerItemPadding * 2}px)`,
     },
     lastButton: {
         marginTop: theme.spacing(1),
@@ -59,11 +29,10 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    toDisplay: IAttendee | IProfile;
+    toDisplay: IAttendee | IProfile | null;
     expandedDefault: boolean;
     openEditing?: boolean;
     resetProfileChanges: () => void;
-    updateAttendeeCollisionNotes: (collisionId: string, updatedNotes: string) => void;
 }
 
 const AttendeeCollision: React.FC<IProps> = ({
@@ -72,23 +41,10 @@ const AttendeeCollision: React.FC<IProps> = ({
     expandedDefault,
     openEditing,
     resetProfileChanges,
-    updateAttendeeCollisionNotes,
 }) => {
     const [expanded, setExpanded] = React.useState<boolean>(expandedDefault);
     const [editing, setEditing] = React.useState<boolean>(openEditing !== undefined && openEditing);
 
-    const showNotes = (object: IAttendee | IProfile) => {
-        if ('userNotes' in object) {
-            return (
-                <TextField
-                    className={classes.notes}
-                    label="Notes"
-                    multiline
-                    value={object.userNotes}
-                    onChange={e => updateAttendeeCollisionNotes(toDisplay.id.toString(), e.target.value)}
-                />);
-        }
-    }
     const startEditing = () => {
         setEditing(true);
         // Trigger resize for hidden text areas
@@ -114,7 +70,7 @@ const AttendeeCollision: React.FC<IProps> = ({
         setExpanded(!expanded)
     }
     
-    const isProfileRes: boolean = isProfile(toDisplay);
+    const isProfileRes: boolean = toDisplay !== null && isProfile(toDisplay);
     let headerButtons: JSX.Element[] = [
         (<FabWithHidden key="edit-button" size="small" onClick={() => startEditing()} hidden={!isProfileRes || editing}>
             <CreateIcon />
@@ -141,47 +97,13 @@ const AttendeeCollision: React.FC<IProps> = ({
             hasExpander={true}
             expanded={expanded}
             onExpandContractClick={() => toggleExpanded()}
-            headerButtons={headerButtons}>
-            <Grid spacing={2} className={classes.header} container direction="row" justify="flex-start" alignItems="center">
-                <Grid item className={classes.avatar}>
-                    <AttendeeAvatar attendee={toDisplay} />
-                </Grid>
-                <Grid item className={classes.nameAndTitle}>
-                    <Grid hidden={true} container direction="column" justify="center" alignItems="flex-start">
-                        <Grid item>
-                            <Typography>{`${toDisplay.firstName} ${toDisplay.lastName}`}</Typography>
-                        </Grid>
-                        <Grid item>
-                            <Typography 
-                                hidden={!validNonEmptyString(toDisplay.position) || !validNonEmptyString(toDisplay.companyName)}
-                                variant="subtitle2" 
-                                className={classes.secondaryHeading}>
-                                {`${toDisplay.position} at ${toDisplay.companyName}`}
-                            </Typography>
-                        </Grid>
-                    </Grid>
-                </Grid>
-            </Grid>
+            headerButtons={headerButtons}
+        >
+            <AttendeeCollisionHeader toDisplay={toDisplay} />
             <Box hidden={!expanded}>
-                <ProfileImage toDisplay={toDisplay} />
-            </Box>
-            <Box hidden={(editing && isProfileRes) || !expanded}>
-                <Table>
-                    <TableBody>
-                        <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Email" fieldSelector={(p : IProfile | IAttendee) => p.email} />
-                        <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="LinkedIn" fieldSelector={(p : IProfile | IAttendee) => p.linkedInUsername} />
-                        <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Bio" fieldSelector={(p : IProfile | IAttendee) => p.description} />
-                        <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Division" fieldSelector={(p : IProfile | IAttendee) => p.companyDivision} />
-                        <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Phone" fieldSelector={(p : IProfile | IAttendee) => p.phone} />
-                        <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Skype Username" fieldSelector={(p : IProfile | IAttendee) => p.skype} />
-                        <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Website" fieldSelector={(p : IProfile | IAttendee) => p.website} />
-                        <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Address" fieldSelector={(p : IProfile | IAttendee) => p.address} />
-                    </TableBody>
-                </Table>
-                {showNotes(toDisplay)}
-            </Box>
-            <Box hidden={!editing || !isProfileRes}>
-                <EditProfile hideSubmit={true} />
+                {toDisplay !== null ?
+                    <AttendeeCollisionBody toDisplay={toDisplay} editing={editing} /> :
+                    <AttendeeCollisionAboutContent />}
             </Box>
         </NeonPaper>);
 }
@@ -193,7 +115,6 @@ const mapStateToProps = (store: IAppState) => {
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
-        updateAttendeeCollisionNotes: (collisionId: string, updatedNotes: string) => dispatch(updateAttendeeCollisionNotesActionCreator(collisionId, updatedNotes)),
         resetProfileChanges: () => dispatch(reset(EditProfileFormName))
     };
 };

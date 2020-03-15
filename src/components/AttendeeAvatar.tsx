@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { IAppState } from '../store';
 import { Avatar } from '@material-ui/core';
 import { IAttendeeBaseFields } from '../store/attendee';
+import CoinLogo from '../assets/svg/CoinLogo';
 
 const styles = (theme: Theme) => createStyles({
     avatar: {
@@ -14,11 +15,18 @@ const styles = (theme: Theme) => createStyles({
         borderColor: 'white',
         borderWidth: 1,
         borderStyle: 'solid',
+        '& .MuiSvgIcon-root': {
+            color: 'rgb(230, 116, 0)',
+        },
     },
     small: {
-        width: theme.spacing(3.5),
-        height: theme.spacing(3.5),
-        fontSize: theme.spacing(2),
+        width: theme.spacing(4.5),
+        height: theme.spacing(4.5),
+        fontSize: theme.spacing(2.5),
+        '& .MuiSvgIcon-root': {
+            width: theme.spacing(3),
+            height: theme.spacing(3),
+        },
     },
     large: {
         width: theme.spacing(16),
@@ -44,7 +52,9 @@ const AttendeeAvatar: React.FC<IProps> = ({
 
     const src: string | undefined = attendee !== null && attendee.profilePictureBase64Data ? attendee.profilePictureBase64Data : undefined;
     const alt: string = attendee !== null ? `Profile image for ${attendee.firstName[0]} ${attendee.lastName[0]}` : 'Collision Coin';
-    const children: string = attendee !== null ? `${attendee.firstName[0]}${attendee.lastName[0]}` : '';
+    const children: JSX.Element = attendee !== null ? 
+        <>{attendee.firstName[0]}{attendee.lastName[0]}</> : 
+        <CoinLogo />;
 
     return <Avatar
         className={`${classes.avatar} ${sizeClass}`}
