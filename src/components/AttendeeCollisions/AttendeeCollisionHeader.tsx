@@ -16,6 +16,8 @@ const styles = (theme: Theme) => createStyles({
     header: {
         width: 'initial',
         whiteSpace: 'nowrap',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
     },
     secondaryHeading: {
         color: theme.palette.text.secondary,
