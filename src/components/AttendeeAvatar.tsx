@@ -12,7 +12,7 @@ import CoinLogo from '../assets/svg/CoinLogo';
 const styles = (theme: Theme) => createStyles({
     avatar: {
         fontWeight: 600,
-        borderColor: 'white',
+        borderColor: theme.palette.primary.contrastText,
         borderWidth: 1,
         borderStyle: 'solid',
         '& .MuiSvgIcon-root': {
