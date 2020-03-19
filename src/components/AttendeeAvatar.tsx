@@ -51,7 +51,7 @@ const AttendeeAvatar: React.FC<IProps> = ({
     }
 
     const src: string | undefined = attendee !== null && attendee.profilePictureBase64Data ? attendee.profilePictureBase64Data : undefined;
-    const alt: string = attendee !== null ? `Profile image for ${attendee.firstName[0]} ${attendee.lastName[0]}` : 'Collision Coin';
+    const alt: string = attendee !== null ? `Profile image for ${attendee.firstName[0]} ${attendee.lastName[0]}` : `${process.env.REACT_APP_APP_NAME}`;
     const children: JSX.Element = attendee !== null ? 
         <>{attendee.firstName[0]}{attendee.lastName[0]}</> : 
         <CoinLogo />;

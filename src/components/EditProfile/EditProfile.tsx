@@ -62,7 +62,7 @@ const FormComponent: React.FC<InjectedFormProps<IUpdateProfileFields, IFormProps
                 margin="normal"
             />
             <Field
-                name="phone"
+                name="phoneNumber"
                 component={renderTextField}
                 type="tel"
                 label="Phone Number"
@@ -161,7 +161,7 @@ const EditProfile: React.FC<IProps> = ({
                         description: nullStringToEmpty(profileFields.description),
                         companyDivision: nullStringToEmpty(profileFields.companyDivision),
                         linkedIn: nullStringToEmpty(profileFields.linkedInUsername),
-                        phone: nullStringToEmpty(profileFields.phone),
+                        phoneNumber: nullStringToEmpty(profileFields.phoneNumber),
                         skype: nullStringToEmpty(profileFields.skype),
                         website: nullStringToEmpty(profileFields.website),
                         address: nullStringToEmpty(profileFields.address),

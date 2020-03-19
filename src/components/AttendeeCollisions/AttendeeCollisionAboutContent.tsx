@@ -3,7 +3,7 @@ import React from 'react';
 const AttendeeCollisionAboutContent: React.FC = () => {
     return (
         <>
-            About Collision Coin
+            About {process.env.REACT_APP_APP_NAME}
         </>);
 }
 

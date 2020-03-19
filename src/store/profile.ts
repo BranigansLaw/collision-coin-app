@@ -58,7 +58,7 @@ export interface IUpdateProfileFields {
     position: string;
     description: string;
     companyDivision: string;
-    phone: string;
+    phoneNumber: string;
     skype: string;
     website: string;
     linkedIn: string;
@@ -139,7 +139,7 @@ export const profileReducer: Reducer<IProfileState, AttendeeActions> = (
                         skype: action.updates.skype,
                         website: action.updates.website,
                         address: action.updates.address,
-                        phone: action.updates.phone,
+                        phoneNumber: action.updates.phoneNumber,
                     }
                 };
             }

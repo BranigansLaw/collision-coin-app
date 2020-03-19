@@ -39,7 +39,7 @@ const tableOfContents = [
                     Place the QR code you wish to scan in the line of sight of your camera and wait.
                 </Typography>
                 <Typography>
-                    Collision coin automatically knows the type of QR code you scanned and will present the appropriate information to you.
+                    {process.env.REACT_APP_APP_NAME} automatically knows the type of QR code you scanned and will present the appropriate information to you.
                 </Typography>
             </>
         ),
@@ -92,7 +92,7 @@ const tableOfContents = [
                     Open your contact list by selecting the contacts icon at the bottom of the screen.
                 </Typography>
                 <Typography>
-                    About collision coin will be at the top. Select it to find out more about Collision coin.
+                    About {process.env.REACT_APP_APP_NAME} will be at the top. Select it to find out more about {process.env.REACT_APP_APP_NAME}.
                 </Typography>
                 <Typography>
                     Your own card will be next on the list.
@@ -123,7 +123,7 @@ const tableOfContents = [
     },    
     {
         index: 'ContactCollisionCoin',
-        title: 'Contact Collision Coin during the event',
+        title: `Contact ${process.env.REACT_APP_APP_NAME} during the event`,
         content: (
             <>
                 <Typography>

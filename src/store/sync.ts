@@ -126,7 +126,7 @@ export const handleApiAction = async (
                         newSkype: action.meta.updates.skype,
                         newWebsite: action.meta.updates.website,
                         newAddress: action.meta.updates.address,
-                        newPhone: action.meta.updates.phone,
+                        newPhone: action.meta.updates.phoneNumber,
                     },
                     {
                         headers
