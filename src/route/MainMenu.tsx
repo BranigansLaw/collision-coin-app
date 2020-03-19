@@ -19,6 +19,7 @@ import AttendeeAvatar from '../components/AttendeeAvatar';
 import Logout from '../components/Logout';
 import QrCodeIcon from '../assets/svg/QrCodeIcon';
 import FlexGrow from '../components/UserInterface/FlewGrow';
+import RevokePermissionsConfirmModal from '../components/RevokePermissions/RevokePermissionsConfirmModal';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -39,6 +40,7 @@ const Navbar: React.FC<IProps> = ({
     classes,
 }) => {
     const [anchorEl, setAnchorEl] = React.useState<HTMLLIElement | null>(null);
+    const [revokePermissionsModalOpen, setRevokePermissionsModalOpen] = React.useState<boolean>(false);
 
     const editProfileClick = () => {
         setAnchorEl(null);
@@ -64,63 +66,68 @@ const Navbar: React.FC<IProps> = ({
     }
 
     return (
-        <Toolbar className={classes.root} variant="dense" disableGutters={true} aria-controls="main-user-menu" aria-haspopup="true">
-            <MenuItem onClick={(event: React.MouseEvent<HTMLLIElement, MouseEvent>) => qrCodeIconClick()}>
-                <QrCodeIcon />
-            </MenuItem>
-            <FlexGrow />
-            <MenuItem onClick={(event: React.MouseEvent<HTMLLIElement, MouseEvent>) => setAnchorEl(event.currentTarget)}>
-                <AttendeeAvatar attendee={profile} />
-            </MenuItem>
-            <Menu
-                id="main-user-menu"
-                open={Boolean(anchorEl)}
-                onClose={() => setAnchorEl(null)}
-                anchorEl={anchorEl}
-                elevation={0}
-                keepMounted
-                anchorOrigin={{
-                    vertical: 'top',
-                    horizontal: 'left',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'left',
-                }}
-            >
-                <MenuItem onClick={() => editProfileClick()}>
-                    <ListItemIcon>
-                        <CreateIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary="Edit Profile" />
+        <>
+            <Toolbar className={classes.root} variant="dense" disableGutters={true} aria-controls="main-user-menu" aria-haspopup="true">
+                <MenuItem onClick={(event: React.MouseEvent<HTMLLIElement, MouseEvent>) => qrCodeIconClick()}>
+                    <QrCodeIcon />
                 </MenuItem>
-                <MenuItem onClick={() => toggleUiMode()}>
-                    <ListItemIcon>
-                        {profile.isLightMode ? <Brightness3Icon fontSize="small" /> : <WbSunnyIcon fontSize="small" />}
-                    </ListItemIcon>
-                    <ListItemText primary={`Toggle ${profile.isLightMode ? 'Dark' : 'Light'} Mode`} />
+                <FlexGrow />
+                <MenuItem onClick={(event: React.MouseEvent<HTMLLIElement, MouseEvent>) => setAnchorEl(event.currentTarget)}>
+                    <AttendeeAvatar attendee={profile} />
                 </MenuItem>
-                <MenuItem onClick={() => helpClick()}>
-                    <ListItemIcon>
-                        <HelpIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary="Help" />
-                </MenuItem>
-                <MenuItem onClick={() => aboutUsClick()}>
-                    <ListItemIcon>
-                        <InfoIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary="About" />
-                </MenuItem>
-                <Logout />
-                <MenuItem>
-                    <ListItemIcon>
-                        <DeleteForeverIcon fontSize="small" />
-                    </ListItemIcon>
-                    <ListItemText primary="Revoke Permissions" />
-                </MenuItem>
-            </Menu>
-        </Toolbar>
+                <Menu
+                    id="main-user-menu"
+                    open={Boolean(anchorEl)}
+                    onClose={() => setAnchorEl(null)}
+                    anchorEl={anchorEl}
+                    elevation={0}
+                    keepMounted
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left',
+                    }}
+                    transformOrigin={{
+                        vertical: 'top',
+                        horizontal: 'left',
+                    }}
+                >
+                    <MenuItem onClick={() => editProfileClick()}>
+                        <ListItemIcon>
+                            <CreateIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText primary="Edit Profile" />
+                    </MenuItem>
+                    <MenuItem onClick={() => toggleUiMode()}>
+                        <ListItemIcon>
+                            {profile.isLightMode ? <Brightness3Icon fontSize="small" /> : <WbSunnyIcon fontSize="small" />}
+                        </ListItemIcon>
+                        <ListItemText primary={`Toggle ${profile.isLightMode ? 'Dark' : 'Light'} Mode`} />
+                    </MenuItem>
+                    <MenuItem onClick={() => helpClick()}>
+                        <ListItemIcon>
+                            <HelpIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText primary="Help" />
+                    </MenuItem>
+                    <MenuItem onClick={() => aboutUsClick()}>
+                        <ListItemIcon>
+                            <InfoIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText primary="About" />
+                    </MenuItem>
+                    <Logout />
+                    <MenuItem onClick={() => setRevokePermissionsModalOpen(true)}>
+                        <ListItemIcon>
+                            <DeleteForeverIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText primary="Revoke Permissions" />
+                    </MenuItem>
+                </Menu>
+            </Toolbar>
+            <RevokePermissionsConfirmModal
+                show={revokePermissionsModalOpen}
+                cancelCallback={() => setRevokePermissionsModalOpen(false)} />
+        </>
     );
 }
 
