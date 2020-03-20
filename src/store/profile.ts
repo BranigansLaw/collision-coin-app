@@ -5,6 +5,7 @@ import { IReceivedDataSyncAction } from './sync';
 import { ILogoutAction } from './auth';
 import { IAttendeeBaseFields, IAttendee } from './attendee';
 import { validNonEmptyString } from '../util';
+import { handleApiCall } from './apiTransactionHandler';
 
 // Store
 export interface IProfile extends IAttendeeBaseFields {
@@ -14,6 +15,7 @@ export interface IProfile extends IAttendeeBaseFields {
 
 export interface IProfileState {
     readonly userProfile: IProfile | null;
+    readonly revokingPermissions?: 'loading' | 'complete';
 }
 
 // TODO: Replace this method with a lookup from the database
@@ -30,6 +32,7 @@ export function isProfile(toTest: IAttendee | IProfile): boolean {
 
 const initialProfileState: IProfileState = {
     userProfile: null,
+    revokingPermissions: undefined,
 };
 
 // Actions
@@ -45,11 +48,17 @@ export interface IUpdateProfileImageAction extends Action<'UpdateProfileImage'> 
     imageData: string;
 }
 
+export interface IRevokingPermissionsAction extends Action<'RevokingPermissions'> {}
+
+export interface IRevokedPermissionsAction extends Action<'RevokedPermissions'> {}
+
 export type AttendeeActions =
     | IUpdateProfileAction
     | IUpdatePreferredUiModeAction
     | IUpdateProfileImageAction
     | IReceivedDataSyncAction
+    | IRevokingPermissionsAction
+    | IRevokedPermissionsAction
     | ILogoutAction;
 
 // Action Creators
@@ -119,6 +128,43 @@ export const updateUserProfilePictureActionCreator: ActionCreator<
     };
 };
 
+export const revokeLoggedInUserPermissionsActionCreator: ActionCreator<
+    ThunkAction<
+        Promise<void>,        // The type of the last action to be dispatched - will always be promise<T> for async actions
+        IAppState,            // The type for the data within the last action
+        null,                 // The type of the parameter for the nested function 
+        IUpdateProfileAction  // The type of the last action to be dispatched
+    >
+> = () => {
+    return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
+        const token: string | undefined = getState().authState.authToken;
+        if (token === undefined) {
+            throw new Error('Token is not valid');
+        }
+
+        dispatch({
+            type: 'RevokingPermissions',
+        } as IRevokingPermissionsAction);
+
+        await handleApiCall(
+            `${process.env.REACT_APP_API_ROOT_URL}Profile/revoke-permissions`,
+            token,
+            undefined,
+            204,
+            (data: any) => {
+                dispatch({
+                    type: 'RevokedPermissions',
+                } as IRevokedPermissionsAction);
+
+                dispatch({
+                    type: 'Logout',
+                    logoutReason: 'revokePermissions',
+                } as ILogoutAction);
+            },
+        )
+    };
+};
+
 // Reducers
 export const profileReducer: Reducer<IProfileState, AttendeeActions> = (
     state = initialProfileState,
@@ -168,6 +214,18 @@ export const profileReducer: Reducer<IProfileState, AttendeeActions> = (
                     ...state.userProfile,
                     profilePictureBase64Data: action.imageData,
                 } : null,
+            };
+        }
+        case 'RevokingPermissions': {
+            return {
+                ...state,
+                revokingPermissions: 'loading',
+            };
+        }
+        case 'RevokedPermissions': {
+            return {
+                ...state,
+                revokingPermissions: 'complete',
             };
         }
         case 'Logout': {

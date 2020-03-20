@@ -52,7 +52,7 @@ const wrapResponse = async (axiosPromise: Promise<AxiosResponse<any> | undefined
         if (e.isAxiosError && e.response.status === 401) {
             dispatch({
                 type: 'Logout',
-                isForceLogout: true,
+                logoutReason: 'expiry',
             } as ILogoutAction);
             return undefined;
         }
@@ -132,17 +132,17 @@ export const handleApiAction = async (
                         headers
                     }), dispatch);
                 break;
-                case 'UpdateProfileImage': {
-                    res = await wrapResponse(axios.post(
-                        `${process.env.REACT_APP_API_ROOT_URL}profile/update/photo`,
-                        {
-                            imageData: action.meta.imageData,
-                        },
-                        {
-                            headers
-                        }), dispatch);
-                    break;
-                }
+            case 'UpdateProfileImage': {
+                res = await wrapResponse(axios.post(
+                    `${process.env.REACT_APP_API_ROOT_URL}profile/update/photo`,
+                    {
+                        imageData: action.meta.imageData,
+                    },
+                    {
+                        headers
+                    }), dispatch);
+                break;
+            }
             case 'UpdatePreferredUiMode': {
                     res = await wrapResponse(axios.post(
                         `${process.env.REACT_APP_API_ROOT_URL}profile/update/ui-mode`,

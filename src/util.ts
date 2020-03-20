@@ -66,3 +66,9 @@ export function getTimeString(date: Date) {
 
     return `${hourStr}:${minStr}`;
 }
+
+export function wait(timeoutMilliseconds: number) {
+    return new Promise(resolve => {
+        setTimeout(resolve, timeoutMilliseconds);
+    });
+}

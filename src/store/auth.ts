@@ -18,13 +18,15 @@ interface authFailedMessage {
     normalAuth?: string;
 }
 
+export type LogoutReason = 'expiry' | 'revokePermissions';
+
 export interface IAuthState {
     readonly loading: authFlag;
     readonly loginFailed: authFailedMessage;
     readonly redeemTokenLoading: boolean;
     readonly authToken?: string;
     readonly clientCode?: string;
-    readonly wasForcedLogout: boolean;
+    readonly logoutReason?: LogoutReason;
 }
 
 const initialSyncState: IAuthState = {
@@ -39,7 +41,7 @@ const initialSyncState: IAuthState = {
         normalAuth: undefined,
     },
     redeemTokenLoading: false,
-    wasForcedLogout: false,
+    logoutReason: undefined,
 };
 
 export enum ThirdParty {
@@ -91,7 +93,7 @@ export interface ILoginThirdPartyRedeemTokenFailedAction extends Action<'LoginTh
 }
 
 export interface ILogoutAction extends Action<'Logout'> {
-    isForceLogout: boolean;
+    logoutReason: LogoutReason;
 }
 
 export type SyncActions =
@@ -467,8 +469,8 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                 ...state,
                 loading: initialSyncState.loading,
                 authToken: undefined,
-                wasForcedLogout: action.isForceLogout,
-            };
+                logoutReason: action.logoutReason,
+            };   
         default:
             neverReached(action); // when a new action is created, this helps us remember to handle it in the reducer
     }

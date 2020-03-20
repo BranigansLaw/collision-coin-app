@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { IOfflineAppState } from '../../store';
-import { loginActionCreator, registerActionCreator } from '../../store/auth';
+import { loginActionCreator, registerActionCreator, LogoutReason } from '../../store/auth';
 import { push } from 'connected-react-router';
 import { RootUrls } from '../../route';
 import LoadingButton from '../UserInterface/LoadingButton';
@@ -83,7 +83,7 @@ const ConnectedFormComponent =  reduxForm<ILoginForm, IFormProps>({
 
 interface IProps {
     loading: boolean;
-    forcedLogout: boolean;
+    logoutReason: LogoutReason | undefined;
     online: boolean;
     errorMessage: string | undefined;
     userId?: string;
@@ -95,7 +95,7 @@ interface IProps {
 
 const LoginForm: React.FC<IProps> = ({
     loading,
-    forcedLogout,
+    logoutReason,
     online,
     errorMessage,
     userId,
@@ -104,8 +104,10 @@ const LoginForm: React.FC<IProps> = ({
     register,
     push,
 }) => {
-    if (errorMessage === undefined && forcedLogout) {
-        errorMessage = "Oh snap! An error occurred. Please login again."
+    if (errorMessage === undefined && logoutReason !== undefined) {
+        errorMessage = logoutReason === 'expiry' ?
+            "Oh snap! An error occurred. Please login again." :
+            "Your account has been successfully removed.";
     }
 
     return (
@@ -139,7 +141,7 @@ const mapStateToProps = (store: IOfflineAppState) => {
             store.authState.loading.linkedinAuth || 
             store.authState.loading.normalAuth,
         errorMessage: store.authState.loginFailed.normalAuth,
-        forcedLogout: store.authState.wasForcedLogout,
+        logoutReason: store.authState.logoutReason,
         online: store.offline.online,
     };
 };
