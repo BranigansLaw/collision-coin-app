@@ -9,6 +9,8 @@ import { IAppState } from '../../store';
 import { IAttendeeRedemption } from '../../store/redemption';
 import { Guid } from 'guid-typescript';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import GridWithHidden from '../UserInterface/GridWithHidden';
+import TimeSince from '../UserInterface/TimeSince';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -52,9 +54,9 @@ const AttendeeRedemption: React.FC<IProps> = ({
             <Grid item>
                 <Typography>{toDisplay.redemptionItemName} for {toDisplay.amount}</Typography>
             </Grid>
-            <Grid item>
-                <Typography>Purchased at {new Date(toDisplay.updatedDateTimeEpochMilliseconds).toLocaleTimeString()}</Typography>
-            </Grid>
+            <GridWithHidden hidden={isLoading} item>
+                <Typography>Purchased <TimeSince sinceEpochMilliseconds={toDisplay.updatedDateTimeEpochMilliseconds} /> ago</Typography>
+            </GridWithHidden>
         </Grid>
     </Box>;
 }
