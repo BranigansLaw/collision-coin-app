@@ -2,6 +2,7 @@ import { Reducer } from 'redux';
 import { neverReached, } from '.';
 import { IReceivedDataSyncAction } from './sync';
 import { ICreateAttendeeCollisionAction } from './attendee';
+import { INewRedemptionAction } from './redemption';
 
 // Store
 export interface IWalletState {
@@ -18,6 +19,7 @@ const initialProfileState: IWalletState = {
 
 export type AttendeeActions =
     | ICreateAttendeeCollisionAction
+    | INewRedemptionAction
     | IReceivedDataSyncAction;
 
 // Action Creators
@@ -32,6 +34,12 @@ export const walletReducer: Reducer<IWalletState, AttendeeActions> = (
             return {
                 ...state,
                 balance: action.balance !== null ? action.balance : state.balance,
+            };
+        }
+        case 'NewRedemption': {
+            return {
+                ...state,
+                balance: state.balance - action.cost,
             };
         }
         case 'CreateAttendeeCollision': {

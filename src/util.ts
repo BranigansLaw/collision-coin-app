@@ -44,6 +44,23 @@ export function mergeLists<T extends IMergeableObject>(
     return Array.from(newItems.values());
 }
 
+export function mergeListsWithSelector<T extends IMergeableObject>(
+    existingList: T[],
+    toMerge: T[],
+    selector: (c1: T) => string,
+): T[] {
+    const newItems: Map<string, T> = new Map();
+    const modSelector: (c1: T) => string = (c1: T) => selector(c1).toLowerCase();
+    toMerge.forEach(a => newItems.set(modSelector(a), a));
+    existingList.forEach(a => {
+        if (!newItems.has(modSelector(a)) && !a.deleted) {
+            newItems.set(modSelector(a), a);
+        }
+    });
+
+    return Array.from(newItems.values());
+}
+
 export function range(start: number, stop: number, step: number): number[] {
     if (start >= stop) {
         return [];

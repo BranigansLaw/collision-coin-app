@@ -10,6 +10,7 @@ import { Guid } from 'guid-typescript';
 import { getCurrentTimeEpochMilliseconds } from '../util';
 import { IUpdateProfileAction } from './profile';
 import { IEvent } from './event';
+import { IAttendeeRedemption, INewRedemptionAction } from './redemption';
 
 // Store
 export interface ISyncState {
@@ -27,6 +28,7 @@ export type ApiActions =
     | IUpdatePreferredUiModeAction
     | IUpdateAttendeeNotesAction
     | ICreateAttendeeCollisionAction
+    | INewRedemptionAction
     | ILogoutRequeueAction;
 
 export class ApiAction<A extends ApiActions> {
@@ -102,6 +104,7 @@ export const handleApiAction = async (
                         dispatch({
                             type: 'ReceivedDataSync',
                             attendeeCollisions: res.data.attendeeCollisions,
+                            attendeeRedemptions: res.data.redemptions,
                             events: res.data.events,
                             myProfile: res.data.myProfile,
                             balance: res.data.myWallet !== null ? res.data.myWallet.balance : null,
@@ -174,6 +177,17 @@ export const handleApiAction = async (
                         headers
                     }), dispatch);
                 break;
+            case 'NewRedemption':
+                res = await wrapResponse(axios.post(
+                    `${process.env.REACT_APP_API_ROOT_URL}redeemable/redeem/${action.meta.redeemableId}`,
+                    {
+                        amount: action.meta.sendCost ? action.meta.cost : undefined,
+                        appRedemptionId: action.meta.appRedemptionId,
+                    },
+                    {
+                        headers
+                    }), dispatch);
+                break;
             case 'LogoutRequeue':
                 dispatch(action.meta);
 
@@ -216,6 +230,7 @@ interface IIncrementNumTries extends Action<'IncrementTries'> {
 
 export interface IReceivedDataSyncAction extends Action<'ReceivedDataSync'> {
     attendeeCollisions: IAttendee[];
+    attendeeRedemptions: IAttendeeRedemption[];
     events: IEvent[];
     myProfile: IProfile;
     balance: number | null;
@@ -358,6 +373,15 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
                 actionQueue: [ 
                     ...state.actionQueue.filter(q => q.meta.type !== 'UpdateAttendeeNotes' || q.meta.attendeeId !== action.attendeeId), 
                     new ApiAction<IUpdateAttendeeNotesAction>(action)
+                ],
+            }
+        }
+        case 'NewRedemption': {
+            return {
+                ...state,
+                actionQueue: [ 
+                    ...state.actionQueue.filter(q => q.meta.type !== 'NewRedemption' || q.meta.appRedemptionId !== action.appRedemptionId), 
+                    new ApiAction<INewRedemptionAction>(action)
                 ],
             }
         }

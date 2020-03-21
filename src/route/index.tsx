@@ -23,6 +23,7 @@ import { CollisionCoinId } from '../components/AttendeeCollisions/AttendeeCollis
 import HelpPage from './HelpPage';
 import UnsubscribePage from './UnsubscribePage';
 import CurrentRedemptionPage from './CurrentRedemptionPage';
+import AttendeeRedemptionPage from './AttendeeRedemptionPage';
 
 // min height of 48 to work with AppBar
 export const headerHeight: string = '48px';
@@ -41,6 +42,7 @@ export class RootUrls {
     public static readonly unsubscribe = (): string => '/unsubscribe-success';
     public static readonly attendeeCollisions = (id?: string, editOpen?: boolean): string => `/attendee-collisions${id ? `/${id}` : ''}${editOpen && id ? '/edit' : ''}`;
     public static readonly currentRedemption = (): string => '/current-redemption';
+    public static readonly attendeeRedemption = (appRedemptionId: string): string => `/redemption/${appRedemptionId}`;
 }
 
 const styles = (theme: Theme) => createStyles({
@@ -100,6 +102,8 @@ const AppRoute: React.FC<IProps> = ({
                     <Route exact path='/styles-test-page' component={StylesTestPage} />
                     <AuthenticatedRoute exact path='/offline-app-testing-area-auth' component={OfflineFunctionalTestPage} />
                     <AuthenticatedRoute exact path={RootUrls.currentRedemption()} component={CurrentRedemptionPage} />
+                    <AuthenticatedRoute exact path={RootUrls.attendeeRedemption(':id')}
+                        render={route => <AttendeeRedemptionPage appRedemptionIdToDisplay={route.match.params.id} />} />
                 </main>
                 <BottomBar />
             </ConnectedRouter>

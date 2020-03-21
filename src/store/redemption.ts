@@ -3,11 +3,17 @@ import { neverReached, IAppState } from '.';
 import { IReceivedDataSyncAction, IAuditableEntity } from './sync';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { ILogoutAction } from './auth';
-import { mergeLists } from '../util';
+import { mergeListsWithSelector } from '../util';
+import { Guid } from 'guid-typescript';
 
 // Store
 export interface IAttendeeRedemption extends IAuditableEntity {
     id: string;
+    amount: number;
+    redemptionItemName: string;
+    used: boolean;
+    updatedDateTimeEpochMilliseconds: number;
+    appRedemptionId: string;
 }
 
 export interface IRedeemable {
@@ -27,13 +33,22 @@ const initialAttendeeRedemptionState: IAttendeeRedemptionState = {
 };
 
 // Actions
-export interface ISetCurrentRedeemable extends Action<'SetCurrentRedeemable'> {
+export interface ISetCurrentRedeemableAction extends Action<'SetCurrentRedeemable'> {
     newCurrent: IRedeemable;
+}
+
+export interface INewRedemptionAction extends Action<'NewRedemption'> {
+    redeemableId: string;
+    name: string;
+    cost: number;
+    appRedemptionId: string;
+    sendCost: boolean;
 }
 
 export type AttendeeActions =
     | IReceivedDataSyncAction
-    | ISetCurrentRedeemable
+    | ISetCurrentRedeemableAction
+    | INewRedemptionAction
     | ILogoutAction;
 
 // Action Creators
@@ -42,14 +57,34 @@ export const setCurrentRedeemableActionCreator: ActionCreator<
         Promise<void>,        // The type of the last action to be dispatched - will always be promise<T> for async actions
         IAppState,            // The type for the data within the last action
         null,                 // The type of the parameter for the nested function 
-        ISetCurrentRedeemable // The type of the last action to be dispatched
+        ISetCurrentRedeemableAction // The type of the last action to be dispatched
     >
 > = (newCurrent: IRedeemable) => {
     return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
         dispatch({
             type: 'SetCurrentRedeemable',
             newCurrent: newCurrent,
-        } as ISetCurrentRedeemable);
+        } as ISetCurrentRedeemableAction);
+    };
+};
+
+export const redeemActionCreator: ActionCreator<
+    ThunkAction<
+        Promise<void>,        // The type of the last action to be dispatched - will always be promise<T> for async actions
+        IAppState,            // The type for the data within the last action
+        null,                 // The type of the parameter for the nested function 
+        ISetCurrentRedeemableAction // The type of the last action to be dispatched
+    >
+> = (toRedeem: IRedeemable, appRedemptionId: Guid, cost: number) => {
+    return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
+        dispatch({
+            type: 'NewRedemption',
+            appRedemptionId: appRedemptionId.toString(),
+            name: toRedeem.name,
+            redeemableId: toRedeem.id.toString(),
+            cost: cost,
+            sendCost: toRedeem.cost === undefined,
+        } as INewRedemptionAction);
     };
 };
 
@@ -62,13 +97,30 @@ export const attendeeRedemptionReducer: Reducer<IAttendeeRedemptionState, Attend
         case 'ReceivedDataSync': {
             return {
                 ...state,
-                redemptions: mergeLists(state.redemptions, action.attendeeCollisions),
+                redemptions: mergeListsWithSelector(
+                    state.redemptions, 
+                    action.attendeeRedemptions,
+                    (s: IAttendeeRedemption) => s.appRedemptionId),
             };
         }
         case 'SetCurrentRedeemable': {
             return {
                 ...state,
                 current: action.newCurrent,
+            };
+        }
+        case 'NewRedemption': {
+            return {
+                ...state,
+                redemptions: [ 
+                    {
+                        id: Guid.createEmpty().toString(),
+                        redemptionItemName: action.name,
+                        amount: action.cost,
+                        appRedemptionId: action.appRedemptionId,
+                    } as IAttendeeRedemption,
+                    ...state.redemptions,
+                ],
             };
         }
         case 'Logout': {
