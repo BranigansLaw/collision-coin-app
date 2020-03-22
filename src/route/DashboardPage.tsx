@@ -9,20 +9,12 @@ import { IAppState } from '../store';
 const styles = (theme: Theme) => createStyles({
     root: {
     },
-    qrCode: {
-        width: 400,
-        height: 400,
-        backgroundSize: 'cover',
-    },
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    myQrCode: string | undefined;
-    addCoins: () => void;
 }
 
 const DashboardPage: React.FC<IProps> = ({
-    myQrCode,
     classes,
 }) => {
     return (
@@ -34,7 +26,6 @@ const DashboardPage: React.FC<IProps> = ({
 
 const mapStateToProps = (store: IAppState) => {
     return {
-        myQrCode: store.profile.userProfile ? store.profile.userProfile.qrCodeBase64Data : undefined,
     };
 };
 

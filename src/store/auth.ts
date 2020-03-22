@@ -25,6 +25,7 @@ export interface IAuthState {
     readonly loginFailed: authFailedMessage;
     readonly redeemTokenLoading: boolean;
     readonly authToken?: string;
+    readonly roles: string[];
     readonly clientCode?: string;
     readonly logoutReason?: LogoutReason;
 }
@@ -42,6 +43,7 @@ const initialSyncState: IAuthState = {
     },
     redeemTokenLoading: false,
     logoutReason: undefined,
+    roles: [],
 };
 
 export enum ThirdParty {
@@ -54,6 +56,7 @@ export interface ILoginSentAction extends Action<'LoginSent'> {}
 
 export interface ILoginSuccessAction extends Action<'LoginSuccess'> {
     accessToken: string;
+    roles: string[];
 }
 
 export interface ILoginFailedAction extends Action<'LoginFailed'> {
@@ -64,6 +67,7 @@ export interface IRegisterSentAction extends Action<'RegisterSent'> {}
 
 export interface IRegisterSuccessAction extends Action<'RegisterSuccess'> {
     accessToken: string;
+    roles: string[];
 }
 
 export interface IRegisterFailedAction extends Action<'RegisterFailed'> {
@@ -86,6 +90,7 @@ export interface ILoginThirdPartyRedeemTokenSentAction extends Action<'LoginThir
 
 export interface ILoginThirdPartyRedeemTokenSuccessAction extends Action<'LoginThirdPartyRedeemTokenSuccess'> {
     accessToken: string;
+    roles: string[];
 }
 
 export interface ILoginThirdPartyRedeemTokenFailedAction extends Action<'LoginThirdPartyRedeemTokenFailed'> {
@@ -149,6 +154,7 @@ export const loginActionCreator: ActionCreator<
             dispatch({
                 type: 'LoginSuccess',
                 accessToken: res.data.token,
+                roles: res.data.roles,
             } as ILoginSuccessAction);
 
             return true;
@@ -220,6 +226,7 @@ export const registerActionCreator: ActionCreator<
             dispatch({
                 type: 'RegisterSuccess',
                 accessToken: res.data.token,
+                roles: res.data.roles,
             } as IRegisterSuccessAction);
 
             return true;
@@ -318,7 +325,7 @@ export const thirdPartyRedeemTokenActionCreator: ActionCreator<
             type: 'LoginThirdPartyRedeemTokenSent',
         } as ILoginThirdPartyRedeemTokenSentAction);
 
-        const token: string = (await axios.post(
+        const res: AxiosResponse<any> = (await axios.post(
             `${process.env.REACT_APP_AUTH_ROOT_URL}third-party-redeem`,
             {
                 clientCode: getState().authState.clientCode,
@@ -328,11 +335,12 @@ export const thirdPartyRedeemTokenActionCreator: ActionCreator<
                 headers: { 
                     'Access-Control-Allow-Origin': '*'
                 }
-            })).data.value.token;
+            }));
 
         dispatch({
             type: 'LoginThirdPartyRedeemTokenSuccess',
-            accessToken: token,
+            accessToken: res.data.value.token,
+            roles: res.data.value.roles,
         } as ILoginThirdPartyRedeemTokenSuccessAction);
     };
 };
@@ -374,6 +382,7 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                 loading: initialSyncState.loading,
                 loginFailed: initialSyncState.loginFailed,
                 authToken: action.accessToken,
+                roles: action.roles,
                 wasForcedLogout: false,
             };
         case 'LoginFailed':
@@ -401,6 +410,7 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                 loading: initialSyncState.loading,
                 loginFailed: initialSyncState.loginFailed,
                 authToken: action.accessToken,
+                roles: action.roles,
                 wasForcedLogout: false,
             };
         case 'RegisterFailed':
@@ -453,6 +463,7 @@ export const authReducer: Reducer<IAuthState, SyncActions> = (
                 ...state,
                 loading: initialSyncState.loading,
                 authToken: action.accessToken,
+                roles: action.roles,
                 redirectUrl: undefined,
                 clientCode: undefined,
                 redeemTokenLoading: false,
