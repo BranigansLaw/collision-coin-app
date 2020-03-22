@@ -220,6 +220,8 @@ interface IDataSyncAction extends OfflineAction {
     type: 'DataSync';
 }
 
+export interface IClearSyncStateAction extends Action<'ClearSyncState'> {}
+
 interface IDequeueAction extends Action<'Deque'> {
     toDequeue: ApiAction<ApiActions>[];
 }
@@ -241,6 +243,7 @@ export interface IReceivedDataSyncAction extends Action<'ReceivedDataSync'> {
 
 export type SyncActions =
     | IDequeueAction
+    | IClearSyncStateAction
     | IIncrementNumTries
     | IReceivedDataSyncAction
     | ILogoutAction
@@ -313,6 +316,21 @@ export const checkQueueActionCreator: ActionCreator<
     };
 };
 
+export const clearSyncStateActionCreator: ActionCreator<
+    ThunkAction<
+        void,     // The type of the last action to be dispatched - will always be promise<T> for async actions
+        IOfflineAppState,  // The type for the data within the last action
+        null,              // The type of the parameter for the nested function 
+        IDataSyncAction    // The type of the last action to be dispatched
+    >
+> = () => {
+    return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IOfflineAppState) => {
+        dispatch({
+            type: 'ClearSyncState',
+        } as IClearSyncStateAction);
+    };
+};
+
 // Reducers
 export const syncReducer: Reducer<ISyncState, SyncActions> = (
     state = initialSyncState,
@@ -325,6 +343,9 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
                 lastSyncEpochMilliseconds: action.epochUpdateTimeMilliseconds,
                 syncIntervalMilliseconds: action.syncIntervalMilliseconds !== null ? action.syncIntervalMilliseconds : state.syncIntervalMilliseconds,
             };
+        }
+        case 'ClearSyncState': {
+            return initialSyncState;
         }
         case 'Logout': {
             return {

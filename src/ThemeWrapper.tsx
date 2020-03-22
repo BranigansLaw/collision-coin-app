@@ -10,6 +10,7 @@ import { lightTheme, darkTheme } from './theme';
 import { CssBaseline } from '@material-ui/core';
 import { IAppState } from './store';
 import { connect } from 'react-redux';
+import LocalDataIntegrityCheck from './components/Wrappers/LocalDataIntegrityCheck';
 
 interface IProps {
     isLightMode: boolean;
@@ -24,7 +25,9 @@ const ThemeWrapper: React.FC<IProps> = ({
             <RehydrateWrapper>
                 <OfflineWrapper>
                     <ServiceWorkerUpdateWrapper>
-                        <Route />
+                        <LocalDataIntegrityCheck>
+                            <Route />
+                        </LocalDataIntegrityCheck>
                     </ServiceWorkerUpdateWrapper>
                 </OfflineWrapper>
             </RehydrateWrapper>

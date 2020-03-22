@@ -1,7 +1,7 @@
 import { ActionCreator, Reducer, AnyAction, Action } from 'redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IAppState } from '.';
-import { IReceivedDataSyncAction } from './sync';
+import { IReceivedDataSyncAction, IClearSyncStateAction } from './sync';
 import { ILogoutAction } from './auth';
 import { IAttendeeBaseFields, IAttendee } from './attendee';
 import { validNonEmptyString } from '../util';
@@ -59,6 +59,7 @@ export type AttendeeActions =
     | IReceivedDataSyncAction
     | IRevokingPermissionsAction
     | IRevokedPermissionsAction
+    | IClearSyncStateAction
     | ILogoutAction;
 
 // Action Creators
@@ -228,7 +229,8 @@ export const profileReducer: Reducer<IProfileState, AttendeeActions> = (
                 revokingPermissions: 'complete',
             };
         }
-        case 'Logout': {
+        case 'Logout':
+        case 'ClearSyncState': {
             return initialProfileState;
         }
         default:
