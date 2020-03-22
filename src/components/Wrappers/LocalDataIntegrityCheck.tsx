@@ -22,6 +22,7 @@ const LocalDataIntegrityCheck: React.FC<IProps> = ({
 }) => {
     if ((isSynced && !hasProfile) ||
         (isAuthenticated && !hasProfile)) {
+        console.log('Data integrity errors! Clearing sync state');
         clearSyncState();
     }
 
