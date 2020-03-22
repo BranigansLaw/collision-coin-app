@@ -20,8 +20,8 @@ const LocalDataIntegrityCheck: React.FC<IProps> = ({
     clearSyncState,
     children,
 }) => {
-    if (isSynced && !hasProfile ||
-        isAuthenticated && !hasProfile) {
+    if ((isSynced && !hasProfile) ||
+        (isAuthenticated && !hasProfile)) {
         clearSyncState();
     }
 
