@@ -15,12 +15,14 @@ import { IServiceWorkerState, serviceWorkerReducer } from './serviceWorker';
 import { AppState as OfflineAppState, Config, NetworkCallback } from '@redux-offline/redux-offline/lib/types';
 import { ICalendarState, calendarReducer } from './event';
 import { IAttendeeRedemptionState, attendeeRedemptionReducer } from './redemption';
+import { IAdminState, adminReducer } from './admin';
 
 // state
 export interface IAppState {
     readonly form: FormStateMap;
     readonly router: RouterState;
     readonly rehydrated: IRehydratedState;
+    readonly admin: IAdminState;
     readonly sync: ISyncState;
     readonly attendeesState: IAttendeeState;
     readonly eventState: ICalendarState;
@@ -44,6 +46,7 @@ const rootReducer = ((history: History) => combineReducers<IAppState>({
     form: reduxFormReducer,
     router: connectRouter(history),
     rehydrated: rehydratedReducer,
+    admin: adminReducer,
     sync: syncReducer,
     attendeesState: attendeeReducer,
     eventState: calendarReducer,

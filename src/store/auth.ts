@@ -20,6 +20,11 @@ interface authFailedMessage {
 
 export type LogoutReason = 'expiry' | 'revokePermissions';
 
+export const adminPageRoles: string[] = ['SuperAdministrator'];
+export function isAdmin(userRoles: string[]): boolean {
+    return adminPageRoles.some(role => userRoles.some(role1 => role === role1));
+}
+
 export interface IAuthState {
     readonly loading: authFlag;
     readonly loginFailed: authFailedMessage;

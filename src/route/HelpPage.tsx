@@ -181,7 +181,7 @@ const HelpPage: React.FC<IProps> = ({
             <Box className={classes.toc}>
                 <Typography variant="h4">Table of Contents</Typography>
                 {tableOfContents.map(i => (
-                    <Typography>
+                    <Typography key={i.index}>
                         <Link href={`#${i.index}`}>
                             {i.title}
                         </Link>
@@ -190,11 +190,11 @@ const HelpPage: React.FC<IProps> = ({
             </Box>
             <>
                 {tableOfContents.map(i => (
-                    <>
+                    <Box key={i.index}>
                         <hr />
                         <Typography id={i.index} variant="h4">{i.title}</Typography>
                         {i.content}
-                    </>
+                    </Box>
                 ))}
             </>
         </Box>

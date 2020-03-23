@@ -20,6 +20,8 @@ import Logout from '../components/Logout';
 import QrCodeIcon from '../assets/svg/QrCodeIcon';
 import FlexGrow from '../components/UserInterface/FlewGrow';
 import RevokePermissionsConfirmModal from '../components/RevokePermissions/RevokePermissionsConfirmModal';
+import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount';
+import { isAdmin } from '../store/auth';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -29,12 +31,14 @@ const styles = (theme: Theme) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     profile: IProfile;
+    userRoles: string[];
     push: (url: string) => void;
     updateUiPreference: (isLightMode: boolean) => void;
 }
 
 const Navbar: React.FC<IProps> = ({
     profile,
+    userRoles,
     push,
     updateUiPreference,
     classes,
@@ -42,28 +46,34 @@ const Navbar: React.FC<IProps> = ({
     const [anchorEl, setAnchorEl] = React.useState<HTMLLIElement | null>(null);
     const [revokePermissionsModalOpen, setRevokePermissionsModalOpen] = React.useState<boolean>(false);
 
-    const editProfileClick = () => {
+    const adminDashboardClick = React.useCallback(() => {
+        setAnchorEl(null);
+        push(RootUrls.adminDashboard());
+    }, [setAnchorEl, push]);
+
+    const editProfileClick = React.useCallback(() => {
         setAnchorEl(null);
         push(RootUrls.attendeeCollisions(profile.id, true));
-    }
+    }, [setAnchorEl, profile.id, push]);
 
-    const aboutUsClick = () => {
+    const aboutUsClick = React.useCallback(() => {
         setAnchorEl(null);
         push(RootUrls.about());
-    }
+    }, [setAnchorEl, push]);
 
-    const helpClick = () => {
+    const helpClick = React.useCallback(() => {
         setAnchorEl(null);
         push(RootUrls.help());
-    }
+    }, [setAnchorEl, push]);
 
-    const toggleUiMode = () => {
+    const toggleUiMode = React.useCallback(() => {
         updateUiPreference(!profile.isLightMode);
-    }
+    }, [updateUiPreference, profile.isLightMode]);
 
-    const qrCodeIconClick = () => {
+    const qrCodeIconClick = React.useCallback(() => {
+        setAnchorEl(null);
         push(RootUrls.myCode())
-    }
+    }, [setAnchorEl, push]);
 
     return (
         <>
@@ -91,6 +101,12 @@ const Navbar: React.FC<IProps> = ({
                         horizontal: 'left',
                     }}
                 >
+                    {isAdmin(userRoles) ? <MenuItem onClick={() => adminDashboardClick()} hidden={true}>
+                        <ListItemIcon>
+                            <SupervisorAccountIcon fontSize="small" />
+                        </ListItemIcon>
+                        <ListItemText primary="Admin Dashboard" />
+                    </MenuItem> : <></>}
                     <MenuItem onClick={() => editProfileClick()}>
                         <ListItemIcon>
                             <CreateIcon fontSize="small" />
@@ -133,6 +149,7 @@ const Navbar: React.FC<IProps> = ({
 
 const mapStateToProps = (store: IAppState) => {
     return {
+        userRoles: store.authState.roles,
     };
 };
 

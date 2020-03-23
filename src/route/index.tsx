@@ -24,6 +24,8 @@ import HelpPage from './HelpPage';
 import UnsubscribePage from './UnsubscribePage';
 import CurrentRedemptionPage from './CurrentRedemptionPage';
 import AttendeeRedemptionPage from './AttendeeRedemptionPage';
+import AdminDashboard from './AdminDashboard';
+import { adminPageRoles } from '../store/auth';
 
 // min height of 48 to work with AppBar
 export const headerHeight: string = '48px';
@@ -36,6 +38,7 @@ export class RootUrls {
     public static readonly qrCodeScan = () => '/scan';    
     public static readonly thirdPartyAuth = (): string => '/thirdPartyAuth';
     public static readonly dashboard = (): string => '/dashboard';
+    public static readonly adminDashboard = (): string => '/admin-dashboard';
     public static readonly firstDataSync = (): string => '/first-data-sync';
     public static readonly about = (): string => '/about';
     public static readonly help = (): string => '/help';
@@ -66,6 +69,7 @@ const AppRoute: React.FC<IProps> = ({
                 <main className={classes.main}>
                     <Route exact path='/' render={route => <Redirect to={RootUrls.dashboard()} />} />
                     <AuthenticatedRoute exact path={RootUrls.dashboard()} component={DashboardPage} />
+                    <AuthenticatedRoute exact path={RootUrls.adminDashboard()} component={AdminDashboard} requiredRoles={adminPageRoles} />
                     <UnauthenticatedRoute exact path={RootUrls.login()} component={LoginPage} />
                     <UnauthenticatedRoute exact path='/register' render={route => {
                         const search = window.location.search;

@@ -8,13 +8,12 @@ import { AnyAction } from 'redux';
 import { IAppState } from '../../store';
 import { updateProfileActionCreator, IProfile, IUpdateProfileFields } from '../../store/profile';
 import { nullStringToEmpty } from '../../util';
+import { required } from '../Form/formValidators';
 
 interface IFormProps {
     loading: boolean;
     hideSubmit: boolean;
 }
-
-const required = (value: any) => (value || typeof value === 'number' ? undefined : 'Required');
 
 const FormComponent: React.FC<InjectedFormProps<IUpdateProfileFields, IFormProps> & IFormProps> = ({
     handleSubmit,

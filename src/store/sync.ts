@@ -11,6 +11,7 @@ import { getCurrentTimeEpochMilliseconds } from '../util';
 import { IUpdateProfileAction } from './profile';
 import { IEvent } from './event';
 import { IAttendeeRedemption, INewRedemptionAction } from './redemption';
+import { IAdminData } from './admin';
 
 // Store
 export interface ISyncState {
@@ -103,6 +104,7 @@ export const handleApiAction = async (
                     try {
                         dispatch({
                             type: 'ReceivedDataSync',
+                            adminData: res.data.adminData,
                             attendeeCollisions: res.data.attendeeCollisions,
                             attendeeRedemptions: res.data.redemptions,
                             events: res.data.events,
@@ -231,6 +233,7 @@ interface IIncrementNumTries extends Action<'IncrementTries'> {
 }
 
 export interface IReceivedDataSyncAction extends Action<'ReceivedDataSync'> {
+    adminData: IAdminData;
     attendeeCollisions: IAttendee[];
     attendeeRedemptions: IAttendeeRedemption[];
     events: IEvent[];
