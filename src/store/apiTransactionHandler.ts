@@ -1,15 +1,21 @@
 import axios, { AxiosResponse } from 'axios';
 import { Guid } from 'guid-typescript';
 import { wait } from '../util';
+import { IAppState } from '.';
 
 export async function handleApiCall(
     url: string,
-    token: string,
+    getState: () => IAppState,
     data: any | undefined,
     acceptableResponseCode: number,
     successCallback: (data: any) => void,
     errorCallback?: (error: any | undefined) => void,
 ): Promise<void> {
+    const token: string | undefined = getState().authState.authToken;
+    if (token === undefined) {
+        throw new Error('Token is not valid');
+    }
+
     let res: AxiosResponse<any> | undefined;
     const transactionId: string = Guid.create().toString();
     let errorOccurred: boolean = true;

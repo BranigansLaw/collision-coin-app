@@ -29,7 +29,7 @@ const MyCode: React.FC<IProps> = ({
 }) => {
     return (
         <Box className={classes.root}>
-            <CodeDisplay myQrCode={myQrCode} />
+            <CodeDisplay qrCode={myQrCode} />
         </Box>
     );
 }

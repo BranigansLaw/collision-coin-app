@@ -138,18 +138,13 @@ export const revokeLoggedInUserPermissionsActionCreator: ActionCreator<
     >
 > = () => {
     return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
-        const token: string | undefined = getState().authState.authToken;
-        if (token === undefined) {
-            throw new Error('Token is not valid');
-        }
-
         dispatch({
             type: 'RevokingPermissions',
         } as IRevokingPermissionsAction);
 
         await handleApiCall(
             `${process.env.REACT_APP_API_ROOT_URL}Profile/revoke-permissions`,
-            token,
+            getState,
             undefined,
             204,
             (data: any) => {
@@ -162,7 +157,7 @@ export const revokeLoggedInUserPermissionsActionCreator: ActionCreator<
                     logoutReason: 'revokePermissions',
                 } as ILogoutAction);
             },
-        )
+        );
     };
 };
 

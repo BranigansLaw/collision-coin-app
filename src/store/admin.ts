@@ -4,6 +4,7 @@ import { neverReached, IAppState } from '.';
 import { IReceivedDataSyncAction } from './sync';
 import { Guid } from 'guid-typescript';
 import { mergeLists } from '../util';
+import { handleApiCall } from './apiTransactionHandler';
 
 // Store
 export interface IConference {
@@ -17,18 +18,24 @@ export interface IAdminData {
 
 export interface IAdminState {
     conferences: IConference[];
+    newAttendeeQrCodeData: string | undefined;
     sendingAttendee: boolean;
+    errorCreatingAttendee: boolean;
 }
 
 const initialAdminState: IAdminState = {
     conferences: [],
+    newAttendeeQrCodeData: undefined,
     sendingAttendee: false,
+    errorCreatingAttendee: false,
 };
 
 // Actions
 export interface ISendingNewAttendeeAction extends Action<'SendingNewAttendee'> {}
 
-export interface ISuccessCreatingAttendeeAction extends Action<'SuccessCreatingAttendee'> {}
+export interface ISuccessCreatingAttendeeAction extends Action<'SuccessCreatingAttendee'> {
+    newAttendeeQrCode: string;
+}
 
 export interface IErrorCreatingAttendeeAction extends Action<'ErrorCreatingAttendee'> {}
 
@@ -51,6 +58,29 @@ export const createAttendeeActionCreator: ActionCreator<
         dispatch({
             type: 'SendingNewAttendee',
         } as ISendingNewAttendeeAction);
+
+        await handleApiCall(
+            `${process.env.REACT_APP_API_ROOT_URL}Attendee/add-attendee-with-conference`,
+            getState,
+            {
+                conferenceId: conferenceId.toString(),
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+            },
+            201,
+            (data: any) => {
+                dispatch({
+                    type: 'SuccessCreatingAttendee',
+                    newAttendeeQrCode: data.newAttendeeQrCodeData,
+                } as ISuccessCreatingAttendeeAction);
+            },
+            (error: any) => {
+                dispatch({
+                    type: 'ErrorCreatingAttendee',
+                } as IErrorCreatingAttendeeAction);
+            },
+        );
     };
 };
 
@@ -70,16 +100,22 @@ export const adminReducer: Reducer<IAdminState, AdminActions> = (
             return {
                 ...state,
                 sendingAttendee: true,
+                errorCreatingAttendee: false,
             };
         }
         case 'SuccessCreatingAttendee': {
             return {
                 ...state,
+                sendingAttendee: false,
+                errorCreatingAttendee: false,
+                newAttendeeQrCodeData: action.newAttendeeQrCode,
             };
         }
         case 'ErrorCreatingAttendee': {
             return {
                 ...state,
+                sendingAttendee: false,
+                errorCreatingAttendee: true,
             };
         }
         default:
