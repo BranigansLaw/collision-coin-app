@@ -91,10 +91,15 @@ export const adminReducer: Reducer<IAdminState, AdminActions> = (
 ) => {
     switch (action.type) {
         case 'ReceivedDataSync': {
-            return {
-                ...state,
-                conferences: mergeLists(state.conferences, action.adminData.conferences),
-            };
+            if (action.adminData) {
+                return {
+                    ...state,
+                    conferences: mergeLists(state.conferences, action.adminData.conferences),
+                };
+            }
+            else {
+                return state;
+            }
         }
         case 'SendingNewAttendee': {
             return {

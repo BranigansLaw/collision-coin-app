@@ -233,7 +233,7 @@ interface IIncrementNumTries extends Action<'IncrementTries'> {
 }
 
 export interface IReceivedDataSyncAction extends Action<'ReceivedDataSync'> {
-    adminData: IAdminData;
+    adminData: IAdminData | undefined;
     attendeeCollisions: IAttendee[];
     attendeeRedemptions: IAttendeeRedemption[];
     events: IEvent[];
