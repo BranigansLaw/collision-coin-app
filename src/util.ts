@@ -121,3 +121,7 @@ export function timeDifference(d1: Date, d2: Date): string {
 
     return Math.floor(seconds) + " seconds";
 }
+
+export function stringNullEmptyOrUndefined(s: string | null | undefined): boolean {
+    return s === '' || s === null || s === undefined;
+}

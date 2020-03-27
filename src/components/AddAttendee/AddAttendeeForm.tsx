@@ -27,6 +27,7 @@ const FormComponent: React.FC<InjectedFormProps<ICreateAttendee, IFormProps> & I
     pristine,
     submitting,
     loading,
+    reset,
     conferences,
 }) => {
     return (
@@ -72,10 +73,21 @@ const FormComponent: React.FC<InjectedFormProps<ICreateAttendee, IFormProps> & I
                 size="large"
                 variant="contained"
                 color="primary" 
-                aria-label="add" 
+                aria-label="submit" 
                 type="submit"
-                disabled={pristine || submitting || loading}>
+                disabled={pristine || submitting || loading}
+            >
                 Save Changes
+            </Button>
+            <Button
+                size="large"
+                variant="contained"
+                color="secondary" 
+                aria-label="reset" 
+                disabled={pristine || submitting || loading}
+                onClick={() => reset()}
+            >
+                Reset
             </Button>
         </form>);
 };
