@@ -11,6 +11,7 @@ import { IProfile, isProfile } from '../../store/profile';
 import EditProfile from '../EditProfile/EditProfile';
 import AttendeeFieldDisplay from './AttendeeFieldDisplay';
 import ProfileImage from './ProfileImage';
+import { stringNullEmptyOrUndefined } from '../../util';
 
 const styles = (theme: Theme) => createStyles({
     notes: {
@@ -29,18 +30,21 @@ const AttendeeCollisionBody: React.FC<IProps> = ({
     editing,
     updateAttendeeCollisionNotes,
 }) => {
-    const showNotes = (object: IAttendee | IProfile) => {
-        if ('userNotes' in object) {
-            return (
-                <TextField
-                    className={classes.notes}
-                    label="Notes"
-                    multiline
-                    value={object.userNotes}
-                    onChange={e => updateAttendeeCollisionNotes(toDisplay.id.toString(), e.target.value)}
-                />);
+    const [notesValue, setNotesValue] = React.useState<string>("");
+
+    React.useEffect(() => {
+        if ('userNotes' in toDisplay) {
+            if (stringNullEmptyOrUndefined(toDisplay.userNotes)) {
+                setNotesValue("");
+            }
+            else {
+                setNotesValue(toDisplay.userNotes);
+            }
         }
-    }
+        else {
+            setNotesValue("");
+        }
+    }, [toDisplay]);
     
     const isProfileRes: boolean = isProfile(toDisplay);
 
@@ -62,7 +66,14 @@ const AttendeeCollisionBody: React.FC<IProps> = ({
                         <AttendeeFieldDisplay toDisplay={toDisplay} fieldName="Address" fieldSelector={(p : IProfile | IAttendee) => p.address} />
                     </TableBody>
                 </Table>
-                {showNotes(toDisplay)}
+                {'userNotes' in toDisplay ?
+                    <TextField
+                        className={classes.notes}
+                        label="Notes"
+                        multiline
+                        value={notesValue}
+                        onChange={e => updateAttendeeCollisionNotes(toDisplay.id.toString(), e.target.value)}
+                    /> : <></>}
             </Box>
             <Box hidden={!editing || !isProfileRes}>
                 <EditProfile hideSubmit={true} />

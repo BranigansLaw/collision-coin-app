@@ -106,7 +106,7 @@ const Navbar: React.FC<IProps> = ({
                             <SupervisorAccountIcon fontSize="small" />
                         </ListItemIcon>
                         <ListItemText primary="Admin Dashboard" />
-                    </MenuItem> : <></>}
+                    </MenuItem> : ""}
                     <MenuItem onClick={() => editProfileClick()}>
                         <ListItemIcon>
                             <CreateIcon fontSize="small" />
