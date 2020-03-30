@@ -6,12 +6,13 @@ import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../../store';
 import { IAttendee, updateAttendeeCollisionNotesActionCreator } from '../../store/attendee';
-import { Table, TableBody, TextField, Box } from '@material-ui/core';
+import { Table, TableBody, Box } from '@material-ui/core';
 import { IProfile, isProfile } from '../../store/profile';
 import EditProfile from '../EditProfile/EditProfile';
 import AttendeeFieldDisplay from './AttendeeFieldDisplay';
 import ProfileImage from './ProfileImage';
 import { stringNullEmptyOrUndefined } from '../../util';
+import HideableTextArea from '../UserInterface/HideableTextArea';
 
 const styles = (theme: Theme) => createStyles({
     notes: {
@@ -67,7 +68,7 @@ const AttendeeCollisionBody: React.FC<IProps> = ({
                     </TableBody>
                 </Table>
                 {'userNotes' in toDisplay ?
-                    <TextField
+                    <HideableTextArea
                         className={classes.notes}
                         label="Notes"
                         multiline

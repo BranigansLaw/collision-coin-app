@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { reduxForm, InjectedFormProps, Field } from 'redux-form';
 import { Button, TextField } from '@material-ui/core';
-import { renderTextField } from '../muiReduxFormIntegration';
+import { renderTextField, renderHideableMultilineTextField } from '../muiReduxFormIntegration';
 import { connect } from 'react-redux';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
@@ -44,7 +44,7 @@ const FormComponent: React.FC<InjectedFormProps<IUpdateProfileFields, IFormProps
             />
             <Field
                 name="description"
-                component={renderTextField}
+                component={renderHideableMultilineTextField}
                 type="text"
                 label="Tell us about yourself"
                 disabled={submitting || loading}
@@ -93,7 +93,7 @@ const FormComponent: React.FC<InjectedFormProps<IUpdateProfileFields, IFormProps
             />
             <Field
                 name="address"
-                component={renderTextField}
+                component={renderHideableMultilineTextField}
                 type="text"
                 label="Work Address"
                 disabled={submitting || loading}

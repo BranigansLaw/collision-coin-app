@@ -47,8 +47,6 @@ const AttendeeCollision: React.FC<IProps> = ({
 
     const startEditing = () => {
         setEditing(true);
-        // Trigger resize for hidden text areas
-        window.dispatchEvent(new Event('resize'));
         setExpanded(true);
     }
 
@@ -63,9 +61,6 @@ const AttendeeCollision: React.FC<IProps> = ({
     }
 
     const toggleExpanded = () => {
-        // Trigger resize for hidden text areas
-        window.dispatchEvent(new Event('resize'));
-        
         if (expanded) {
             setEditing(false);
         }

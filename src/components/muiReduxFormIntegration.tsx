@@ -1,5 +1,6 @@
 import React from 'react';
 import { TextField, FormHelperText, Select, InputLabel, FormControl } from "@material-ui/core";
+import HideableTextArea from './UserInterface/HideableTextArea';
 
 interface IMeta {
     touched: boolean;
@@ -17,6 +18,25 @@ export const renderTextField = (
     },
 ) => (
     <TextField
+        type={type}
+        error={touched && (error !== undefined || warning !== undefined)}
+        helperText={error ? error : warning}
+        label={label}
+        {...input}
+        {...custom}
+    />
+);
+
+export const renderHideableMultilineTextField = (
+    { input, label, type, meta: { touched, error, warning }, ...custom }: {
+        [x: string]: any;
+        input: any;
+        label: string;
+        type: string;
+        meta: IMeta;
+    },
+) => (
+    <HideableTextArea
         type={type}
         error={touched && (error !== undefined || warning !== undefined)}
         helperText={error ? error : warning}
