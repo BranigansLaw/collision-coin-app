@@ -3,8 +3,25 @@ import { WithStyles, createStyles, withStyles, Button, Fab, Paper } from '@mater
 import { Theme } from '@material-ui/core/styles/createMuiTheme';
 import AddToPhotosIcon from '@material-ui/icons/AddToPhotos';
 import LoadingButton from '../components/UserInterface/LoadingButton';
+import NewLogoIcon from '../assets/svg/NewLogoIcon';
 
 const styles = (theme: Theme) => createStyles({
+    newLogo: {
+        fontSize: theme.spacing(12),
+        '& > #captured': {
+            color: 'red',
+        },
+        '& > #mag': {
+            color: 'purple',
+        },
+        '& > #bigC': {
+            color: 'green',
+        },
+    },
+    newLogo2: {
+        fontSize: theme.spacing(12),
+        color: 'pink',
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -15,6 +32,8 @@ const StylesTestPage: React.FC<IProps> = ({
 }) => {
     return (
         <>
+            <NewLogoIcon className={classes.newLogo} />
+            <NewLogoIcon className={classes.newLogo2} />
             <Paper>
                 Orange Box
             </Paper>
