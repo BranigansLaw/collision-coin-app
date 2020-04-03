@@ -8,10 +8,10 @@ import NewLogoIcon from '../assets/svg/NewLogoIcon';
 const styles = (theme: Theme) => createStyles({
     newLogo: {
         fontSize: theme.spacing(12),
-        '& > #captured': {
+        '& > #bLine': {
             color: 'red',
         },
-        '& > #mag': {
+        '& > #glass': {
             color: 'purple',
         },
         '& > #bigC': {
