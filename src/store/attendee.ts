@@ -25,6 +25,7 @@ export interface IAttendeeBaseFields extends IAuditableEntity {
 
 export interface IAttendee extends IAttendeeBaseFields {
     userNotes: string;
+    approvalState: 'New' | 'Block' | 'Approved';
 }
 
 export interface IAttendeeState {

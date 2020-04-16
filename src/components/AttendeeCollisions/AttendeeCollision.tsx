@@ -6,7 +6,7 @@ import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../../store';
 import { IAttendee } from '../../store/attendee';
-import { Box } from '@material-ui/core';
+import { Box, Fab } from '@material-ui/core';
 import { IProfile, isProfile, profileIsValid } from '../../store/profile';
 import CreateIcon from '@material-ui/icons/Create';
 import FabWithHidden from '../UserInterface/FabWithHidden';
@@ -18,6 +18,8 @@ import SaveProfileButton from './SaveProfileButton';
 import AttendeeCollisionHeader from './AttendeeCollisionHeader';
 import AttendeeCollisionBody from './AttendeeCollisionBody';
 import AttendeeCollisionAboutContent from './AttendeeCollisionAboutContent';
+import CheckIcon from '@material-ui/icons/Check';
+import ClearIcon from '@material-ui/icons/Clear';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -69,6 +71,11 @@ const AttendeeCollision: React.FC<IProps> = ({
     }
     
     const isProfileRes: boolean = toDisplay !== null && isProfile(toDisplay);
+
+    const isPending: boolean = React.useMemo(() => 
+        toDisplay !== null && 'approvalState' in toDisplay && toDisplay.approvalState === 'New',
+        [toDisplay]);
+
     let headerButtons: JSX.Element[] = [
         (<FabWithHidden key="edit-button" size="small" onClick={() => startEditing()} hidden={!isProfileRes || editing}>
             <CreateIcon />
@@ -84,6 +91,18 @@ const AttendeeCollision: React.FC<IProps> = ({
                 key="save-button"
                 closeFormCallback={saveProfile} />,
             ...headerButtons
+        ];
+    }
+
+    if (isPending) {
+        headerButtons = [
+            (<Fab key="approve-button" size="small" onClick={() => alert('approve')}>
+                <CheckIcon />
+            </Fab>),
+            (<Fab key="deny-button" size="small" onClick={() => alert('deny')}>
+                <ClearIcon />
+            </Fab>),
+        ...headerButtons
         ];
     }
 

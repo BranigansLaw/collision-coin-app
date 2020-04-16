@@ -9,6 +9,7 @@ import { IAttendee } from '../../store/attendee';
 import AttendeeCollision from './AttendeeCollision';
 import { Guid } from 'guid-typescript';
 import { IProfile } from '../../store/profile';
+import PendingCollisionsCollapsible from './PendingCollisionsCollapsible';
 
 export const CollisionCoinId: string = Guid.EMPTY.toString();
 
@@ -31,6 +32,10 @@ const AttendeeCollisionList: React.FC<IProps> = ({
     collisions,
     profile,
 }) => {
+    const sortedApprovedCollisions = React.useMemo(() =>
+        collisions.filter(c => c.approvalState === 'Approved').sort((a, b) => a.lastName < b.lastName ? 1 : -1),
+    [collisions]);
+
     return <>
             <AttendeeCollision 
                 key={CollisionCoinId} 
@@ -42,7 +47,8 @@ const AttendeeCollisionList: React.FC<IProps> = ({
                     key={profile.id.toString()} 
                     toDisplay={profile} 
                     expandedDefault={openedCollision !== undefined ? openedCollision.toString() === profile.id.toString() : false} /> : ''}
-            {collisions.sort((a, b) => a.lastName < b.lastName ? 1 : -1).map(c =>
+            <PendingCollisionsCollapsible openedCollision={openedCollision}/>
+            {sortedApprovedCollisions.map(c =>
                 <AttendeeCollision
                     key={c.id.toString()}
                     toDisplay={c}

@@ -6,13 +6,16 @@ import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../../store';
 import { IAttendee, updateAttendeeCollisionNotesActionCreator } from '../../store/attendee';
-import { Table, TableBody, Box } from '@material-ui/core';
+import { Table, TableBody, Box, Grid } from '@material-ui/core';
 import { IProfile, isProfile } from '../../store/profile';
 import EditProfile from '../EditProfile/EditProfile';
 import AttendeeFieldDisplay from './AttendeeFieldDisplay';
 import ProfileImage from './ProfileImage';
 import { stringNullEmptyOrUndefined } from '../../util';
 import HideableTextArea from '../UserInterface/HideableTextArea';
+import CheckIcon from '@material-ui/icons/Check';
+import ClearIcon from '@material-ui/icons/Clear';
+import ButtonWithText from '../UserInterface/ButtonWithText';
 
 const styles = (theme: Theme) => createStyles({
     notes: {
@@ -54,6 +57,16 @@ const AttendeeCollisionBody: React.FC<IProps> = ({
             <Box>
                 <ProfileImage toDisplay={toDisplay} />
             </Box>
+            {'approvalState' in toDisplay && toDisplay.approvalState === 'New' ?
+                <Grid container justify="center">
+                    <ButtonWithText color="secondary" aria-label="approve connection" text="Approve" onClick={() => alert('Approve')}>
+                        <CheckIcon />
+                    </ButtonWithText>
+                    <ButtonWithText color="secondary" aria-label="deny connection" text="Deny" onClick={() => alert('Deny')}>
+                        <ClearIcon />
+                    </ButtonWithText>
+                </Grid> : <></>
+            }
             <Box hidden={(editing && isProfileRes)}>
                 <Table>
                     <TableBody>
