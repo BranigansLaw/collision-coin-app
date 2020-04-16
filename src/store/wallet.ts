@@ -67,11 +67,15 @@ export const walletReducer: Reducer<IWalletState, AttendeeActions> = (
             };
         }
         case 'UpdateAttendeeApproval': {
-            return {
-                ...state,
-                balance: state.balance + state.bonusSettings.attendeeApprovalCoinsEarned,
-                addAttendeeCoins: state.addAttendeeCoins,
-            };
+            if (action.currState === 'New' && action.newState === 'Approved') {
+                return {
+                    ...state,
+                    balance: state.balance + state.bonusSettings.attendeeApprovalCoinsEarned,
+                    addAttendeeCoins: state.addAttendeeCoins,
+                };
+            }
+            
+            return state;
         }
         default:
             neverReached(action); // when a new action is created, this helps us remember to handle it in the reducer

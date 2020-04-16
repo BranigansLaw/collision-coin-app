@@ -5,17 +5,16 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../../store';
-import { IAttendee, updateAttendeeCollisionNotesActionCreator, ApprovalState, updateAttendeeCollisionApprovalStateActionCreator } from '../../store/attendee';
-import { Table, TableBody, Box, Grid } from '@material-ui/core';
+import { IAttendee, updateAttendeeCollisionNotesActionCreator } from '../../store/attendee';
+import { Table, TableBody, Box } from '@material-ui/core';
 import { IProfile, isProfile } from '../../store/profile';
 import EditProfile from '../EditProfile/EditProfile';
 import AttendeeFieldDisplay from './AttendeeFieldDisplay';
 import ProfileImage from './ProfileImage';
 import { stringNullEmptyOrUndefined } from '../../util';
 import HideableTextArea from '../UserInterface/HideableTextArea';
-import CheckIcon from '@material-ui/icons/Check';
-import ClearIcon from '@material-ui/icons/Clear';
-import ButtonWithText from '../UserInterface/ButtonWithText';
+import AttendeeCollisionAcceptOrReject from './AttendeeCollisionAcceptOrReject';
+import AttendeeCollisionBlock from './AttendeeCollisionBlock';
 
 const styles = (theme: Theme) => createStyles({
     notes: {
@@ -26,7 +25,6 @@ interface IProps extends WithStyles<typeof styles> {
     toDisplay: IAttendee | IProfile;
     editing: boolean;
     updateAttendeeCollisionNotes: (collisionId: string, updatedNotes: string) => void;
-    updateAttendeeApproval: (id: string, newState: ApprovalState) => void;
 }
 
 const AttendeeCollisionBody: React.FC<IProps> = ({
@@ -34,7 +32,6 @@ const AttendeeCollisionBody: React.FC<IProps> = ({
     toDisplay,
     editing,
     updateAttendeeCollisionNotes,
-    updateAttendeeApproval,
 }) => {
     const [notesValue, setNotesValue] = React.useState<string>("");
 
@@ -59,26 +56,8 @@ const AttendeeCollisionBody: React.FC<IProps> = ({
             <Box>
                 <ProfileImage toDisplay={toDisplay} />
             </Box>
-            {'approvalState' in toDisplay && toDisplay.approvalState === 'New' ?
-                <Grid container justify="center">
-                    <ButtonWithText
-                        color="secondary"
-                        aria-label="approve connection"
-                        text="Approve"
-                        onClick={() => updateAttendeeApproval(toDisplay.id, 'Approved')}
-                    >
-                        <CheckIcon />
-                    </ButtonWithText>
-                    <ButtonWithText
-                        color="secondary"
-                        aria-label="deny connection"
-                        text="Deny"
-                        onClick={() => updateAttendeeApproval(toDisplay.id, 'Block')}
-                    >
-                        <ClearIcon />
-                    </ButtonWithText>
-                </Grid> : <></>
-            }
+            <AttendeeCollisionAcceptOrReject toDisplay={toDisplay} />
+            <AttendeeCollisionBlock toDisplay={toDisplay} />
             <Box hidden={(editing && isProfileRes)}>
                 <Table>
                     <TableBody>
@@ -115,7 +94,6 @@ const mapStateToProps = (store: IAppState) => {
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
         updateAttendeeCollisionNotes: (collisionId: string, updatedNotes: string) => dispatch(updateAttendeeCollisionNotesActionCreator(collisionId, updatedNotes)),
-        updateAttendeeApproval: (id: string, newState: ApprovalState) => dispatch(updateAttendeeCollisionApprovalStateActionCreator(id, newState)),
     };
 };
 

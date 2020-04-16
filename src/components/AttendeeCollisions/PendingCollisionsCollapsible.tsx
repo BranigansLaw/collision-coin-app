@@ -5,7 +5,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../../store';
-import { IAttendee } from '../../store/attendee';
+import { IAttendee, ApprovalState } from '../../store/attendee';
 import AttendeeCollision from './AttendeeCollision';
 import { Guid } from 'guid-typescript';
 import { ListItem, ListItemText, Collapse } from '@material-ui/core';
@@ -22,23 +22,28 @@ const styles = (theme: Theme) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
     openedCollision?: Guid;
     collisions: IAttendee[];
+    state: ApprovalState;
 }
 
 const PendingCollisionsCollapsible: React.FC<IProps> = ({
     classes,
     openedCollision,
     collisions,
+    state,
 }) => {
     const sortedPendingCollisions = React.useMemo(() => 
-        collisions.filter(c => c.approvalState !== 'Approved').sort((a, b) => a.lastName < b.lastName ? 1 : -1),
-    [collisions]);
+        collisions.filter(c => c.approvalState === state).sort((a, b) => a.lastName < b.lastName ? 1 : -1),
+    [collisions, state]);
+
+    const stateString = React.useMemo(() => state === 'New' ? 'Pending' : 'Blocked', [state]);
+
     const [pendingApprovalOpen, setPendingApprovalOpen] = React.useState<boolean>(false);
 
     return <>
             {sortedPendingCollisions.length > 0 ?
                 <>
                     <ListItem button onClick={() => setPendingApprovalOpen(!pendingApprovalOpen)}>
-                        <ListItemText primary={`Pending Collisions (${sortedPendingCollisions.length})`} />
+                        <ListItemText primary={`${stateString} Collisions (${sortedPendingCollisions.length})`} />
                         {pendingApprovalOpen ? <ExpandLess /> : <ExpandMore />}
                     </ListItem>
                     <Collapse in={pendingApprovalOpen} timeout="auto" unmountOnExit>

@@ -47,7 +47,8 @@ const AttendeeCollisionList: React.FC<IProps> = ({
                     key={profile.id.toString()} 
                     toDisplay={profile} 
                     expandedDefault={openedCollision !== undefined ? openedCollision.toString() === profile.id.toString() : false} /> : ''}
-            <PendingCollisionsCollapsible openedCollision={openedCollision}/>
+            <PendingCollisionsCollapsible state="New" openedCollision={openedCollision}/>
+            <PendingCollisionsCollapsible state="Block" openedCollision={openedCollision}/>
             {sortedApprovedCollisions.map(c =>
                 <AttendeeCollision
                     key={c.id.toString()}

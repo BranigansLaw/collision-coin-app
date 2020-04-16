@@ -52,6 +52,7 @@ export interface IUpdateAttendeeNotesAction extends Action<'UpdateAttendeeNotes'
 
 export interface IUpdateAttendeeApprovalStateAction extends Action<'UpdateAttendeeApproval'> {
     attendeeId: string;
+    currState: ApprovalState;
     newState: ApprovalState;
 }
 
@@ -116,10 +117,11 @@ export const updateAttendeeCollisionApprovalStateActionCreator: ActionCreator<
         IUpdateAttendeeApprovalStateAction  // The type of the last action to be dispatched
     >
 > = (attendeeId: string, newState: ApprovalState) => {
-    return async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
+    return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
         const updateAttendeeApprovalStateAction: IUpdateAttendeeApprovalStateAction = {
             type: 'UpdateAttendeeApproval',
             attendeeId,
+            currState: getState().attendeesState.collisions.filter(c => c.id === attendeeId)[0].approvalState,
             newState,
         };
 
@@ -174,12 +176,27 @@ export const attendeeReducer: Reducer<IAttendeeState, AttendeeActions> = (
                 return state;
             }
 
+            const newValue: IAttendee = matchingCollisionQuery[0];
+            newValue.approvalState = action.newState;
+
+            if (action.newState === 'Block') {
+                newValue.companyDivision = null;
+                newValue.companyName = null;
+                newValue.description = null;
+                newValue.email = null;
+                newValue.linkedInUsername = null;
+                newValue.phoneNumber = null;
+                newValue.position = null;
+                newValue.profilePictureBase64Data = null;
+                newValue.skype = null;
+                newValue.website = null;
+            }
+
             return {
                 ...state,
                 collisions: [ 
                     {
-                        ...matchingCollisionQuery[0],
-                        approvalState: action.newState,
+                        ...newValue,
                     } as IAttendee,
                     ...state.collisions.filter(c => c.id.toString() !== action.attendeeId) ]
             };
