@@ -5,7 +5,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../../store';
-import { IAttendee, updateAttendeeCollisionNotesActionCreator } from '../../store/attendee';
+import { IAttendee, updateAttendeeCollisionNotesActionCreator, ApprovalState, updateAttendeeCollisionApprovalStateActionCreator } from '../../store/attendee';
 import { Table, TableBody, Box, Grid } from '@material-ui/core';
 import { IProfile, isProfile } from '../../store/profile';
 import EditProfile from '../EditProfile/EditProfile';
@@ -26,6 +26,7 @@ interface IProps extends WithStyles<typeof styles> {
     toDisplay: IAttendee | IProfile;
     editing: boolean;
     updateAttendeeCollisionNotes: (collisionId: string, updatedNotes: string) => void;
+    updateAttendeeApproval: (id: string, newState: ApprovalState) => void;
 }
 
 const AttendeeCollisionBody: React.FC<IProps> = ({
@@ -33,6 +34,7 @@ const AttendeeCollisionBody: React.FC<IProps> = ({
     toDisplay,
     editing,
     updateAttendeeCollisionNotes,
+    updateAttendeeApproval,
 }) => {
     const [notesValue, setNotesValue] = React.useState<string>("");
 
@@ -59,10 +61,20 @@ const AttendeeCollisionBody: React.FC<IProps> = ({
             </Box>
             {'approvalState' in toDisplay && toDisplay.approvalState === 'New' ?
                 <Grid container justify="center">
-                    <ButtonWithText color="secondary" aria-label="approve connection" text="Approve" onClick={() => alert('Approve')}>
+                    <ButtonWithText
+                        color="secondary"
+                        aria-label="approve connection"
+                        text="Approve"
+                        onClick={() => updateAttendeeApproval(toDisplay.id, 'Approved')}
+                    >
                         <CheckIcon />
                     </ButtonWithText>
-                    <ButtonWithText color="secondary" aria-label="deny connection" text="Deny" onClick={() => alert('Deny')}>
+                    <ButtonWithText
+                        color="secondary"
+                        aria-label="deny connection"
+                        text="Deny"
+                        onClick={() => updateAttendeeApproval(toDisplay.id, 'Block')}
+                    >
                         <ClearIcon />
                     </ButtonWithText>
                 </Grid> : <></>
@@ -103,6 +115,7 @@ const mapStateToProps = (store: IAppState) => {
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
         updateAttendeeCollisionNotes: (collisionId: string, updatedNotes: string) => dispatch(updateAttendeeCollisionNotesActionCreator(collisionId, updatedNotes)),
+        updateAttendeeApproval: (id: string, newState: ApprovalState) => dispatch(updateAttendeeCollisionApprovalStateActionCreator(id, newState)),
     };
 };
 

@@ -2,7 +2,7 @@ import { ActionCreator, Reducer, AnyAction, Action } from 'redux';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IOfflineAppState } from '.';
 import axios, { AxiosResponse } from 'axios';
-import { IAttendee, ICreateAttendeeCollisionAction, IUpdateAttendeeNotesAction } from './attendee';
+import { IAttendee, ICreateAttendeeCollisionAction, IUpdateAttendeeNotesAction, IUpdateAttendeeApprovalStateAction } from './attendee';
 import { IProfile, IUpdateProfileImageAction, IUpdatePreferredUiModeAction } from './profile';
 import { ILogoutAction, ILoginThirdPartySuccessAction, IRegisterSuccessAction, ILoginSuccessAction } from './auth';
 import { OfflineAction } from '@redux-offline/redux-offline/lib/types';
@@ -28,6 +28,7 @@ export type ApiActions =
     | IUpdateProfileImageAction
     | IUpdatePreferredUiModeAction
     | IUpdateAttendeeNotesAction
+    | IUpdateAttendeeApprovalStateAction
     | ICreateAttendeeCollisionAction
     | INewRedemptionAction
     | ILogoutRequeueAction;
@@ -111,7 +112,7 @@ export const handleApiAction = async (
                             myProfile: res.data.myProfile,
                             balance: res.data.myWallet !== null ? res.data.myWallet.balance : null,
                             addAttendeeCoins: res.data.appSettings !== null ? res.data.appSettings.attendeeCollisionCoinsEarned : null,
-                            syncIntervalMilliseconds: res.data.appSettings !== null ? res.data.appSettings.syncIntervalMilliseconds : null,
+                            appSettings: res.data.appSettings,
                             epochUpdateTimeMilliseconds: res.data.epochUpdateTimeMilliseconds,
                         } as IReceivedDataSyncAction);
                     } catch (ex) {
@@ -164,6 +165,16 @@ export const handleApiAction = async (
                     `${process.env.REACT_APP_API_ROOT_URL}collision/attendee/${action.meta.attendeeId.toString()}/update`,
                     {
                         updatedNotes: action.meta.updatedNotes
+                    },
+                    {
+                        headers
+                    }), dispatch);
+                break;
+            case 'UpdateAttendeeApproval':
+                res = await wrapResponse(axios.post(
+                    `${process.env.REACT_APP_API_ROOT_URL}collision/attendee/${action.meta.attendeeId.toString()}/update/status`,
+                    {
+                        newState: action.meta.newState,
                     },
                     {
                         headers
@@ -232,6 +243,12 @@ interface IIncrementNumTries extends Action<'IncrementTries'> {
     toIncrementTransactionId: string;
 }
 
+export interface AppSettings {
+    readonly syncIntervalMilliseconds: number;
+    readonly attendeeCollisionCoinsEarned: number;
+    readonly attendeeApprovalCoinsEarned: number;
+}
+
 export interface IReceivedDataSyncAction extends Action<'ReceivedDataSync'> {
     adminData: IAdminData | undefined;
     attendeeCollisions: IAttendee[];
@@ -240,7 +257,7 @@ export interface IReceivedDataSyncAction extends Action<'ReceivedDataSync'> {
     myProfile: IProfile;
     balance: number | null;
     addAttendeeCoins: number | null;
-    syncIntervalMilliseconds: number | null;
+    appSettings: AppSettings | null;
     epochUpdateTimeMilliseconds: number;
 }
 
@@ -344,7 +361,7 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
             return {
                 ...state,
                 lastSyncEpochMilliseconds: action.epochUpdateTimeMilliseconds,
-                syncIntervalMilliseconds: action.syncIntervalMilliseconds !== null ? action.syncIntervalMilliseconds : state.syncIntervalMilliseconds,
+                syncIntervalMilliseconds: action.appSettings !== null ? action.appSettings.syncIntervalMilliseconds : state.syncIntervalMilliseconds,
             };
         }
         case 'ClearSyncState': {
@@ -397,6 +414,15 @@ export const syncReducer: Reducer<ISyncState, SyncActions> = (
                 actionQueue: [ 
                     ...state.actionQueue.filter(q => q.meta.type !== 'UpdateAttendeeNotes' || q.meta.attendeeId !== action.attendeeId), 
                     new ApiAction<IUpdateAttendeeNotesAction>(action)
+                ],
+            }
+        }
+        case 'UpdateAttendeeApproval': {
+            return {
+                ...state,
+                actionQueue: [ 
+                    ...state.actionQueue.filter(q => q.meta.type !== 'UpdateAttendeeApproval' || q.meta.attendeeId !== action.attendeeId), 
+                    new ApiAction<IUpdateAttendeeApprovalStateAction>(action)
                 ],
             }
         }

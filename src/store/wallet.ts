@@ -1,18 +1,28 @@
 import { Reducer } from 'redux';
 import { neverReached, } from '.';
 import { IReceivedDataSyncAction } from './sync';
-import { ICreateAttendeeCollisionAction } from './attendee';
+import { ICreateAttendeeCollisionAction, IUpdateAttendeeApprovalStateAction } from './attendee';
 import { INewRedemptionAction } from './redemption';
 
 // Store
+interface BonusSettings {
+    readonly attendeeCollisionCoinsEarned: number;
+    readonly attendeeApprovalCoinsEarned: number;
+}
+
 export interface IWalletState {
     readonly balance: number;
     readonly addAttendeeCoins: number;
+    readonly bonusSettings: BonusSettings;
 }
 
 const initialProfileState: IWalletState = {
     balance: 0,
     addAttendeeCoins: 0,
+    bonusSettings: {
+        attendeeApprovalCoinsEarned: 0,
+        attendeeCollisionCoinsEarned: 0,
+    },
 };
 
 // Actions
@@ -20,7 +30,8 @@ const initialProfileState: IWalletState = {
 export type AttendeeActions =
     | ICreateAttendeeCollisionAction
     | INewRedemptionAction
-    | IReceivedDataSyncAction;
+    | IReceivedDataSyncAction
+    | IUpdateAttendeeApprovalStateAction;
 
 // Action Creators
 
@@ -34,6 +45,12 @@ export const walletReducer: Reducer<IWalletState, AttendeeActions> = (
             return {
                 ...state,
                 balance: action.balance !== null ? action.balance : state.balance,
+                bonusSettings: {
+                    attendeeApprovalCoinsEarned: action.appSettings !== null ?
+                        action.appSettings.attendeeApprovalCoinsEarned : state.bonusSettings.attendeeApprovalCoinsEarned,
+                    attendeeCollisionCoinsEarned: action.appSettings !== null ?
+                        action.appSettings.attendeeCollisionCoinsEarned : state.bonusSettings.attendeeCollisionCoinsEarned,
+                },
             };
         }
         case 'NewRedemption': {
@@ -45,7 +62,14 @@ export const walletReducer: Reducer<IWalletState, AttendeeActions> = (
         case 'CreateAttendeeCollision': {
             return {
                 ...state,
-                balance: state.balance + 500,
+                balance: state.balance + state.bonusSettings.attendeeCollisionCoinsEarned,
+                addAttendeeCoins: state.addAttendeeCoins,
+            };
+        }
+        case 'UpdateAttendeeApproval': {
+            return {
+                ...state,
+                balance: state.balance + state.bonusSettings.attendeeApprovalCoinsEarned,
                 addAttendeeCoins: state.addAttendeeCoins,
             };
         }

@@ -6,6 +6,8 @@ import { ILogoutAction } from './auth';
 import { mergeLists } from '../util';
 
 // Store
+export type ApprovalState = 'New' | 'Block' | 'Approved';
+
 export interface IAttendeeBaseFields extends IAuditableEntity {
     id: string;
     firstName: string;
@@ -25,7 +27,7 @@ export interface IAttendeeBaseFields extends IAuditableEntity {
 
 export interface IAttendee extends IAttendeeBaseFields {
     userNotes: string;
-    approvalState: 'New' | 'Block' | 'Approved';
+    approvalState: ApprovalState;
 }
 
 export interface IAttendeeState {
@@ -48,10 +50,16 @@ export interface IUpdateAttendeeNotesAction extends Action<'UpdateAttendeeNotes'
     updatedNotes: string;
 }
 
+export interface IUpdateAttendeeApprovalStateAction extends Action<'UpdateAttendeeApproval'> {
+    attendeeId: string;
+    newState: ApprovalState;
+}
+
 export type AttendeeActions =
     | IReceivedDataSyncAction
     | ICreateAttendeeCollisionAction
     | IUpdateAttendeeNotesAction
+    | IUpdateAttendeeApprovalStateAction
     | ILogoutAction;
 
 // Action Creators
@@ -100,6 +108,25 @@ export const updateAttendeeCollisionNotesActionCreator: ActionCreator<
     };
 };
 
+export const updateAttendeeCollisionApprovalStateActionCreator: ActionCreator<
+    ThunkAction<
+        Promise<void>,        // The type of the last action to be dispatched - will always be promise<T> for async actions
+        IAppState,            // The type for the data within the last action
+        null,                 // The type of the parameter for the nested function 
+        IUpdateAttendeeApprovalStateAction  // The type of the last action to be dispatched
+    >
+> = (attendeeId: string, newState: ApprovalState) => {
+    return async (dispatch: ThunkDispatch<any, any, AnyAction>) => {
+        const updateAttendeeApprovalStateAction: IUpdateAttendeeApprovalStateAction = {
+            type: 'UpdateAttendeeApproval',
+            attendeeId,
+            newState,
+        };
+
+        dispatch(updateAttendeeApprovalStateAction);
+    };
+};
+
 // Reducers
 export const attendeeReducer: Reducer<IAttendeeState, AttendeeActions> = (
     state = initialAttendeeState,
@@ -136,6 +163,23 @@ export const attendeeReducer: Reducer<IAttendeeState, AttendeeActions> = (
                     {
                         ...matchingCollisionQuery[0],
                         userNotes: action.updatedNotes,
+                    } as IAttendee,
+                    ...state.collisions.filter(c => c.id.toString() !== action.attendeeId) ]
+            };
+        }
+        case 'UpdateAttendeeApproval': {
+            const matchingCollisionQuery: IAttendee[] = state.collisions.filter(c => c.id.toString() === action.attendeeId);
+
+            if (matchingCollisionQuery.length !== 1) {
+                return state;
+            }
+
+            return {
+                ...state,
+                collisions: [ 
+                    {
+                        ...matchingCollisionQuery[0],
+                        approvalState: action.newState,
                     } as IAttendee,
                     ...state.collisions.filter(c => c.id.toString() !== action.attendeeId) ]
             };

@@ -5,7 +5,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../../store';
-import { IAttendee } from '../../store/attendee';
+import { IAttendee, updateAttendeeCollisionApprovalStateActionCreator, ApprovalState } from '../../store/attendee';
 import { Box, Fab } from '@material-ui/core';
 import { IProfile, isProfile, profileIsValid } from '../../store/profile';
 import CreateIcon from '@material-ui/icons/Create';
@@ -35,6 +35,7 @@ interface IProps extends WithStyles<typeof styles> {
     expandedDefault: boolean;
     openEditing?: boolean;
     resetProfileChanges: () => void;
+    updateAttendeeApproval: (id: string, newState: ApprovalState) => void;
 }
 
 const AttendeeCollision: React.FC<IProps> = ({
@@ -43,6 +44,7 @@ const AttendeeCollision: React.FC<IProps> = ({
     expandedDefault,
     openEditing,
     resetProfileChanges,
+    updateAttendeeApproval,
 }) => {
     const [expanded, setExpanded] = React.useState<boolean>(expandedDefault);
     const [editing, setEditing] = React.useState<boolean>(openEditing !== undefined && openEditing);
@@ -94,12 +96,12 @@ const AttendeeCollision: React.FC<IProps> = ({
         ];
     }
 
-    if (isPending) {
+    if (isPending && toDisplay !== null) {
         headerButtons = [
-            (<Fab key="approve-button" size="small" onClick={() => alert('approve')}>
+            (<Fab key="approve-button" size="small" onClick={() => updateAttendeeApproval(toDisplay.id, 'Approved')}>
                 <CheckIcon />
             </Fab>),
-            (<Fab key="deny-button" size="small" onClick={() => alert('deny')}>
+            (<Fab key="deny-button" size="small" onClick={() => updateAttendeeApproval(toDisplay.id, 'Block')}>
                 <ClearIcon />
             </Fab>),
         ...headerButtons
@@ -132,7 +134,8 @@ const mapStateToProps = (store: IAppState) => {
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
-        resetProfileChanges: () => dispatch(reset(EditProfileFormName))
+        resetProfileChanges: () => dispatch(reset(EditProfileFormName)),
+        updateAttendeeApproval: (id: string, newState: ApprovalState) => dispatch(updateAttendeeCollisionApprovalStateActionCreator(id, newState)),
     };
 };
 
