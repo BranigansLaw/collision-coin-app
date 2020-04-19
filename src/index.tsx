@@ -20,11 +20,18 @@ const skipWaitingImp = (registration: ServiceWorkerRegistration) => {
 // Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.register({
     onUpdate: (registration: ServiceWorkerRegistration) => {
-        onServiceWorkerUpdateAvailable();
-
-        skipWaitingCall = () => {
-            skipWaitingImp(registration);
-        };
+        const waitingServiceWorker = registration.waiting;
+        if (waitingServiceWorker) {
+            waitingServiceWorker.addEventListener("statechange", () => {
+                if (waitingServiceWorker.state === "activated") {
+                    onServiceWorkerUpdateAvailable();
+                    skipWaitingCall = () => {
+                        window.location.reload();
+                    };
+                }
+            });
+            waitingServiceWorker.postMessage({ type: "SKIP_WAITING" });
+        }
     },
     onRegister: (registration: ServiceWorkerRegistration) => {
         skipWaitingCall = () => {
