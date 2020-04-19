@@ -79,7 +79,7 @@ const BottomBar: React.FC<IProps> = ({
     else {
         return (                
             <footer className={classes.footer}>
-                &copy; {process.env.REACT_APP_APP_NAME} {new Date().getFullYear()} - {process.env.NODE_ENV}
+                &copy; {process.env.REACT_APP_APP_NAME} {new Date().getFullYear()}
             </footer>);
     }
 }
