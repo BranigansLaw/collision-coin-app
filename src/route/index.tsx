@@ -51,6 +51,8 @@ export class RootUrls {
 const styles = (theme: Theme) => createStyles({
     root: {
         position: 'relative',
+        maxWidth: 600,
+        margin: '0 auto',
     },
     main: {
         minHeight: '100%',
