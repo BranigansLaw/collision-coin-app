@@ -3,12 +3,11 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IOfflineAppState } from '.';
 import axios, { AxiosResponse } from 'axios';
 import { IAttendee, ICreateAttendeeCollisionAction, IUpdateAttendeeNotesAction, IUpdateAttendeeApprovalStateAction } from './attendee';
-import { IProfile, IUpdateProfileImageAction, IUpdatePreferredUiModeAction } from './profile';
+import { IProfile, IUpdateProfileImageAction, IUpdatePreferredUiModeAction, IUpdateProfileAction } from './profile';
 import { ILogoutAction, ILoginThirdPartySuccessAction, IRegisterSuccessAction, ILoginSuccessAction } from './auth';
 import { OfflineAction } from '@redux-offline/redux-offline/lib/types';
 import { Guid } from 'guid-typescript';
 import { getCurrentTimeEpochMilliseconds } from '../util';
-import { IUpdateProfileAction } from './profile';
 import { IEvent } from './event';
 import { IAttendeeRedemption, INewRedemptionAction } from './redemption';
 import { IAdminData } from './admin';
@@ -284,8 +283,8 @@ export const checkQueueActionCreator: ActionCreator<
         console.log('Check data queue');
         try {
             if (getState().offline.online) {
-                let completedActions: ApiAction<ApiActions>[] = [];
-                let failedActions: ApiAction<ApiActions>[] = [];
+                const completedActions: ApiAction<ApiActions>[] = [];
+                const failedActions: ApiAction<ApiActions>[] = [];
 
                 for (const action of getState().sync.actionQueue) {
                     const res: AxiosResponse<any> | undefined =
