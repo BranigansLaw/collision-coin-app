@@ -42,6 +42,7 @@
     "typescript": "3.4.5"
   },
   "scripts": {
+    "lint": "tslint --project tsconfig.json",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -61,5 +62,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "tslint": "^6.1.1"
   }
 }

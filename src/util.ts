@@ -66,7 +66,8 @@ export function range(start: number, stop: number, step: number): number[] {
         return [];
     }
 
-    var a = [start], b = start;
+    const a = [start];
+    let b = start;
     while (b < stop) {
         a.push(b += step || 1);
     }
@@ -91,9 +92,9 @@ export function wait(timeoutMilliseconds: number) {
 }
 
 export function timeDifference(d1: Date, d2: Date): string {
-    var seconds = Math.floor((Number(d2) - Number(d1)) / 1000);
+    const seconds = Math.floor((Number(d2) - Number(d1)) / 1000);
 
-    var interval = Math.floor(seconds / 31536000);
+    let interval = Math.floor(seconds / 31536000);
 
     if (interval > 1) {
         return interval + " years";

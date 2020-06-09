@@ -1,0 +1,9 @@
+name: main
+on: [pull-request]
+
+jobs:
+  run-lint:
+    runs-on: ubuntu-latest
+    name: Build and test
+    steps:
+      - run: npm run lint
