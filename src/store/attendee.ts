@@ -4,6 +4,7 @@ import { IReceivedDataSyncAction, IAuditableEntity } from './sync';
 import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { ILogoutAction } from './auth';
 import { mergeLists } from '../util';
+import { nowBetweenEpochs, getCurrentTimeEpochMilliseconds } from '../epochConverter';
 
 // Store
 export type ApprovalState = 'New' | 'Block' | 'Approved';
@@ -43,6 +44,8 @@ export interface ICreateAttendeeCollisionAction extends Action<'CreateAttendeeCo
     attendeeId: string;
     firstName: string;
     lastName: string;
+    timeOfConnectionEpochMilliseconds: number;
+    conferenceIdConnectionMadeAt: string;
 }
 
 export interface IUpdateAttendeeNotesAction extends Action<'UpdateAttendeeNotes'> {
@@ -54,6 +57,8 @@ export interface IUpdateAttendeeApprovalStateAction extends Action<'UpdateAttend
     attendeeId: string;
     currState: ApprovalState;
     newState: ApprovalState;
+    timeOfUpdateEpochMilliseconds: number;
+    conferenceIdUpdateMadeAt: string;
 }
 
 export type AttendeeActions =
@@ -79,11 +84,21 @@ export const createAttendeeCollisionActionCreator: ActionCreator<
                 return;
         }
 
+        // Change this so the user selects with conference they are at
+        const conferencesCurrentlyAttending = 
+            getState().profile.conferences.filter(c => nowBetweenEpochs(c.startEpochMilliseconds, c.endEpochMilliseconds));
+
+        if (conferencesCurrentlyAttending.length === 0) {
+            return;
+        }
+
         const createAttendeeCollisionAction: ICreateAttendeeCollisionAction = {
             type: 'CreateAttendeeCollision',
             attendeeId,
             firstName,
             lastName,
+            timeOfConnectionEpochMilliseconds: getCurrentTimeEpochMilliseconds(),
+            conferenceIdConnectionMadeAt: conferencesCurrentlyAttending[0].id,
         };
 
         dispatch(createAttendeeCollisionAction);
@@ -118,11 +133,22 @@ export const updateAttendeeCollisionApprovalStateActionCreator: ActionCreator<
     >
 > = (attendeeId: string, newState: ApprovalState) => {
     return async (dispatch: ThunkDispatch<any, any, AnyAction>, getState: () => IAppState) => {
+        debugger;
+        // Change this so the user selects with conference they are at
+        const conferencesCurrentlyAttending = 
+            getState().profile.conferences.filter(c => nowBetweenEpochs(c.startEpochMilliseconds, c.endEpochMilliseconds));
+
+        if (conferencesCurrentlyAttending.length === 0) {
+            return;
+        }
+    
         const updateAttendeeApprovalStateAction: IUpdateAttendeeApprovalStateAction = {
             type: 'UpdateAttendeeApproval',
             attendeeId,
             currState: getState().attendeesState.collisions.filter(c => c.id === attendeeId)[0].approvalState,
             newState,
+            conferenceIdUpdateMadeAt: conferencesCurrentlyAttending[0].id,
+            timeOfUpdateEpochMilliseconds: getCurrentTimeEpochMilliseconds(),
         };
 
         dispatch(updateAttendeeApprovalStateAction);
@@ -148,6 +174,7 @@ export const attendeeReducer: Reducer<IAttendeeState, AttendeeActions> = (
                     id: action.attendeeId,
                     firstName: action.firstName,
                     lastName: action.lastName,
+                    approvalState: 'Approved',
                     userNotes: '',
                 } as IAttendee, ...state.collisions ]
             };

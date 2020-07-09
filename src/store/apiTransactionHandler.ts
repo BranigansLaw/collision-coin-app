@@ -8,17 +8,28 @@ export async function handleApiCall(
     getState: () => IAppState,
     data: any | undefined,
     acceptableResponseCode: number,
+    requireAuth: boolean,
     successCallback: (data: any) => void,
     errorCallback?: (error: any | undefined) => void,
 ): Promise<void> {
-    const token: string | undefined = getState().authState.authToken;
-    if (token === undefined) {
-        throw new Error('Token is not valid');
+    const headers: { [key: string]: string } = { 
+        'Access-Control-Allow-Origin': '*',
+    };
+
+    if (requireAuth) {
+        const token: string | undefined = getState().authState.authToken;
+        if (token === undefined) {
+            throw new Error('Token is not valid');
+        }
+
+        headers["authorization"] = `Bearer ${token}`;
     }
 
     let res: AxiosResponse<any> | undefined;
     const transactionId: string = Guid.create().toString();
     let errorOccurred: boolean = true;
+
+    headers["TransactionId"] = transactionId;
 
     while (errorOccurred) {
         errorOccurred = false;
@@ -27,11 +38,7 @@ export async function handleApiCall(
                 url,
                 data,
                 {
-                    headers: { 
-                        'Access-Control-Allow-Origin': '*',
-                        authorization: `Bearer ${token}`,
-                        'TransactionId': transactionId,
-                    }
+                    headers: headers
                 });
         }
         catch (e) {

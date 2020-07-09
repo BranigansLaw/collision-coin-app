@@ -9,6 +9,7 @@ import { push } from 'connected-react-router';
 import { createAttendeeCollisionActionCreator } from '../store/attendee';
 import { RootUrls } from '.';
 import { IRedeemable, setCurrentRedeemableActionCreator } from '../store/redemption';
+import { IOfflineAppState } from '../store';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -16,12 +17,14 @@ const styles = (theme: Theme) => createStyles({
 });
 
 interface IProps extends WithStyles<typeof styles> {
+    searchData: string;
     push: (url: string) => void;
     createAttendeeCollision: (id: string, firstName: string, lastName: string) => void;
     setCurrentRedeemable: (newCurrent: IRedeemable) => void;
 }
 
 const QrCodeReaderPage: React.FC<IProps> = ({
+    searchData,
     push,
     createAttendeeCollision,
     setCurrentRedeemable,
@@ -30,10 +33,14 @@ const QrCodeReaderPage: React.FC<IProps> = ({
     const [data, setData] = React.useState("");
     const qrScanUrlFromEnv: string = `${process.env.REACT_APP_QR_SCAN_URL}`;
 
-    const handleScan = (scannedData: string | null) => {
+    const handleScan = React.useCallback(async (scannedData: string | null) => {
         if (scannedData !== null && scannedData.length > 0 && scannedData.indexOf(qrScanUrlFromEnv) >= 0) {
+            if (process.env.REACT_APP_RESERVED_QR_SPLITTER === undefined) {
+                throw Error("process.env.REACT_APP_RESERVED_QR_SPLITTER not defined");
+            }
+
             const data: string = scannedData.substring(qrScanUrlFromEnv.length);
-            const dataSplit: string[] = data.split('#');
+            const dataSplit: string[] = data.split(process.env.REACT_APP_RESERVED_QR_SPLITTER);
             const type: number = +dataSplit[0];
             const id: string = dataSplit[1];
             const meta: string[] = dataSplit.splice(2);
@@ -53,11 +60,21 @@ const QrCodeReaderPage: React.FC<IProps> = ({
                     break;
             }
         }
-    }
+    }, [createAttendeeCollision, push, qrScanUrlFromEnv, setCurrentRedeemable]);
 
-    const handleError = (err: any) => {
+    const handleError = React.useCallback((err: any) => {
         setData(err.toString());
-    }
+    }, [setData]);
+
+    React.useEffect(() => {
+        const params: URLSearchParams = new URLSearchParams(searchData);
+        if (params.has("d")) {
+            const data: string | null = params.get("d");
+            if (data !== null) {
+                handleScan(window.location.href);
+            }
+        }
+    }, [searchData, handleScan]);
 
     return (
         <div className={classes.root}>
@@ -72,6 +89,12 @@ const QrCodeReaderPage: React.FC<IProps> = ({
     );
 }
 
+const mapStateToProps = (store: IOfflineAppState) => {
+    return {
+        searchData: store.router.location.search,
+    };
+};
+
 const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
     return {
         push: (url: string) => dispatch(push(url)),
@@ -81,6 +104,6 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<any, any, AnyAction>) => {
 };
 
 export default withStyles(styles)(connect(
-    null,
+    mapStateToProps,
     mapDispatchToProps,
 )(QrCodeReaderPage));

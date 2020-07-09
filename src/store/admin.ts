@@ -5,13 +5,9 @@ import { IReceivedDataSyncAction } from './sync';
 import { Guid } from 'guid-typescript';
 import { mergeLists } from '../util';
 import { handleApiCall } from './apiTransactionHandler';
+import { IConference } from './profile';
 
 // Store
-export interface IConference {
-    id: string;
-    name: string;
-}
-
 export interface IAdminData {
     conferences: IConference[];
 }
@@ -69,6 +65,7 @@ export const createAttendeeActionCreator: ActionCreator<
                 email: email,
             },
             201,
+            false,
             (data: any) => {
                 dispatch({
                     type: 'SuccessCreatingAttendee',

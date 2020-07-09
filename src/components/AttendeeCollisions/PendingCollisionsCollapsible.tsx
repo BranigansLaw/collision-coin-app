@@ -43,7 +43,7 @@ const PendingCollisionsCollapsible: React.FC<IProps> = ({
             {sortedPendingCollisions.length > 0 ?
                 <>
                     <ListItem button onClick={() => setPendingApprovalOpen(!pendingApprovalOpen)}>
-                        <ListItemText primary={`${stateString} Collisions (${sortedPendingCollisions.length})`} />
+                        <ListItemText primary={`${stateString} Connections (${sortedPendingCollisions.length})`} />
                         {pendingApprovalOpen ? <ExpandLess /> : <ExpandMore />}
                     </ListItem>
                     <Collapse in={pendingApprovalOpen} timeout="auto" unmountOnExit>

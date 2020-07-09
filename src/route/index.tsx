@@ -26,6 +26,7 @@ import CurrentRedemptionPage from './CurrentRedemptionPage';
 import AttendeeRedemptionPage from './AttendeeRedemptionPage';
 import AdminDashboard from './AdminDashboard';
 import { adminPageRoles } from '../store/auth';
+import AddAttendeeToStartupTntPage from './AddAttendeeToStartupTntPage';
 
 // min height of 48 to work with AppBar
 export const headerHeight: string = '48px';
@@ -81,6 +82,7 @@ const AppRoute: React.FC<IProps> = ({
 
                         return <LoginPage id={id !== null ? id : undefined} code={code !== null ? code : undefined} />;
                     }} />
+                    <Route exact path='/tnt' component={AddAttendeeToStartupTntPage} />
                     <Route exact path={RootUrls.thirdPartyAuth()} render={route => {
                         const search = window.location.search;
                         const params = new URLSearchParams(search);

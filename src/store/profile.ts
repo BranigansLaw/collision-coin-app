@@ -4,7 +4,7 @@ import { neverReached, IAppState } from '.';
 import { IReceivedDataSyncAction, IClearSyncStateAction } from './sync';
 import { ILogoutAction } from './auth';
 import { IAttendeeBaseFields, IAttendee } from './attendee';
-import { validNonEmptyString } from '../util';
+import { validNonEmptyString, mergeLists } from '../util';
 import { handleApiCall } from './apiTransactionHandler';
 
 // Store
@@ -13,8 +13,16 @@ export interface IProfile extends IAttendeeBaseFields {
     readonly isLightMode: boolean;
 }
 
+export interface IConference {
+    id: string;
+    name: string;
+    startEpochMilliseconds: number;
+    endEpochMilliseconds: number;
+}
+
 export interface IProfileState {
     readonly userProfile: IProfile | null;
+    readonly conferences: IConference[];
     readonly revokingPermissions?: 'loading' | 'complete';
 }
 
@@ -32,6 +40,7 @@ export function isProfile(toTest: IAttendee | IProfile): boolean {
 
 const initialProfileState: IProfileState = {
     userProfile: null,
+    conferences: [],
     revokingPermissions: undefined,
 };
 
@@ -147,6 +156,7 @@ export const revokeLoggedInUserPermissionsActionCreator: ActionCreator<
             getState,
             undefined,
             204,
+            true,
             (data: any) => {
                 dispatch({
                     type: 'RevokedPermissions',
@@ -192,6 +202,7 @@ export const profileReducer: Reducer<IProfileState, AttendeeActions> = (
             return {
                 ...state,
                 userProfile: action.myProfile != null ? action.myProfile : state.userProfile,
+                conferences: mergeLists(state.conferences, action.userConferences),
             };
         }
         case 'UpdatePreferredUiMode': {

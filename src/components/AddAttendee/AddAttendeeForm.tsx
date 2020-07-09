@@ -8,11 +8,14 @@ import { AnyAction } from 'redux';
 import { IAppState } from '../../store';
 import { required } from '../Form/formValidators';
 import { Guid } from 'guid-typescript';
-import { createAttendeeActionCreator, IConference } from '../../store/admin';
+import { createAttendeeActionCreator } from '../../store/admin';
+import LoadingButton from '../UserInterface/LoadingButton';
+import { IConference } from '../../store/profile';
 
 interface IFormProps {
     loading: boolean;
     conferences: IConference[];
+    showConferencePicker: boolean;
 }
 
 interface ICreateAttendee {
@@ -29,6 +32,7 @@ const FormComponent: React.FC<InjectedFormProps<ICreateAttendee, IFormProps> & I
     loading,
     reset,
     conferences,
+    showConferencePicker,
 }) => {
     return (
         <form onSubmit={handleSubmit}>
@@ -59,7 +63,7 @@ const FormComponent: React.FC<InjectedFormProps<ICreateAttendee, IFormProps> & I
                 margin="normal"
                 validate={[required]}
             />
-            <Field
+            {showConferencePicker ? <Field
                 name="conferenceId"
                 component={renderSelectField}
                 label="Conference"
@@ -68,8 +72,9 @@ const FormComponent: React.FC<InjectedFormProps<ICreateAttendee, IFormProps> & I
             >
                 <option value="" />
                 {conferences.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </Field>
-            <Button
+            </Field> : <></>}
+            <LoadingButton
+                loading={loading}
                 size="large"
                 variant="contained"
                 color="primary" 
@@ -78,7 +83,7 @@ const FormComponent: React.FC<InjectedFormProps<ICreateAttendee, IFormProps> & I
                 disabled={pristine || submitting || loading}
             >
                 Save Changes
-            </Button>
+            </LoadingButton>
             <Button
                 size="large"
                 variant="contained"
@@ -100,17 +105,21 @@ const ConnectedFormComponent = reduxForm<ICreateAttendee, IFormProps>({
 
 interface IProps {
     conferences: IConference[];
+    loading: boolean;
+    conferenceId: string | undefined;
     createAttendee: (firstName: string, lastName: string, email: string, conferenceId: Guid) => void;
 }
 
 const AddAttendeeForm: React.FC<IProps> = ({
     conferences,
+    loading,
+    conferenceId,
     createAttendee,
 }) => {
     return (
         <>
             <ConnectedFormComponent
-                loading={false}
+                loading={loading}
                 conferences={conferences}
                 enableReinitialize={true}
                 onSubmit={(values: ICreateAttendee) => {
@@ -119,7 +128,11 @@ const AddAttendeeForm: React.FC<IProps> = ({
                         values.lastName, 
                         values.email,
                         Guid.parse(values.conferenceId)); 
-                }} />
+                }}
+                showConferencePicker={conferenceId === undefined}
+                initialValues={{
+                    conferenceId: conferenceId,
+                }}/>
         </>
     );
 }
@@ -127,6 +140,7 @@ const AddAttendeeForm: React.FC<IProps> = ({
 const mapStateToProps = (store: IAppState) => {
     return {
         conferences: store.admin.conferences,
+        loading: store.admin.sendingAttendee,
     };
 };
 

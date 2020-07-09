@@ -3,15 +3,15 @@ import { ThunkAction, ThunkDispatch } from 'redux-thunk';
 import { neverReached, IOfflineAppState } from '.';
 import axios, { AxiosResponse } from 'axios';
 import { IAttendee, ICreateAttendeeCollisionAction, IUpdateAttendeeNotesAction, IUpdateAttendeeApprovalStateAction } from './attendee';
-import { IProfile, IUpdateProfileImageAction, IUpdatePreferredUiModeAction } from './profile';
+import { IProfile, IUpdateProfileImageAction, IUpdatePreferredUiModeAction, IConference } from './profile';
 import { ILogoutAction, ILoginThirdPartySuccessAction, IRegisterSuccessAction, ILoginSuccessAction } from './auth';
 import { OfflineAction } from '@redux-offline/redux-offline/lib/types';
 import { Guid } from 'guid-typescript';
-import { getCurrentTimeEpochMilliseconds } from '../util';
 import { IUpdateProfileAction } from './profile';
 import { IEvent } from './event';
 import { IAttendeeRedemption, INewRedemptionAction } from './redemption';
 import { IAdminData } from './admin';
+import { getCurrentTimeEpochMilliseconds } from '../epochConverter';
 
 // Store
 export interface ISyncState {
@@ -114,6 +114,7 @@ export const handleApiAction = async (
                             addAttendeeCoins: res.data.appSettings !== null ? res.data.appSettings.attendeeCollisionCoinsEarned : null,
                             appSettings: res.data.appSettings,
                             epochUpdateTimeMilliseconds: res.data.epochUpdateTimeMilliseconds,
+                            userConferences: res.data.conferences,
                         } as IReceivedDataSyncAction);
                     } catch (ex) {
                         debugger;
@@ -175,6 +176,8 @@ export const handleApiAction = async (
                     `${process.env.REACT_APP_API_ROOT_URL}collision/attendee/${action.meta.attendeeId.toString()}/update/status`,
                     {
                         newState: action.meta.newState,
+                        dateScannedEpochMilliseconds: action.meta.timeOfUpdateEpochMilliseconds,
+                        conferenceUpdatedAt: action.meta.conferenceIdUpdateMadeAt,
                     },
                     {
                         headers
@@ -185,6 +188,8 @@ export const handleApiAction = async (
                     `${process.env.REACT_APP_API_ROOT_URL}collision/attendee`,
                     {
                         toUserId: action.meta.attendeeId,
+                        dateScannedEpochMilliseconds: action.meta.timeOfConnectionEpochMilliseconds,
+                        conferenceIdScannedAt: action.meta.conferenceIdConnectionMadeAt,
                     },
                     {
                         headers
@@ -258,6 +263,7 @@ export interface IReceivedDataSyncAction extends Action<'ReceivedDataSync'> {
     balance: number | null;
     addAttendeeCoins: number | null;
     appSettings: AppSettings | null;
+    userConferences: IConference[];
     epochUpdateTimeMilliseconds: number;
 }
 
@@ -291,13 +297,10 @@ export const checkQueueActionCreator: ActionCreator<
                     const res: AxiosResponse<any> | undefined =
                         await handleApiAction(action, getState, dispatch);
 
-                    if (res !== undefined && res.status === 401) {
-                        // break immediately and logout
-                    }
                     if (res !== undefined && (res.status >= 200 && res.status < 300)) {
                         completedActions.push(action);
                     }
-                    if (res !== undefined && (res.status === 400)) {
+                    else if (res !== undefined && (res.status === 400)) {
                         // rollback somehow
                     }
                     else {

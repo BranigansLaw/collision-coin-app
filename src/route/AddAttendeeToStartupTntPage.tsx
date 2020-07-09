@@ -12,17 +12,18 @@ const styles = (theme: Theme) => createStyles({
 interface IProps extends WithStyles<typeof styles> {
 }
 
-const DashboardPage: React.FC<IProps> = ({
+const AddAttendeeToStartupTntPage: React.FC<IProps> = ({
     classes,
 }) => {
     return (
         <div className={classes.root}>
             <AddAttendee
-                title="Create Attendee"
-                showQrCodeButton={true}
+                title={`Welcome to Startup TNT! Sign up to use ${process.env.REACT_APP_APP_NAME} here and earn free beers just by connecting with other attendees!`}
+                showQrCodeButton={false}
+                conferenceId="BAACAEC3-A3CF-4A6E-3CCE-08D823ABDC87"
             />
         </div>
     );
 }
 
-export default withStyles(styles)(DashboardPage);
+export default withStyles(styles)(AddAttendeeToStartupTntPage);
