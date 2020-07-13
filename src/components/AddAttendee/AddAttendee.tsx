@@ -51,7 +51,7 @@ const AddAttendee: React.FC<IProps> = ({
         if (prevError !== undefined && prevError !== error && error) {
             return <Typography color="error">Woops! Looks like something happened creating your account! Please reload and try again.</Typography>
         }
-        else if (prevNewAttendeeQrCodeData !== undefined && prevNewAttendeeQrCodeData !== newAttendeeQrCodeData && !stringNullEmptyOrUndefined(newAttendeeQrCodeData)) {
+        else if (prevNewAttendeeQrCodeData === undefined && prevNewAttendeeQrCodeData !== newAttendeeQrCodeData && !stringNullEmptyOrUndefined(newAttendeeQrCodeData)) {
             return <Typography color="textPrimary">Success! Check your email to finish setting up your account.</Typography>
         }
         else {

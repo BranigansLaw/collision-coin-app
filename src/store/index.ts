@@ -75,7 +75,7 @@ const offlineAppConfig: Config = {
         }, 2000)
     },    
     persistOptions: { 
-        blacklist: [ 'form', 'router', 'serviceWorker' ],
+        blacklist: [ 'form', 'router', 'serviceWorker', 'admin' ],
     },
 };
 

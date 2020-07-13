@@ -3,6 +3,8 @@ import { Guid } from 'guid-typescript';
 import { wait } from '../util';
 import { IAppState } from '.';
 
+const MAX_TRIES: number = 3;
+
 export async function handleApiCall(
     url: string,
     getState: () => IAppState,
@@ -27,12 +29,13 @@ export async function handleApiCall(
 
     let res: AxiosResponse<any> | undefined;
     const transactionId: string = Guid.create().toString();
-    let errorOccurred: boolean = true;
+    let numTries: number = 0;
+    let errorResponseCode = 0;
 
     headers["TransactionId"] = transactionId;
 
-    while (errorOccurred) {
-        errorOccurred = false;
+    while ((errorResponseCode < 200 || errorResponseCode >= 500) && numTries < MAX_TRIES) {
+        numTries++;
         try {
             res = await axios.post(
                 url,
@@ -45,8 +48,14 @@ export async function handleApiCall(
             if (e.isAxiosError) {
                 res = e.response;
             }
-            errorOccurred = true;
             await wait(5000);
+        }
+
+        if (res !== undefined) {
+            errorResponseCode = res.status;
+        }
+        else {
+            errorResponseCode = 500;
         }
     }
 
