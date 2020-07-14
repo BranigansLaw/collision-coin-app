@@ -20,7 +20,7 @@ const AddAttendeeToStartupTntPage: React.FC<IProps> = ({
             <AddAttendee
                 title={`Welcome to Startup TNT! Sign up to use ${process.env.REACT_APP_APP_NAME} here and earn free beers just by connecting with other attendees!`}
                 showQrCodeButton={false}
-                conferenceId="BAACAEC3-A3CF-4A6E-3CCE-08D823ABDC87"
+                conferenceId={process.env.REACT_APP_STARTUP_TNT_CONFERENCE_ID}
             />
         </div>
     );

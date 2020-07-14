@@ -122,18 +122,18 @@ const tableOfContents = [
         ),
     },    
     {
-        index: 'ContactCollisionCoin',
+        index: 'ContactConferenceQuest',
         title: `Contact ${process.env.REACT_APP_APP_NAME} during the event`,
         content: (
             <>
                 <Typography>
-                    Reach us about questions: help@collision-coin.com
+                    Reach us about questions: <Link color="textSecondary" target="_blank" href="mailTo:help@conference-quest.com">help@conference-quest.com</Link>
                 </Typography>
                 <Typography>
-                    Book us for your event: sales@collision-coin.com
+                    Book us for your event: <Link color="textSecondary" target="_blank" href="mailTo:sales@conference-quest.com">sales@conference-quest.com</Link>
                 </Typography>
                 <Typography>
-                    Technical support: tech@collsion-coin.com
+                    Technical support: <Link color="textSecondary" target="_blank" href="mailTo:support@conference-quest.com">support@conference-quest.com</Link>
                 </Typography>
             </>
         ),
