@@ -89,7 +89,7 @@ const DataSyncSlideshow: React.FC<IProps> = ({
             <Button 
                 disabled={!firstSyncCompleted} 
                 onClick={() => push(RootUrls.dashboard())}>
-                    {firstSyncCompleted ? 'Contine' : 'Loading your profile ...'}
+                    {firstSyncCompleted ? 'Continue' : 'Loading your profile ...'}
             </Button>
         </Grid>
     );
