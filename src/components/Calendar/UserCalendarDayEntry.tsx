@@ -43,7 +43,7 @@ const UserCalendarDayEntry: React.FC<IProps> = ({
 
     return (
         <Box className={classes.root}>
-            <Typography>{weekdayNames[date.getDay()]}, {monthNames[date.getMonth()]} {date.getDate() + 1}</Typography>
+            <Typography>{weekdayNames[date.getDay()]}, {monthNames[date.getMonth()]} {date.getDate()}</Typography>
             {range(minHour, maxHour, 1).map((hour: number) =>
                 <UserCalendarHourEntry
                     key={hour}
