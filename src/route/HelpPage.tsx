@@ -54,7 +54,7 @@ const tableOfContents = [
                 </Typography>
                 <ol>
                     <li>
-                        <Typography>If you are on-ine you will see their complete contact card with all information they have shared. You can enter notes about the person or select the Edit icon (pencil) to edit the contact information.</Typography>
+                        <Typography>If you are online you will see their complete contact card with all information they have shared. You can enter notes about the person or select the Edit icon (pencil) to edit the contact information.</Typography>
                     </li>
                     <li>
                         <Typography>If you are off-line you will see a popup mini card with the persons name and company and a place for you to make notes. When you save the information you will get a message telling you that the information and the users complete contact card will be available when you have an internet connection. Your notes and connection will be stored locally until such time.</Typography>
@@ -102,9 +102,6 @@ const tableOfContents = [
                 </Typography>
                 <Typography>
                     Select any of your contact cards to view their information.
-                </Typography>
-                <Typography>
-                    Select the edit icon at the bottom of any of the contact cards to edit the information.
                 </Typography>
                 <Typography>
                     Information you edit about yourself becomes live on the system and will update in all your contacts address books.
