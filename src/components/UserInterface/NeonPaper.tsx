@@ -90,10 +90,22 @@ const styles = (theme: Theme) => createStyles({
             color: 'rgb(121, 125, 0)',
         },
     },
+    blue: {
+        borderColor: 'rgb(0, 154, 242)',
+        '& .MuiFab-root': {
+            color: 'rgb(0, 154, 242)',
+        },
+        '& .light-neon-text': {
+            color: 'rgb(0, 154, 242)',
+        },
+        '& .dark-neon-text': {
+            color: 'rgb(0, 77, 121)',
+        },        
+    }
 });
 
 interface IProps extends WithStyles<typeof styles> {
-    color: ('green' | 'orange' | 'yellow');
+    color: ('green' | 'orange' | 'yellow' | 'blue');
     density: ('normal' | 'dense');
     headerButtons?: JSX.Element[];
     hasExpander?: boolean;
@@ -136,7 +148,7 @@ const NeonPaper: React.FC<IProps & PaperProps> = ({
         }
     }
 
-    const getColorClass = () => {
+    const colorClass = React.useMemo(() => {
         switch (color) {
             case "green":
                 return classes.green;
@@ -144,8 +156,10 @@ const NeonPaper: React.FC<IProps & PaperProps> = ({
                 return classes.orange;
             case "yellow":
                 return classes.yellow;
-            }
-    }
+            case "blue":
+                return classes.blue;
+        }
+    }, [color, classes]);
 
     const expand = () => {
         if (onExpandContractClick !== undefined) {
@@ -170,7 +184,7 @@ const NeonPaper: React.FC<IProps & PaperProps> = ({
     return (
         <Paper
             variant="outlined"
-            className={`${className} ${classes.root} ${hasExpander ? 'hasExpander' : ''} ${expandedFinal ? 'expanded' : ''} ${getDensityClass()} ${getColorClass()}`} 
+            className={`${className} ${classes.root} ${hasExpander ? 'hasExpander' : ''} ${expandedFinal ? 'expanded' : ''} ${getDensityClass()} ${colorClass}`} 
             style={expandedFinal ? expandedStyle : {}}
             {...rest}>
                 <Box className={classes.buttons}>

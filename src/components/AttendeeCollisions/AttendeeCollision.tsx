@@ -110,7 +110,7 @@ const AttendeeCollision: React.FC<IProps> = ({
 
     return (
         <NeonPaper
-            color="yellow"
+            color="blue"
             density="normal"
             className={classes.root}
             hasExpander={true}

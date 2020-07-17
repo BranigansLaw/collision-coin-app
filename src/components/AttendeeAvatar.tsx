@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import { IAppState } from '../store';
 import { Avatar } from '@material-ui/core';
 import { IAttendeeBaseFields } from '../store/attendee';
-import CoinLogo from '../assets/svg/CoinLogo';
+import NewLogoIcon from '../assets/svg/NewLogoIcon';
 
 const styles = (theme: Theme) => createStyles({
     avatar: {
@@ -54,7 +54,7 @@ const AttendeeAvatar: React.FC<IProps> = ({
     const alt: string = attendee !== null ? `Profile image for ${attendee.firstName[0]} ${attendee.lastName[0]}` : `${process.env.REACT_APP_APP_NAME}`;
     const children: JSX.Element = attendee !== null ? 
         <>{attendee.firstName[0]}{attendee.lastName[0]}</> : 
-        <CoinLogo />;
+        <NewLogoIcon useSetColors={true} />;
 
     return <Avatar
         className={`${classes.avatar} ${sizeClass}`}
