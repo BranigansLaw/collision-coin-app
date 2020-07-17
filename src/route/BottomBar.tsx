@@ -5,7 +5,7 @@ import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
 import { IAppState } from '../store';
-import { Toolbar, Fab } from '@material-ui/core';
+import { Toolbar, Fab, Badge } from '@material-ui/core';
 import { RootUrls } from '.';
 import { IProfile } from '../store/profile';
 import CalendarTodayIcon from '@material-ui/icons/CalendarToday';
@@ -15,6 +15,7 @@ import { push } from 'connected-react-router';
 import AppBarWithHidden from '../components/UserInterface/AppBarWithHidden';
 import QrCodeIcon from '../assets/svg/QrCodeIcon';
 import FlexGrow from '../components/UserInterface/FlewGrow';
+import { IAttendee } from '../store/attendee';
 
 export const scanButtonSize: number = 9;
 export const barPadding: number = 3;
@@ -36,6 +37,12 @@ const styles = (theme: Theme) => createStyles({
             fontSize: theme.spacing(scanButtonSize - 5),
         },
     },
+    pendingNotificationsBadge: {
+        "& .MuiBadge-badge": {
+            backgroundColor: 'rgb(0, 154, 242)',
+            fontWeight: 900,
+        }
+    },
     footer: {
         padding: theme.spacing(2),
         textAlign: 'center',
@@ -44,6 +51,8 @@ const styles = (theme: Theme) => createStyles({
 
 interface IProps extends WithStyles<typeof styles> {
     profile: IProfile | null;
+    collisions: IAttendee[];
+
     location: string;
     push: (url: string) => void;
 }
@@ -52,17 +61,24 @@ const BottomBar: React.FC<IProps> = ({
     classes,
     profile,
     location,
+    collisions,
     push,
 }) => {
+    const numNewConnections = React.useMemo(() =>
+        collisions.filter(c => c.approvalState === 'New').length,
+    [collisions]);
+
     if (profile !== null) {
         return (
             <>
                 <div className={classes.navbarOffset} hidden={location === RootUrls.firstDataSync()} />
                 <AppBarWithHidden position="fixed" className={classes.root} hidden={location === RootUrls.firstDataSync()}>
                     <Toolbar>
-                        <ButtonWithText color="secondary" aria-label="contacts list" text="Contacts" onClick={() => push(RootUrls.attendeeCollisions())}>
-                            <PeopleIcon />
-                        </ButtonWithText>
+                        <Badge badgeContent={numNewConnections} className={classes.pendingNotificationsBadge}>
+                            <ButtonWithText color="secondary" aria-label="contacts list" text="Contacts" onClick={() => push(RootUrls.attendeeCollisions())}>
+                                <PeopleIcon />
+                            </ButtonWithText>
+                        </Badge>
                         <FlexGrow />
                         <Fab color="primary" aria-label="scan" className={classes.scanButton} onClick={() => push(RootUrls.qrCodeScan())}>
                             <QrCodeIcon />
@@ -88,6 +104,7 @@ const mapStateToProps = (store: IAppState) => {
     return {
         profile: store.profile.userProfile,
         location: store.router.location.pathname,
+        collisions: store.attendeesState.collisions,
     };
 };
 

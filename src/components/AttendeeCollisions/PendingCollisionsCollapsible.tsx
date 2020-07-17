@@ -17,6 +17,9 @@ export const CollisionCoinId: string = Guid.EMPTY.toString();
 const styles = (theme: Theme) => createStyles({
     root: {
     },
+    pendingCollisionsHeader: {
+        color: 'rgb(0, 154, 242)',
+    },
 });
 
 interface IProps extends WithStyles<typeof styles> {
@@ -42,7 +45,7 @@ const PendingCollisionsCollapsible: React.FC<IProps> = ({
     return <>
             {sortedPendingCollisions.length > 0 ?
                 <>
-                    <ListItem button onClick={() => setPendingApprovalOpen(!pendingApprovalOpen)}>
+                    <ListItem className={`${state === 'New' ? classes.pendingCollisionsHeader : ''}`} button onClick={() => setPendingApprovalOpen(!pendingApprovalOpen)}>
                         <ListItemText primary={`${stateString} Connections (${sortedPendingCollisions.length})`} />
                         {pendingApprovalOpen ? <ExpandLess /> : <ExpandMore />}
                     </ListItem>

@@ -53,6 +53,11 @@ export const darkTheme = createMuiTheme({
                 width: '100%',
             },
         },
+        MuiBadge: {
+            badge: {
+                color: 'rgb(28, 28, 28)',
+            }
+        }
     }
 });
 
@@ -96,5 +101,10 @@ export const lightTheme = createMuiTheme({
                 width: '100%',
             },
         },
+        MuiBadge: {
+            badge: {
+                color: 'rgb(242, 242, 242)',
+            }
+        }
     }
 });
