@@ -10,7 +10,7 @@ import { walletBarHeight } from '.';
 import { muiPaperOutlinedOverride } from '../theme';
 import RunningCounter from '../components/RunningCounter';
 import NeonPaper, { NeonPaperTypography } from '../components/UserInterface/NeonPaper';
-import CoinLogo from '../assets/svg/CoinLogo';
+import NewLogoIcon from '../assets/svg/NewLogoIcon';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -30,7 +30,7 @@ const Walletbar: React.FC<IProps> = ({
         <NeonPaper color="orange" density="normal">
             <Grid container justify="center" alignItems="center" className={classes.root}>
                 <Grid container direction="row" justify="center" alignItems="flex-end">
-                    <NeonPaperTypography shade="light"><CoinLogo fontSize="large" /></NeonPaperTypography>
+                    <NeonPaperTypography shade="light"><NewLogoIcon fontSize="large" useSetColors={true} /></NeonPaperTypography>
                     <Typography variant="h3"><RunningCounter val={balance} /></Typography>
                     <Typography variant="subtitle1">Coins</Typography>
                 </Grid>
