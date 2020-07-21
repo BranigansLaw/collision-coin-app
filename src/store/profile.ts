@@ -4,7 +4,7 @@ import { neverReached, IAppState } from '.';
 import { IReceivedDataSyncAction, IClearSyncStateAction } from './sync';
 import { ILogoutAction } from './auth';
 import { IAttendeeBaseFields, IAttendee } from './attendee';
-import { validNonEmptyString, mergeLists } from '../util';
+import { mergeLists } from '../util';
 import { handleApiCall } from './apiTransactionHandler';
 
 // Store
@@ -28,10 +28,7 @@ export interface IProfileState {
 
 // TODO: Replace this method with a lookup from the database
 export const profileIsValid = (profile: IAttendeeBaseFields | null): boolean => {
-    return profile !== null &&
-        validNonEmptyString(profile.companyName) &&
-        validNonEmptyString(profile.position) &&
-        validNonEmptyString(profile.description);
+    return profile !== null;
 }
 
 export function isProfile(toTest: IAttendee | IProfile): boolean {

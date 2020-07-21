@@ -8,7 +8,6 @@ import { AnyAction } from 'redux';
 import { IAppState } from '../../store';
 import { updateProfileActionCreator, IProfile, IUpdateProfileFields } from '../../store/profile';
 import { nullStringToEmpty } from '../../util';
-import { required } from '../Form/formValidators';
 
 interface IFormProps {
     loading: boolean;
@@ -31,7 +30,6 @@ const FormComponent: React.FC<InjectedFormProps<IUpdateProfileFields, IFormProps
                 label="Company Name"
                 disabled={submitting || loading}
                 margin="normal"
-                validate={[required]}
             />
             <Field
                 name="position"
@@ -40,7 +38,6 @@ const FormComponent: React.FC<InjectedFormProps<IUpdateProfileFields, IFormProps
                 label="Position"
                 disabled={submitting || loading}
                 margin="normal"
-                validate={[required]}
             />
             <Field
                 name="description"
@@ -49,7 +46,6 @@ const FormComponent: React.FC<InjectedFormProps<IUpdateProfileFields, IFormProps
                 label="Tell us about yourself"
                 disabled={submitting || loading}
                 margin="normal"
-                validate={[required]}
                 multiline
             />
             <Field
