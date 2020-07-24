@@ -115,6 +115,7 @@ const AttendeeCollision: React.FC<IProps> = ({
             className={classes.root}
             hasExpander={true}
             expanded={expanded}
+            stickyButtons={true}
             onExpandContractClick={() => toggleExpanded()}
             headerButtons={headerButtons}
         >

@@ -14,6 +14,7 @@ const darkNeonPaperTextClassName: string = 'dark-neon-text';
 
 const styles = (theme: Theme) => createStyles({
     root: {
+        position: 'relative',
         padding: 16,
         borderRadius: 20,
         borderWidth: 1,
@@ -50,9 +51,17 @@ const styles = (theme: Theme) => createStyles({
     },
     buttons: {
         float: 'right',
+        zIndex: 1000,
         '& > .MuiFab-root': {
             marginLeft: theme.spacing(0.5),
         },
+        '&.sticky': {
+            position: 'sticky',
+            top: 0,
+            '&': {
+                position: '-webkit-sticky', // Safari
+            }
+        }
     },
     green: {
         borderColor: 'rgb(0, 255, 0)',
@@ -110,6 +119,7 @@ interface IProps extends WithStyles<typeof styles> {
     headerButtons?: JSX.Element[];
     hasExpander?: boolean;
     expanded?: boolean;
+    stickyButtons?: boolean;
     onExpandContractClick?: () => void;
 }
 
@@ -123,6 +133,7 @@ const NeonPaper: React.FC<IProps & PaperProps> = ({
     headerButtons,
     hasExpander,
     expanded,
+    stickyButtons,
     onExpandContractClick,
     ...rest
 }) => {
@@ -187,7 +198,7 @@ const NeonPaper: React.FC<IProps & PaperProps> = ({
             className={`${className} ${classes.root} ${hasExpander ? 'hasExpander' : ''} ${expandedFinal ? 'expanded' : ''} ${getDensityClass()} ${colorClass}`} 
             style={expandedFinal ? expandedStyle : {}}
             {...rest}>
-                <Box className={classes.buttons}>
+                <Box className={`${classes.buttons} ${stickyButtons === true ? "sticky" : ""}`}>
                     {headerButtons !== undefined ? headerButtons : ''}
                     <FabWithHidden size="small" onClick={() => expand()} hidden={!hasExpander || expandedFinal}>
                         <ExpandMoreIcon fontSize="small" />
