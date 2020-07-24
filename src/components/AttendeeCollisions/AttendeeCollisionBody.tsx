@@ -37,7 +37,7 @@ const AttendeeCollisionBody: React.FC<IProps> = ({
     const [activeTimeout, setActiveTimeout] = React.useState<NodeJS.Timeout | undefined>(undefined);
 
     React.useEffect(() => {
-        if (activeTimeout !== undefined) {
+        if (activeTimeout === undefined) {
             if ('userNotes' in toDisplay) {
                 if (stringNullEmptyOrUndefined(toDisplay.userNotes)) {
                     setNotesValue("");
@@ -53,12 +53,12 @@ const AttendeeCollisionBody: React.FC<IProps> = ({
     }, [toDisplay, activeTimeout]);
 
     const onChange = React.useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setNotesValue(e.target.value);
+        const newNotesValue = e.target.value;
+        setNotesValue(newNotesValue);
         if (activeTimeout !== undefined) {
             clearTimeout(activeTimeout);
         }
 
-        const newNotesValue = e.target.value;
         setActiveTimeout(setTimeout(() => {
             updateAttendeeCollisionNotes(toDisplay.id.toString(), newNotesValue);
             setActiveTimeout(undefined);
