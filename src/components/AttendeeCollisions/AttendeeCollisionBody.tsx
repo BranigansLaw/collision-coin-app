@@ -34,20 +34,36 @@ const AttendeeCollisionBody: React.FC<IProps> = ({
     updateAttendeeCollisionNotes,
 }) => {
     const [notesValue, setNotesValue] = React.useState<string>("");
+    const [activeTimeout, setActiveTimeout] = React.useState<NodeJS.Timeout | undefined>(undefined);
 
     React.useEffect(() => {
-        if ('userNotes' in toDisplay) {
-            if (stringNullEmptyOrUndefined(toDisplay.userNotes)) {
-                setNotesValue("");
+        if (activeTimeout !== undefined) {
+            if ('userNotes' in toDisplay) {
+                if (stringNullEmptyOrUndefined(toDisplay.userNotes)) {
+                    setNotesValue("");
+                }
+                else {
+                    setNotesValue(toDisplay.userNotes);
+                }
             }
             else {
-                setNotesValue(toDisplay.userNotes);
+                setNotesValue("");
             }
         }
-        else {
-            setNotesValue("");
-        }
     }, [toDisplay]);
+
+    const onChange = React.useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setNotesValue(e.target.value);
+        if (activeTimeout !== undefined) {
+            clearTimeout(activeTimeout);
+        }
+
+        const newNotesValue = e.target.value;
+        setActiveTimeout(setTimeout(() => {
+            updateAttendeeCollisionNotes(toDisplay.id.toString(), newNotesValue);
+            setActiveTimeout(undefined);
+        }, 2000));
+    }, [updateAttendeeCollisionNotes, activeTimeout, setActiveTimeout, setNotesValue]);
     
     const isProfileRes: boolean = isProfile(toDisplay);
 
@@ -77,7 +93,7 @@ const AttendeeCollisionBody: React.FC<IProps> = ({
                         label="Notes"
                         multiline
                         value={notesValue}
-                        onChange={e => updateAttendeeCollisionNotes(toDisplay.id.toString(), e.target.value)}
+                        onChange={onChange}
                     /> : <></>}
             </Box>
             <Box hidden={!editing || !isProfileRes}>
