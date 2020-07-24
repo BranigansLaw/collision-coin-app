@@ -57,7 +57,7 @@ export const darkTheme = createMuiTheme({
             badge: {
                 color: 'rgb(28, 28, 28)',
             }
-        }
+        },
     }
 });
 
@@ -105,6 +105,13 @@ export const lightTheme = createMuiTheme({
             badge: {
                 color: 'rgb(242, 242, 242)',
             }
-        }
+        },
+        MuiSvgIcon: {
+            root: {
+                '&.set-colors #glass': {
+                    color: '#333333 !important',
+                },
+            },
+        },
     }
 });
