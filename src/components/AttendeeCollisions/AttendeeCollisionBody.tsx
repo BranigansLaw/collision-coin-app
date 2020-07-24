@@ -50,7 +50,7 @@ const AttendeeCollisionBody: React.FC<IProps> = ({
                 setNotesValue("");
             }
         }
-    }, [toDisplay]);
+    }, [toDisplay, activeTimeout]);
 
     const onChange = React.useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setNotesValue(e.target.value);
@@ -63,7 +63,7 @@ const AttendeeCollisionBody: React.FC<IProps> = ({
             updateAttendeeCollisionNotes(toDisplay.id.toString(), newNotesValue);
             setActiveTimeout(undefined);
         }, 2000));
-    }, [updateAttendeeCollisionNotes, activeTimeout, setActiveTimeout, setNotesValue]);
+    }, [updateAttendeeCollisionNotes, activeTimeout, setActiveTimeout, setNotesValue, toDisplay.id]);
     
     const isProfileRes: boolean = isProfile(toDisplay);
 
