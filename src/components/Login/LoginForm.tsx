@@ -18,6 +18,7 @@ interface ILoginForm {
 
 interface IFormProps {
     loading: boolean;
+    preventSubmit: boolean;
     isRegister: boolean;
     online: boolean;
     errorMessage: string | undefined;
@@ -28,6 +29,7 @@ const FormComponent: React.FC<InjectedFormProps<ILoginForm, IFormProps> & IFormP
     pristine,
     submitting,
     loading,
+    preventSubmit,
     isRegister,
     online,
     errorMessage,
@@ -66,7 +68,7 @@ const FormComponent: React.FC<InjectedFormProps<ILoginForm, IFormProps> & IFormP
                     color="primary" 
                     aria-label={isRegister ? 'Register' : 'Login'} 
                     type="submit"
-                    disabled={pristine || submitting || !online}
+                    disabled={pristine || submitting || !online || preventSubmit}
                     loading={loading}
                 >
                     {isRegister ? 'Register' : 'Login'}
@@ -83,6 +85,7 @@ const ConnectedFormComponent =  reduxForm<ILoginForm, IFormProps>({
 
 interface IProps {
     loading: boolean;
+    disabled: boolean;
     logoutReason: LogoutReason | undefined;
     online: boolean;
     errorMessage: string | undefined;
@@ -95,6 +98,7 @@ interface IProps {
 
 const LoginForm: React.FC<IProps> = ({
     loading,
+    disabled,
     logoutReason,
     online,
     errorMessage,
@@ -114,6 +118,7 @@ const LoginForm: React.FC<IProps> = ({
         <ConnectedFormComponent 
             online={online}
             loading={loading} 
+            preventSubmit={disabled}
             errorMessage={errorMessage}
             isRegister={registrationCode !== undefined}
             initialValues={{
@@ -137,9 +142,10 @@ const LoginForm: React.FC<IProps> = ({
 
 const mapStateToProps = (store: IOfflineAppState) => {
     return {
-        loading: store.authState.loading.googleAuth || 
+        disabled: store.authState.loading.googleAuth || 
             store.authState.loading.linkedinAuth || 
             store.authState.loading.normalAuth,
+        loading: store.authState.loading.normalAuth,
         errorMessage: store.authState.loginFailed.normalAuth,
         logoutReason: store.authState.logoutReason,
         online: store.offline.online,

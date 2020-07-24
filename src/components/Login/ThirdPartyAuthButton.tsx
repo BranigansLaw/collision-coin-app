@@ -4,7 +4,8 @@ import { IOfflineAppState } from '../../store';
 import { ThirdParty, thirdPartyLoginActionCreator } from '../../store/auth';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
-import { Button, Typography, WithStyles, createStyles, withStyles, Theme } from '@material-ui/core';
+import { Typography, WithStyles, createStyles, withStyles, Theme } from '@material-ui/core';
+import LoadingButton from '../UserInterface/LoadingButton';
 
 const styles = (theme: Theme) => createStyles({
     errorMessage: {
@@ -16,6 +17,7 @@ interface IProps extends WithStyles<typeof styles> {
     authType: ThirdParty;
     userId: string | undefined;
     registrationCode: string | undefined;
+    normalLoading: boolean;
     googleLoading: boolean;
     linkedInLoading: boolean;
     online: boolean;
@@ -28,6 +30,7 @@ const ThirdPartyAuthButton: React.FC<IProps> = ({
     authType,
     userId,
     registrationCode,
+    normalLoading,
     googleLoading,
     linkedInLoading,
     thirdPartyLogin,
@@ -36,17 +39,22 @@ const ThirdPartyAuthButton: React.FC<IProps> = ({
     linkedInError,
     classes,
 }) => {
-    const login = async () => {
+    const login = React.useCallback(async () => {
         const redirectTo: string | undefined = await thirdPartyLogin(authType, userId, registrationCode);
 
         if (redirectTo !== undefined) {
             window.location.assign(redirectTo);
         }
-    }
+    }, [authType, userId, registrationCode, thirdPartyLogin]);
 
-    const isLoading = 
-        (authType === ThirdParty.Google && googleLoading) ||
-        (authType === ThirdParty.LinkedIn && linkedInLoading);
+    const isLoading = React.useMemo(() => {
+        return (authType === ThirdParty.Google && googleLoading) ||
+            (authType === ThirdParty.LinkedIn && linkedInLoading);
+    }, [authType, googleLoading, linkedInLoading]);
+
+    const otherAuthLoading = React.useMemo(() => {
+        return normalLoading || googleLoading || linkedInLoading;
+    }, [normalLoading, googleLoading, linkedInLoading])
 
     const errorMessage: string | undefined = 
         (authType === ThirdParty.Google && googleError !== undefined) ? googleError :
@@ -54,17 +62,25 @@ const ThirdPartyAuthButton: React.FC<IProps> = ({
 
     return (
         <>
-            <Button
-                disabled={!online}
-                onClick={login}>
-                {userId === undefined ? 'Login' : 'Register'} with {authType} {isLoading ? 'Loading ...' : ''}
-            </Button>
+            <LoadingButton
+                    size="large"
+                    variant="contained"
+                    color="primary" 
+                    aria-label={userId !== undefined ? 'Register' : 'Login'} 
+                    type="submit"
+                    disabled={!online || otherAuthLoading}
+                    loading={isLoading}
+                    onClick={login}
+                >
+                    {userId !== undefined ? 'Register' : 'Login'} with {authType}
+            </LoadingButton>
             <Typography hidden={errorMessage !== undefined} className={classes.errorMessage}>{errorMessage}</Typography>
         </>);
 }
 
 const mapStateToProps = (store: IOfflineAppState) => {
     return {
+        normalLoading: store.authState.loading.normalAuth,
         googleLoading: store.authState.loading.googleAuth,
         linkedInLoading: store.authState.loading.linkedinAuth,
         googleError: store.authState.loginFailed.googleAuth,
