@@ -4,7 +4,7 @@ import { Theme } from '@material-ui/core/styles/createMuiTheme';
 import { ThunkDispatch } from 'redux-thunk';
 import { AnyAction } from 'redux';
 import { connect } from 'react-redux';
-import { IAppState } from '../store';
+import { IAppState, appInsightsObj } from '../store';
 import { Toolbar, Fab, Badge } from '@material-ui/core';
 import { RootUrls } from '.';
 import { IProfile } from '../store/profile';
@@ -68,6 +68,11 @@ const BottomBar: React.FC<IProps> = ({
         collisions.filter(c => c.approvalState === 'New').length,
     [collisions]);
 
+    const clickQrScan = React.useCallback(() => {
+        appInsightsObj.trackEvent({ name: 'Click QR Code Scan', properties: { data: { field: "value" } } });
+        push(RootUrls.qrCodeScan());
+    }, [push]);
+
     if (profile !== null) {
         return (
             <>
@@ -80,7 +85,7 @@ const BottomBar: React.FC<IProps> = ({
                             </ButtonWithText>
                         </Badge>
                         <FlexGrow />
-                        <Fab color="primary" aria-label="scan" className={classes.scanButton} onClick={() => push(RootUrls.qrCodeScan())}>
+                        <Fab color="primary" aria-label="scan" className={classes.scanButton} onClick={() => clickQrScan()}>
                             <QrCodeIcon />
                         </Fab>
                         <FlexGrow />

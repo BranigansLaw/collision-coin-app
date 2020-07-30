@@ -16,6 +16,8 @@ import { AppState as OfflineAppState, Config, NetworkCallback } from '@redux-off
 import { ICalendarState, calendarReducer } from './event';
 import { IAttendeeRedemptionState, attendeeRedemptionReducer } from './redemption';
 import { IAdminState, adminReducer } from './admin';
+import { ApplicationInsights } from '@microsoft/applicationinsights-web'
+import { ReactPlugin, withAITracking } from '@microsoft/applicationinsights-react-js'
 
 // state
 export interface IAppState {
@@ -41,6 +43,21 @@ export type IOfflineAppState =
 export const neverReached = (never: never) => {};
 
 export const history = createBrowserHistory();
+
+const reactPlugin = new ReactPlugin();
+const ai = new ApplicationInsights({
+    config: {
+        instrumentationKey: process.env.REACT_APP_APPINSIGHTS_KEY,
+        extensions: [reactPlugin],
+        extensionConfig: {
+            [reactPlugin.identifier]: { history: history }
+        }
+    }
+});
+ai.loadAppInsights();
+
+export const withAppInsights = (Component: React.ComponentType) => withAITracking(reactPlugin, Component);
+export const appInsightsObj = ai.appInsights;
 
 const rootReducer = ((history: History) => combineReducers<IAppState>({
     form: reduxFormReducer,

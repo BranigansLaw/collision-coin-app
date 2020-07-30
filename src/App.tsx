@@ -1,12 +1,11 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { configureStore, IAppState } from './store/';
+import { configureStore, IAppState, withAppInsights } from './store/';
 import { Store, AnyAction } from 'redux';
 import { checkQueueActionCreator } from './store/sync';
 import { ThunkDispatch } from 'redux-thunk';
 import { updateAvailableActionCreator } from './store/serviceWorker';
 import ThemeWrapper from './ThemeWrapper';
-import withAppInsights from './appInsights';
 
 const store: Store<IAppState, AnyAction> = configureStore();
 
