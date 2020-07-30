@@ -16,8 +16,8 @@ import { AppState as OfflineAppState, Config, NetworkCallback } from '@redux-off
 import { ICalendarState, calendarReducer } from './event';
 import { IAttendeeRedemptionState, attendeeRedemptionReducer } from './redemption';
 import { IAdminState, adminReducer } from './admin';
-import { ApplicationInsights } from '@microsoft/applicationinsights-web'
-import { ReactPlugin, withAITracking } from '@microsoft/applicationinsights-react-js'
+import { ApplicationInsights } from '@microsoft/applicationinsights-web';
+import { ReactPlugin, withAITracking } from '@microsoft/applicationinsights-react-js';
 
 // state
 export interface IAppState {

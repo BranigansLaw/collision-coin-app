@@ -2,6 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App, { onServiceWorkerUpdateAvailable } from './App';
 import * as serviceWorker from './serviceWorker';
+import * as Sentry from '@sentry/browser';
+import { Integrations as ApmIntegrations } from '@sentry/apm';
 
 require('dotenv').config();
 
@@ -58,5 +60,14 @@ const checkForUpdates = () => {
 
 setInterval(() => checkForUpdates(), 30000);
 checkForUpdates();
+
+Sentry.init({
+    dsn: "https://8c7645c087144221b749122e5dfef465@o427501.ingest.sentry.io/5371621",
+    release: 'conference-quest-app@1.0',
+    integrations: [
+        new ApmIntegrations.Tracing(),
+    ],
+    tracesSampleRate: 0.1, // Be sure to lower this in production
+});
 
 ReactDOM.render(<App />, document.getElementById('root'));
