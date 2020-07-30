@@ -6,6 +6,7 @@ import { checkQueueActionCreator } from './store/sync';
 import { ThunkDispatch } from 'redux-thunk';
 import { updateAvailableActionCreator } from './store/serviceWorker';
 import ThemeWrapper from './ThemeWrapper';
+import withAppInsights from './appInsights';
 
 const store: Store<IAppState, AnyAction> = configureStore();
 
@@ -24,4 +25,4 @@ const App: React.FC = () => {
     );
 }
 
-export default App;
+export default withAppInsights(App);
